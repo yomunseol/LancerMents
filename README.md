@@ -23,11 +23,9 @@ Most project management tools are bloated, cluttered, and require constant manua
 
 | Plan | Price | Best For | What You Get |
 | :--- | :--- | :--- | :--- |
-| **The Engine Room** | $9/mo | Solo creators | 1 Workspace, Daily Task Grid, Calendar |
-| **The Pipeline** | $19/mo | Growing freelancers | 2 Workspaces, Client CRM, Secure Links, Invoicing |
-| **The Studio** | $49/mo | Agencies & teams | Up to 5 Workspaces, Custom Branding, Multi-Workspace Switcher |
-
-> Need more than 5 workspaces? Contact us for a custom Enterprise plan. No hidden fees, no surprises.
+| **Basic** | $9/mo | Solo creators | 1 Workspace, Daily Task Grid, Calendar |
+| **Plus** | $19/mo | Growing freelancers | 2 Workspaces, Client CRM, Secure Links, Invoicing |
+| **Pro** | $49/mo | Agencies & teams | Up to 5 Workspaces, Custom Branding, Multi-Workspace Switcher |
 
 ---
 
@@ -52,4 +50,4 @@ Visit our website to create your account and choose the plan that fits your busi
 ## License & Credits
 This project is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
-2026 Yomunseol | [caremunicate.online](https://caremunicate.online)
+2026 Yomunseol | [lancerments.vercel.app](https://lancerments.vercel.app)
