@@ -23,9 +23,9 @@ Most project management tools are bloated, cluttered, and require constant manua
 
 | Plan | Price | Best For | What You Get |
 | :--- | :--- | :--- | :--- |
-| **Basic** | $9/mo | Solo creators | 1 Workspace, Daily Task Grid, Calendar |
-| **Plus** | $19/mo | Growing freelancers | 2 Workspaces, Client CRM, Secure Links, Invoicing |
-| **Pro** | $49/mo | Agencies & teams | Up to 5 Workspaces, Custom Branding, Multi-Workspace Switcher |
+| **The Engine Room** | $9/mo | Solo creators | 1 Workspace, Daily Task Grid, Calendar |
+| **The Pipeline** | $19/mo | Growing freelancers | 2 Workspaces, Client CRM, Secure Links, Invoicing |
+| **The studio** | $49/mo | Agencies & teams | Up to 5 Workspaces, Custom Branding, Multi-Workspace Switcher |
 
 ---
 
