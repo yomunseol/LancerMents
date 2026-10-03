@@ -1,29 +1,31 @@
+import ThemeToggle from "./components/ThemeToggle";
+
 const engineRoomFeatures = [
-  "Unlimited daily task boards",
-  "One tactical workspace",
-  "Speed-first, accessible UI",
+  "1 Workspace",
+  "Grid Task List (3 daily tasks)",
+  "Async Calendar",
 ];
 
 const pipelineFeatures = [
-  "Everything in The Engine Room",
-  "CRM pipeline & deals",
-  "Unlimited workspaces",
-  "Priority support",
+  "2 Workspaces",
+  "CRM Kanban",
+  "Secure Client Links (max 5)",
+  "Direct Invoice Output",
 ];
 
 const studioFeatures = [
-  "Everything in The Pipeline",
-  "Team seats & roles",
-  "Advanced automation",
-  "Custom integrations",
+  "Up to 5 Workspaces",
+  "White-Label Customization",
+  "Multi-Workspace Switcher",
+  "Secure Client Links (max 15)",
 ];
 
 function FeatureList({ items }: { items: string[] }) {
   return (
-    <ul className="mt-6 flex flex-col gap-3 text-sm" style={{ color: "#F8F4F7" }}>
+    <ul className="mb-8 mt-6 flex flex-col gap-3 text-sm">
       {items.map((item) => (
         <li key={item} className="flex items-start gap-2">
-          <span aria-hidden="true" style={{ color: "#D8A8D3" }}>
+          <span aria-hidden="true" className="text-[#85587D] dark:text-[#D8A8D3]">
             •
           </span>
           <span>{item}</span>
@@ -35,164 +37,172 @@ function FeatureList({ items }: { items: string[] }) {
 
 export default function Home() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#151115" }}>
-      <section className="mx-auto flex max-w-4xl flex-col items-center px-6 py-20 text-center">
-        <span
-          className="rounded-full border px-4 py-1 text-xs font-semibold tracking-[0.2em]"
-          style={{ color: "#D8A8D3", borderColor: "#4A2E46" }}
-        >
-          THE AUTOPILOT WORKSPACE
-        </span>
+    <div className="min-h-screen bg-[#F8F4F7] text-[#151115] transition-colors duration-300 dark:bg-[#151115] dark:text-[#F8F4F7]">
+      <header className="sticky top-0 z-50 border-b border-[#E2D8E0] bg-white dark:border-[#4A2E46] dark:bg-[#151115]">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
+          <div className="flex items-center gap-2">
+            <img
+              src="/LancerMents-Light.png"
+              alt="LancerMents"
+              className="h-8 w-auto dark:hidden"
+            />
+            <img
+              src="/LancerMents-Dark.png"
+              alt=""
+              aria-hidden="true"
+              className="hidden h-8 w-auto dark:block"
+            />
+            <span className="text-lg font-bold text-[#151115] dark:text-[#F8F4F7]">
+              LancerMents
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <button
+              type="button"
+              className="rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white dark:bg-[#D8A8D3] dark:text-[#151115]"
+            >
+              Join Waitlist
+            </button>
+          </div>
+        </nav>
+      </header>
 
-        <h1
-          className="mt-8 text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl"
-          style={{ WebkitTextStroke: "1px #85587D" }}
-        >
-          <span style={{ color: "#F8F4F7" }}>Stop managing tools.</span>{" "}
-          <span style={{ color: "#D8A8D3" }}>Start managing business.</span>
-        </h1>
-
-        <p
-          className="mt-6 max-w-2xl text-base leading-relaxed sm:text-lg"
-          style={{ color: "#F8F4F7", opacity: 0.8 }}
-        >
-          LancerMents is a premium, tactical workspace built for speed and
-          clarity. Join the waitlist for early access to The Engine Room.
-        </p>
-
-        <div className="mt-10 flex w-full max-w-md flex-col gap-3 sm:flex-row">
-          <input
-            type="email"
-            readOnly
-            aria-label="Email address"
-            placeholder="you@example.com"
-            className="w-full flex-1 rounded-md border px-4 py-3 text-sm outline-none placeholder:text-[#F8F4F7]/70"
-            style={{
-              backgroundColor: "#221C21",
-              borderColor: "#4A2E46",
-              color: "#F8F4F7",
-            }}
+      <main className="mx-auto max-w-6xl px-6">
+        <section className="grid grid-cols-1 items-center gap-12 py-24 lg:grid-cols-2">
+          <div>
+            <span className="inline-block rounded-full border border-[#E2D8E0] px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#85587D] dark:border-[#4A2E46] dark:text-[#D8A8D3]">
+              THE AUTOPILOT WORKSPACE
+            </span>
+            <h1 className="mt-6 text-4xl font-bold leading-tight tracking-tight [-webkit-text-stroke:1px_#85587D] sm:text-5xl dark:[-webkit-text-stroke:1px_#D8A8D3]">
+              Stop managing tools.{" "}
+              <span className="text-[#85587D] dark:text-[#D8A8D3]">
+                Start managing business.
+              </span>
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-relaxed sm:text-lg">
+              Automate your invoicing, track your tasks, and manage clients in
+              one place. LancerMents handles the busywork so you can focus on
+              the work.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <input
+                type="email"
+                aria-label="Email address"
+                placeholder="you@example.com"
+                className="w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/70 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/70 dark:focus:ring-[#D8A8D3] sm:flex-1"
+              />
+              <button
+                type="button"
+                className="rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white dark:bg-[#D8A8D3] dark:text-[#151115]"
+              >
+                Join Waitlist
+              </button>
+            </div>
+          </div>
+          <img
+            src="/pexels-mart-production-7643791.jpg"
+            alt="Two professionals reviewing work on a laptop in a modern office"
+            className="h-[500px] w-full rounded-2xl border border-[#E2D8E0] object-cover dark:border-[#4A2E46]"
           />
-          <button
-            type="button"
-            className="w-full rounded-md px-6 py-3 text-sm font-semibold sm:w-auto"
-            style={{ backgroundColor: "#D8A8D3", color: "#151115" }}
-          >
-            Join Waitlist
-          </button>
-        </div>
-      </section>
+        </section>
 
-      <section className="mx-auto w-full max-w-5xl px-6 pb-20">
-        <div
-          className="grid grid-cols-1 gap-6 pt-12 md:grid-cols-3"
-          style={{ borderTop: "1px solid #4A2E46" }}
-        >
-          <article
-            className="flex flex-col rounded-xl border p-6"
-            style={{ backgroundColor: "#221C21", borderColor: "#4A2E46" }}
-          >
-            <h3 className="text-lg font-semibold" style={{ color: "#F8F4F7" }}>
-              The Engine Room
-            </h3>
+        <section className="grid grid-cols-1 items-center gap-12 py-16 lg:grid-cols-2">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              Automated Invoicing &amp; Payments.
+            </h2>
+            <p className="mt-4 text-base leading-relaxed sm:text-lg">
+              Set your rates, send a secure link, and get paid. Smart retries
+              and automated reminders handle the rest—no awkward follow-ups
+              required.
+            </p>
+          </div>
+          <img
+            src="/pexels-yankrukov-7698796.jpg"
+            alt="Team collaborating over financial charts and documents"
+            className="h-[400px] w-full rounded-2xl border border-[#E2D8E0] object-cover dark:border-[#4A2E46]"
+          />
+        </section>
+
+        <section className="grid grid-cols-1 items-center gap-12 py-16 lg:grid-cols-2">
+          <img
+            src="/pexels-thirdman-7652054.jpg"
+            alt="Team reviewing a client pipeline together on a laptop"
+            className="h-[400px] w-full rounded-2xl border border-[#E2D8E0] object-cover dark:border-[#4A2E46]"
+          />
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              Visual Task Grids &amp; Client CRM.
+            </h2>
+            <p className="mt-4 text-base leading-relaxed sm:text-lg">
+              Drag, drop, and done. See your entire client pipeline, daily
+              tasks, and project deadlines in one clean, intuitive view.
+            </p>
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 gap-8 border-t border-[#E2D8E0] py-24 md:grid-cols-3 dark:border-[#4A2E46]">
+          <article className="flex flex-col rounded-2xl border border-[#E2D8E0] bg-white p-8 dark:border-[#4A2E46] dark:bg-[#221C21]">
+            <h3 className="text-lg font-semibold">The Engine Room</h3>
             <p className="mt-2">
-              <span className="text-3xl font-bold" style={{ color: "#F8F4F7" }}>
-                $9
-              </span>
-              <span className="text-sm" style={{ color: "#F8F4F7", opacity: 0.8 }}>
-                /mo
-              </span>
+              <span className="text-3xl font-bold">$9</span>
+              <span className="text-sm opacity-80">/mo</span>
             </p>
             <FeatureList items={engineRoomFeatures} />
-            <div className="mt-auto pt-8">
-              <button
-                type="button"
-                className="w-full rounded-md border px-4 py-2 text-sm font-semibold"
-                style={{ borderColor: "#4A2E46", color: "#F8F4F7" }}
-              >
-                Coming Soon
-              </button>
-            </div>
+            <button
+              type="button"
+              className="mt-auto rounded-lg border border-[#E2D8E0] py-2 text-sm font-semibold text-[#151115] dark:border-[#4A2E46] dark:text-[#F8F4F7]"
+            >
+              Coming Soon
+            </button>
           </article>
 
-          <article
-            className="relative flex flex-col rounded-xl border p-6"
-            style={{ backgroundColor: "#221C21", borderColor: "#D8A8D3" }}
-          >
-            <span
-              className="absolute right-4 top-4 rounded-full px-3 py-1 text-[10px] font-bold tracking-[0.15em]"
-              style={{ backgroundColor: "#D8A8D3", color: "#151115" }}
-            >
+          <article className="relative flex flex-col rounded-2xl border border-[#85587D] bg-white p-8 dark:border-[#D8A8D3] dark:bg-[#221C21]">
+            <span className="absolute right-4 top-4 rounded-full bg-[#85587D] px-2 py-1 text-xs font-bold text-white dark:bg-[#D8A8D3] dark:text-[#151115]">
               POPULAR
             </span>
-            <h3 className="text-lg font-semibold" style={{ color: "#F8F4F7" }}>
-              The Pipeline
-            </h3>
+            <h3 className="text-lg font-semibold">The Pipeline</h3>
             <p className="mt-2">
-              <span className="text-3xl font-bold" style={{ color: "#F8F4F7" }}>
-                $19
-              </span>
-              <span className="text-sm" style={{ color: "#F8F4F7", opacity: 0.8 }}>
-                /mo
-              </span>
+              <span className="text-3xl font-bold">$19</span>
+              <span className="text-sm opacity-80">/mo</span>
             </p>
             <FeatureList items={pipelineFeatures} />
-            <div className="mt-auto pt-8">
-              <button
-                type="button"
-                className="w-full rounded-md px-4 py-2 text-sm font-semibold"
-                style={{ backgroundColor: "#D8A8D3", color: "#151115" }}
-              >
-                Coming Soon
-              </button>
-            </div>
+            <button
+              type="button"
+              className="mt-auto rounded-lg bg-[#85587D] py-2 text-sm font-semibold text-white dark:bg-[#D8A8D3] dark:text-[#151115]"
+            >
+              Coming Soon
+            </button>
           </article>
 
-          <article
-            className="flex flex-col rounded-xl border p-6"
-            style={{ backgroundColor: "#221C21", borderColor: "#4A2E46" }}
-          >
-            <h3 className="text-lg font-semibold" style={{ color: "#F8F4F7" }}>
-              The Studio
-            </h3>
+          <article className="flex flex-col rounded-2xl border border-[#E2D8E0] bg-white p-8 dark:border-[#4A2E46] dark:bg-[#221C21]">
+            <h3 className="text-lg font-semibold">The Studio</h3>
             <p className="mt-2">
-              <span className="text-3xl font-bold" style={{ color: "#F8F4F7" }}>
-                $49
-              </span>
-              <span className="text-sm" style={{ color: "#F8F4F7", opacity: 0.8 }}>
-                /mo
-              </span>
+              <span className="text-3xl font-bold">$49</span>
+              <span className="text-sm opacity-80">/mo</span>
             </p>
             <FeatureList items={studioFeatures} />
-            <div className="mt-auto pt-8">
-              <button
-                type="button"
-                className="w-full rounded-md border px-4 py-2 text-sm font-semibold"
-                style={{ borderColor: "#4A2E46", color: "#F8F4F7" }}
-              >
-                Coming Soon
-              </button>
-            </div>
+            <button
+              type="button"
+              className="mt-auto rounded-lg border border-[#E2D8E0] py-2 text-sm font-semibold text-[#151115] dark:border-[#4A2E46] dark:text-[#F8F4F7]"
+            >
+              Coming Soon
+            </button>
           </article>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      <footer
-        className="px-6 py-8 text-center text-sm"
-        style={{ borderTop: "1px solid #4A2E46" }}
-      >
-        <p style={{ color: "#F8F4F7" }}>
-          2026 Yomunseol • Also building{" "}
-          <a
-            href="https://caremunicate.online"
-            target="_blank"
-            rel="noreferrer"
-            className="font-semibold underline-offset-4 hover:underline"
-            style={{ color: "#D8A8D3" }}
-          >
-            Caremunicate
-          </a>
-        </p>
+      <footer className="border-t border-[#E2D8E0] py-8 text-center text-sm text-[#151115]/70 dark:border-[#4A2E46] dark:text-[#F8F4F7]/70">
+        2026 Yomunseol • Also building{" "}
+        <a
+          href="https://caremunicate.online"
+          target="_blank"
+          rel="noreferrer"
+          className="font-medium text-[#85587D] hover:underline dark:text-[#D8A8D3]"
+        >
+          Caremunicate
+        </a>
       </footer>
     </div>
   );

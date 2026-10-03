@@ -8,6 +8,14 @@
 - Expects a checked-in-style `.env.local` template created with placeholder values for required config/secrets. Confidence: 0.4
 - Values giving end users enough to actually operate on: favors permissive free-tier limits (e.g. Basic = 5 tasks) and real/seed data over restrictive caps or "fake" single-item states. Confidence: 0.5
 - Prefers the agent to proceed with best-judgment defaults rather than stalling on clarifying questions. Confidence: 0.45
-- Prefers the agent to proceed with best-judgment defaults rather than stalling on clarifying questions. Confidence: 0.45
-d any external dependencies"). Confidence: 0.5
+- Expects work delivered without adding new external dependencies unless explicitly requested. Confidence: 0.5
 - Gives highly prescriptive, literal specs — exact copy strings, layout classes, breakpoints, and hex values — and expects them implemented verbatim. Confidence: 0.5
+- When exact color matching matters, prefers literal hex codes via inline `style` props over theme tokens or Tailwind arbitrary-value classes. Confidence: 0.6
+- For purely visual pages, expects a static server component with zero client interactivity (no `useState`/`useEffect`/`"use client"`/event handlers) — "dumb code". Confidence: 0.6
+- Comfortable having the agent run destructive git operations directly, including `git push origin main --force`. Confidence: 0.45
+- Wants light/dark theming implemented the Tailwind way: `darkMode: 'class'` plus `dark:` variant utilities, toggled by adding/removing a `dark` class on `<html>`/`<body>` from a small client component, rather than a JS/CSS-in-JS theme provider. Confidence: 0.5
+- Maintains one semantic design system (canvas / surface / text / accent / border / outline) across both light and dark modes, mapping each token to a different hex per mode. Confidence: 0.5
+- Prefers using local image assets in `public/` imported into components (rather than external/CDN images), styled with `object-cover` inside rounded bordered containers. Confidence: 0.45
+- Values plain-language, benefit-driven product copy aimed at non-technical end users — emphasizing ease and low mental load ("set-and-forget") over feature/technical detail. Confidence: 0.45
+- Wants copy to be feature-forward: concrete core capabilities (e.g. invoicing, CRM, tasks) should be named and surfaced as effortless, built-in benefits — not only abstract ease/tone. Confidence: 0.45
+- Wants UI icons as inline SVGs (e.g. sun/moon for a toggle) instead of pulling in an icon library. Confidence: 0.4
