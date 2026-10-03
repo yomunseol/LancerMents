@@ -21,6 +21,15 @@ function readSupabaseConfig(): { url: string; anonKey: string } | null {
 
 const config = readSupabaseConfig();
 
+if (!config) {
+  console.error(
+    "[LancerMents] Supabase is not configured. NEXT_PUBLIC_SUPABASE_URL and/or " +
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY are missing or still placeholders. Add them " +
+      "to .env.local (and to your hosting provider's environment variables), then " +
+      "rebuild. The app will keep running, but auth and data calls are disabled.",
+  );
+}
+
 export const isSupabaseConfigured = config !== null;
 
 export const supabase: SupabaseClient | null = config

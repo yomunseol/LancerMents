@@ -94,20 +94,12 @@ export default function Home() {
               one place. LancerMents handles the busywork so you can focus on
               the work.
             </p>
-            <div className="mt-8 flex w-full flex-col gap-3 md:flex-row">
-              <input
-                type="email"
-                aria-label="Email address"
-                placeholder="you@example.com"
-                className="w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/70 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/70 dark:focus:ring-[#D8A8D3] md:flex-1"
-              />
-              <button
-                type="button"
-                className="w-full rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white transition-colors md:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]"
-              >
-                Join Waitlist
-              </button>
-            </div>
+            <Link
+              href="/signup"
+              className="mt-8 inline-block rounded-lg bg-[#85587D] px-8 py-3 text-lg font-semibold text-white transition-colors hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
+            >
+              Get Started Free
+            </Link>
           </div>
           <img
             src="/pexels-mart-production-7643791.jpg"

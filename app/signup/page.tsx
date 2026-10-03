@@ -15,6 +15,7 @@ export default function SignupPage() {
   const [step, setStep] = useState<"credentials" | "mfa">("credentials");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [code, setCode] = useState("");
   const [factorId, setFactorId] = useState("");
   const [qrCode, setQrCode] = useState("");
@@ -28,6 +29,11 @@ export default function SignupPage() {
     const client = supabase;
     if (!client) {
       setError("Supabase is not configured.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
       return;
     }
 
@@ -141,6 +147,19 @@ export default function SignupPage() {
                 className={fieldClass}
               />
             </label>
+            <label className="flex flex-col gap-1 text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
+              Confirm Password
+              <input
+                type="password"
+                required
+                minLength={6}
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                placeholder="••••••••"
+                className={fieldClass}
+              />
+            </label>
 
             <button type="submit" disabled={loading} className={primaryButtonClass}>
               {loading ? "Creating account…" : "Sign Up"}
@@ -153,7 +172,7 @@ export default function SignupPage() {
             </p>
           )}
           {error && (
-            <p className="mt-4 text-sm text-[#85587D] dark:text-[#D8A8D3]">
+            <p className="mt-4 text-sm font-medium text-red-600 dark:text-red-400">
               {error}
             </p>
           )}
@@ -209,7 +228,7 @@ export default function SignupPage() {
           </form>
 
           {error && (
-            <p className="mt-4 text-sm text-[#85587D] dark:text-[#D8A8D3]">
+            <p className="mt-4 text-sm font-medium text-red-600 dark:text-red-400">
               {error}
             </p>
           )}
