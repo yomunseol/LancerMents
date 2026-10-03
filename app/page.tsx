@@ -41,19 +41,17 @@ export default function Home() {
       <header className="sticky top-0 z-50">
         <nav className="flex min-h-[80px] items-center justify-between border-b border-[#E2D8E0] bg-white px-12 py-6 transition-colors duration-300 dark:border-[#4A2E46] dark:bg-[#151115]">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#E2D8E0] bg-white p-2.5 dark:border-[#D8A8D3] dark:bg-[#221C21]">
-              <img
-                src="/LancerMents-Light.png"
-                alt="LancerMents Light"
-                className="block h-full w-full object-contain dark:hidden"
-              />
-              <img
-                src="/LancerMents-Dark.png"
-                alt="LancerMents Dark"
-                className="hidden h-full w-full object-contain dark:block"
-              />
-            </div>
-            <span className="ml-4 text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
+            <img
+              src="/LancerMents-Light.png"
+              alt="LancerMents Light"
+              className="block h-12 w-12 rounded-xl border border-[#E2D8E0] object-cover dark:hidden dark:border-[#D8A8D3]"
+            />
+            <img
+              src="/LancerMents-Dark.png"
+              alt="LancerMents Dark"
+              className="hidden h-12 w-12 rounded-xl border border-[#E2D8E0] object-cover dark:block dark:border-[#D8A8D3]"
+            />
+            <span className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
               LancerMents
             </span>
           </div>
