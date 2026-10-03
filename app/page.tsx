@@ -38,25 +38,31 @@ function FeatureList({ items }: { items: string[] }) {
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#F8F4F7] text-[#151115] transition-colors duration-300 dark:bg-[#151115] dark:text-[#F8F4F7]">
-      <header className="sticky top-0 z-50 border-b border-[#E2D8E0] bg-white dark:border-[#4A2E46] dark:bg-[#151115]">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
-          <div className="flex items-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#4A2E46] bg-[#151115] p-1.5 dark:border-[#4A2E46] dark:bg-[#151115]">
+      <header className="sticky top-0 z-50">
+        <nav className="flex min-h-[80px] items-center justify-between border-b border-[#E2D8E0] bg-white px-12 py-6 transition-colors duration-300 dark:border-[#4A2E46] dark:bg-[#151115]">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#E2D8E0] bg-white p-2.5 dark:border-[#D8A8D3] dark:bg-[#221C21]">
+              <img
+                src="/LancerMents-Light.png"
+                alt="LancerMents Light"
+                className="block h-full w-full object-contain dark:hidden"
+              />
               <img
                 src="/LancerMents-Dark.png"
-                alt="LancerMents Logo"
-                className="h-full w-full object-contain"
+                alt="LancerMents Dark"
+                className="hidden h-full w-full object-contain dark:block"
               />
             </div>
-            <span className="ml-3 text-xl font-bold text-[#151115] dark:text-[#F8F4F7]">
+            <span className="ml-4 text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
               LancerMents
             </span>
           </div>
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center gap-4">
             <ThemeToggle />
             <button
               type="button"
-              className="rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-colors dark:bg-[#D8A8D3] dark:text-[#151115]"
+              className="rounded-lg bg-[#85587D] px-6 py-2.5 text-base font-semibold text-white transition-colors dark:bg-[#D8A8D3] dark:text-[#151115]"
             >
               Join Waitlist
             </button>
