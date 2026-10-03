@@ -39,19 +39,19 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#F8F4F7] text-[#151115] transition-colors duration-300 dark:bg-[#151115] dark:text-[#F8F4F7]">
       <header className="sticky top-0 z-50">
-        <nav className="flex min-h-[80px] items-center justify-between border-b border-[#E2D8E0] bg-white px-12 py-6 transition-colors duration-300 dark:border-[#4A2E46] dark:bg-[#151115]">
+        <nav className="flex min-h-[80px] items-center justify-between border-b border-[#E2D8E0] bg-white px-4 py-4 transition-colors duration-300 md:px-8 md:py-6 lg:px-12 dark:border-[#4A2E46] dark:bg-[#151115]">
           <div className="flex items-center gap-4">
             <img
               src="/LancerMents-Light.png"
               alt="LancerMents Light"
-              className="block h-12 w-12 rounded-xl border border-[#E2D8E0] object-cover dark:hidden dark:border-[#D8A8D3]"
+              className="block h-10 w-10 rounded-xl border border-[#E2D8E0] object-cover dark:hidden dark:border-[#D8A8D3] md:h-12 md:w-12"
             />
             <img
               src="/LancerMents-Dark.png"
               alt="LancerMents Dark"
-              className="hidden h-12 w-12 rounded-xl border border-[#E2D8E0] object-cover dark:block dark:border-[#D8A8D3]"
+              className="hidden h-10 w-10 rounded-xl border border-[#E2D8E0] object-cover dark:block dark:border-[#D8A8D3] md:h-12 md:w-12"
             />
-            <span className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
+            <span className="hidden text-xl font-bold text-[#151115] dark:text-[#F8F4F7] md:inline md:text-3xl">
               LancerMents
             </span>
           </div>
@@ -68,13 +68,13 @@ export default function Home() {
         </nav>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6">
+      <main className="mx-auto max-w-6xl px-4 md:px-8 lg:px-12">
         <section className="flex flex-col items-center gap-12 py-24 lg:flex-row">
           <div className="w-full lg:w-1/2">
             <span className="inline-block rounded-full border border-[#E2D8E0] px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#85587D] dark:border-[#4A2E46] dark:text-[#D8A8D3]">
               THE AUTOPILOT WORKSPACE
             </span>
-            <h1 className="mt-6 text-4xl font-bold leading-tight tracking-tight sm:text-5xl dark:[-webkit-text-stroke:1px_#D8A8D3]">
+            <h1 className="mt-6 break-words text-4xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl dark:[-webkit-text-stroke:1px_#D8A8D3]">
               Stop managing tools.{" "}
               <span className="text-[#85587D] dark:text-[#D8A8D3]">
                 Start managing business.
@@ -85,16 +85,16 @@ export default function Home() {
               one place. LancerMents handles the busywork so you can focus on
               the work.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 flex w-full flex-col gap-3 md:flex-row">
               <input
                 type="email"
                 aria-label="Email address"
                 placeholder="you@example.com"
-                className="w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/70 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/70 dark:focus:ring-[#D8A8D3] sm:flex-1"
+                className="w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/70 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/70 dark:focus:ring-[#D8A8D3] md:flex-1"
               />
               <button
                 type="button"
-                className="rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white transition-colors dark:bg-[#D8A8D3] dark:text-[#151115]"
+                className="w-full rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white transition-colors md:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]"
               >
                 Join Waitlist
               </button>
@@ -109,7 +109,7 @@ export default function Home() {
 
         <section className="flex flex-col items-center gap-12 py-16 lg:flex-row-reverse">
           <div className="w-full lg:w-1/2">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="break-words text-3xl font-bold tracking-tight sm:text-4xl">
               Automated Invoicing &amp; Payments.
             </h2>
             <p className="mt-4 text-base leading-relaxed sm:text-lg">
@@ -127,7 +127,7 @@ export default function Home() {
 
         <section className="flex flex-col items-center gap-12 py-16 lg:flex-row">
           <div className="w-full lg:w-1/2">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="break-words text-3xl font-bold tracking-tight sm:text-4xl">
               Visual Task Grids &amp; Client CRM.
             </h2>
             <p className="mt-4 text-base leading-relaxed sm:text-lg">
