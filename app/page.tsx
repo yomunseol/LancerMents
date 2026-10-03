@@ -40,19 +40,15 @@ export default function Home() {
     <div className="min-h-screen bg-[#F8F4F7] text-[#151115] transition-colors duration-300 dark:bg-[#151115] dark:text-[#F8F4F7]">
       <header className="sticky top-0 z-50 border-b border-[#E2D8E0] bg-white dark:border-[#4A2E46] dark:bg-[#151115]">
         <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
-          <div className="flex items-center gap-2">
-            <img
-              src="/LancerMents-Light.png"
-              alt="LancerMents"
-              className="h-8 w-auto dark:hidden"
-            />
-            <img
-              src="/LancerMents-Dark.png"
-              alt=""
-              aria-hidden="true"
-              className="hidden h-8 w-auto dark:block"
-            />
-            <span className="text-lg font-bold text-[#151115] dark:text-[#F8F4F7]">
+          <div className="flex items-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-[#D8A8D3] bg-[#221C21] p-2 dark:border-[#D8A8D3] dark:bg-[#221C21]">
+              <img
+                src="/LancerMents-Dark.png"
+                alt="LancerMents Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
+            <span className="ml-3 text-xl font-bold text-[#151115] dark:text-[#F8F4F7]">
               LancerMents
             </span>
           </div>

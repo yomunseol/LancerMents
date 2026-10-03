@@ -4,6 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "LancerMents",
   description: "Tactical Configuration Blueprint",
+  icons: { icon: "/LancerMents-Light.png" },
 };
 
 export default function RootLayout({

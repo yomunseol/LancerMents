@@ -20,3 +20,5 @@
 - Wants copy to be feature-forward: concrete core capabilities (e.g. invoicing, CRM, tasks) should be named and surfaced as effortless, built-in benefits — not only abstract ease/tone. Confidence: 0.45
 - Wants UI icons as inline SVGs (e.g. sun/moon for a toggle) instead of pulling in an icon library. Confidence: 0.4
 - Expects the agent to commit and push after every significant change/big action on its own initiative, without waiting to be asked. Confidence: 0.85
+- Aims for visual/design consistency across their own projects, pointing at an existing project (e.g. Caremunicate) as the canonical style source and expecting it replicated in the new project with the new project's colors. Confidence: 0.45
+- Prefers brand marks/logos presented as contained "badge" elements — a rounded-corner container with a crisp border, subtle inner surface background, and padding, with the logo centered inside (`object-contain`) rather than a bare image. Confidence: 0.4
