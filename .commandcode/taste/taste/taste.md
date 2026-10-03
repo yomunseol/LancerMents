@@ -44,3 +44,4 @@ he text and image vertically centered (`items-center`) and tight leading on larg
 - Prefers visual-only feedback indicators (e.g. a password-strength bar) with no text labels — status communicated purely via color and fill width. Confidence: 0.45
 - Values polished, smooth animation on fill/progress bar elements, using longer eased transitions (e.g. `transition-all duration-500 ease-out`). Confidence: 0.4
 - Organizes reusable UI components under an `app/components/` folder. Confidence: 0.4
+- Wants to be explicitly reminded of / walked through required manual configuration steps that live outside the codebase (e.g. adding redirect URLs in the Supabase Dashboard → Authentication → URL Configuration) whenever a code change depends on them. Confidence: 0.4

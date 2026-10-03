@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -19,6 +19,15 @@ export default function LoginPage() {
   const [factorId, setFactorId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const authError = new URLSearchParams(window.location.search).get("error");
+    if (authError === "auth-code-error") {
+      setError("We couldn't verify that sign-in link. Please log in again.");
+    } else if (authError === "missing-code") {
+      setError("That link is missing its verification code. Please try again.");
+    }
+  }, []);
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
