@@ -14,9 +14,8 @@ export default function ThemeToggle() {
   }, []);
 
   function toggleTheme() {
-    const next: Theme = theme === "dark" ? "light" : "dark";
-    document.documentElement.classList.toggle("dark", next === "dark");
-    setTheme(next);
+    const isDark = document.documentElement.classList.toggle("dark");
+    setTheme(isDark ? "dark" : "light");
   }
 
   return (
@@ -26,7 +25,7 @@ export default function ThemeToggle() {
       aria-label={
         theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
       }
-      className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#E2D8E0] text-[#151115] transition-colors hover:bg-[#151115]/5 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:text-[#F8F4F7] dark:hover:bg-[#F8F4F7]/10 dark:focus:ring-[#D8A8D3]"
+      className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#E2D8E0] bg-white text-[#151115] transition-colors dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7]"
     >
       {theme === "dark" ? <SunIcon /> : <MoonIcon />}
     </button>

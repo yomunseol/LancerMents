@@ -41,7 +41,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 border-b border-[#E2D8E0] bg-white dark:border-[#4A2E46] dark:bg-[#151115]">
         <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
           <div className="flex items-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-[#D8A8D3] bg-[#221C21] p-2 dark:border-[#D8A8D3] dark:bg-[#221C21]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#4A2E46] bg-[#151115] p-1.5 dark:border-[#4A2E46] dark:bg-[#151115]">
               <img
                 src="/LancerMents-Dark.png"
                 alt="LancerMents Logo"
@@ -56,7 +56,7 @@ export default function Home() {
             <ThemeToggle />
             <button
               type="button"
-              className="rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white dark:bg-[#D8A8D3] dark:text-[#151115]"
+              className="rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-colors dark:bg-[#D8A8D3] dark:text-[#151115]"
             >
               Join Waitlist
             </button>
@@ -70,7 +70,7 @@ export default function Home() {
             <span className="inline-block rounded-full border border-[#E2D8E0] px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#85587D] dark:border-[#4A2E46] dark:text-[#D8A8D3]">
               THE AUTOPILOT WORKSPACE
             </span>
-            <h1 className="mt-6 text-4xl font-bold leading-tight tracking-tight [-webkit-text-stroke:1px_#85587D] sm:text-5xl dark:[-webkit-text-stroke:1px_#D8A8D3]">
+            <h1 className="mt-6 text-4xl font-bold leading-tight tracking-tight sm:text-5xl dark:[-webkit-text-stroke:1px_#D8A8D3]">
               Stop managing tools.{" "}
               <span className="text-[#85587D] dark:text-[#D8A8D3]">
                 Start managing business.
@@ -90,7 +90,7 @@ export default function Home() {
               />
               <button
                 type="button"
-                className="rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white dark:bg-[#D8A8D3] dark:text-[#151115]"
+                className="rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white transition-colors dark:bg-[#D8A8D3] dark:text-[#151115]"
               >
                 Join Waitlist
               </button>
