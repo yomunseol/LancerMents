@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ThemeToggle from "./components/ThemeToggle";
 
 const engineRoomFeatures = [
@@ -56,14 +57,20 @@ export default function Home() {
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <ThemeToggle />
-            <button
-              type="button"
-              className="rounded-lg bg-[#85587D] px-6 py-2.5 text-base font-semibold text-white transition-colors dark:bg-[#D8A8D3] dark:text-[#151115]"
+            <Link
+              href="/login"
+              className="rounded-lg px-3 py-2 text-sm font-semibold text-[#151115] transition-opacity hover:opacity-70 dark:text-[#F8F4F7]"
             >
-              Join Waitlist
-            </button>
+              Log In
+            </Link>
+            <Link
+              href="/signup"
+              className="rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-colors dark:bg-[#D8A8D3] dark:text-[#151115]"
+            >
+              Sign Up
+            </Link>
           </div>
         </nav>
       </header>
@@ -74,8 +81,10 @@ export default function Home() {
             <span className="inline-block rounded-full border border-[#E2D8E0] px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#85587D] dark:border-[#4A2E46] dark:text-[#D8A8D3]">
               THE AUTOPILOT WORKSPACE
             </span>
-            <h1 className="mt-6 break-words text-4xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl dark:[-webkit-text-stroke:1px_#D8A8D3]">
-              Stop managing tools.{" "}
+            <h1 className="mt-6 break-words text-4xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl">
+              <span className="text-[#151115] dark:text-[#F8F4F7]">
+                Stop managing tools.
+              </span>{" "}
               <span className="text-[#85587D] dark:text-[#D8A8D3]">
                 Start managing business.
               </span>
@@ -143,6 +152,9 @@ export default function Home() {
         </section>
 
         <section className="grid grid-cols-1 gap-8 border-t border-[#E2D8E0] py-24 md:grid-cols-3 dark:border-[#4A2E46]">
+          <p className="col-span-full text-center text-sm font-semibold text-[#85587D] dark:text-[#D8A8D3]">
+            All plans are free during Beta.
+          </p>
           <article className="flex flex-col rounded-2xl border border-[#E2D8E0] bg-white p-8 dark:border-[#4A2E46] dark:bg-[#221C21]">
             <h3 className="text-lg font-semibold">The Engine Room</h3>
             <p className="mt-2">
@@ -150,12 +162,12 @@ export default function Home() {
               <span className="text-sm opacity-80">/mo</span>
             </p>
             <FeatureList items={engineRoomFeatures} />
-            <button
-              type="button"
-              className="mt-auto rounded-lg border border-[#E2D8E0] py-2 text-sm font-semibold text-[#151115] dark:border-[#4A2E46] dark:text-[#F8F4F7]"
+            <Link
+              href="/signup"
+              className="mt-auto block rounded-lg border border-[#E2D8E0] py-2 text-center text-sm font-semibold text-[#151115] transition-colors hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
             >
-              Coming Soon
-            </button>
+              Get Started Free
+            </Link>
           </article>
 
           <article className="relative flex flex-col rounded-2xl border border-[#85587D] bg-white p-8 dark:border-[#D8A8D3] dark:bg-[#221C21]">
@@ -168,12 +180,12 @@ export default function Home() {
               <span className="text-sm opacity-80">/mo</span>
             </p>
             <FeatureList items={pipelineFeatures} />
-            <button
-              type="button"
-              className="mt-auto rounded-lg bg-[#85587D] py-2 text-sm font-semibold text-white dark:bg-[#D8A8D3] dark:text-[#151115]"
+            <Link
+              href="/signup"
+              className="mt-auto block rounded-lg bg-[#85587D] py-2 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
             >
-              Coming Soon
-            </button>
+              Get Started Free
+            </Link>
           </article>
 
           <article className="flex flex-col rounded-2xl border border-[#E2D8E0] bg-white p-8 dark:border-[#4A2E46] dark:bg-[#221C21]">
@@ -183,12 +195,12 @@ export default function Home() {
               <span className="text-sm opacity-80">/mo</span>
             </p>
             <FeatureList items={studioFeatures} />
-            <button
-              type="button"
-              className="mt-auto rounded-lg border border-[#E2D8E0] py-2 text-sm font-semibold text-[#151115] dark:border-[#4A2E46] dark:text-[#F8F4F7]"
+            <Link
+              href="/signup"
+              className="mt-auto block rounded-lg border border-[#E2D8E0] py-2 text-center text-sm font-semibold text-[#151115] transition-colors hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
             >
-              Coming Soon
-            </button>
+              Get Started Free
+            </Link>
           </article>
         </section>
       </main>

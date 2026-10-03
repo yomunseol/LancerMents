@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 type BusinessType = {
   id: string;
@@ -74,32 +75,49 @@ function optionClass(selected: boolean, premium = false): string {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState<1 | 2>(1);
-  const [selectedBusinessType, setSelectedBusinessType] = useState("");
-  const [selectedPlan, setSelectedPlan] = useState("");
+  const [step, setStep] = useState(1);
+  const [businessType, setBusinessType] = useState("");
+  const [planType, setPlanType] = useState("");
   const [loading, setLoading] = useState(false);
 
-  function startFreeTrial() {
+  async function finishOnboarding() {
+    const client = supabase;
     setLoading(true);
-    setTimeout(() => {
-      router.push("/dashboard");
-    }, 1000);
+
+    if (client) {
+      const {
+        data: { user },
+      } = await client.auth.getUser();
+
+      if (user) {
+        const { error } = await client
+          .from("profiles")
+          .update({ business_type: businessType, plan_type: planType })
+          .eq("id", user.id);
+
+        if (error) {
+          console.warn("Could not save onboarding profile:", error.message);
+        }
+      }
+    }
+
+    router.push("/dashboard");
   }
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-20 md:px-8 lg:px-12">
       <p className="mb-2 text-sm font-semibold text-[#85587D] dark:text-[#D8A8D3]">
-        Step {currentStep} of 2
+        Step {step} of 2
       </p>
       <div className="h-1 w-full rounded-full bg-[#E2D8E0] dark:bg-[#4A2E46]">
         <div
           className={`h-1 rounded-full bg-[#85587D] transition-all duration-200 dark:bg-[#D8A8D3] ${
-            currentStep === 1 ? "w-1/2" : "w-full"
+            step === 1 ? "w-1/2" : "w-full"
           }`}
         />
       </div>
 
-      {currentStep === 1 ? (
+      {step === 1 ? (
         <section className="mt-12">
           <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
             What best describes your work?
@@ -110,13 +128,13 @@ export default function OnboardingPage() {
 
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
             {BUSINESS_TYPES.map((type) => {
-              const selected = selectedBusinessType === type.id;
+              const selected = businessType === type.id;
               return (
                 <button
                   key={type.id}
                   type="button"
                   aria-pressed={selected}
-                  onClick={() => setSelectedBusinessType(type.id)}
+                  onClick={() => setBusinessType(type.id)}
                   className={`w-full min-h-[100px] cursor-pointer rounded-2xl p-8 text-left transition-all duration-200 hover:shadow-lg ${optionClass(
                     selected,
                   )}`}
@@ -135,8 +153,8 @@ export default function OnboardingPage() {
           <div className="mt-12 flex justify-end">
             <button
               type="button"
-              disabled={!selectedBusinessType}
-              onClick={() => setCurrentStep(2)}
+              disabled={!businessType}
+              onClick={() => setStep(2)}
               className="w-full rounded-lg bg-[#85587D] px-6 py-2.5 text-base font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]"
             >
               Continue
@@ -154,13 +172,13 @@ export default function OnboardingPage() {
 
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
             {PLANS.map((plan) => {
-              const selected = selectedPlan === plan.id;
+              const selected = planType === plan.id;
               return (
                 <button
                   key={plan.id}
                   type="button"
                   aria-pressed={selected}
-                  onClick={() => setSelectedPlan(plan.id)}
+                  onClick={() => setPlanType(plan.id)}
                   className={`relative w-full min-h-[100px] cursor-pointer rounded-2xl p-8 text-left transition-all duration-200 hover:shadow-lg ${optionClass(
                     selected,
                     plan.popular,
@@ -193,18 +211,18 @@ export default function OnboardingPage() {
           <div className="mt-12 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <button
               type="button"
-              onClick={() => setCurrentStep(1)}
+              onClick={() => setStep(1)}
               className="w-full rounded-lg border border-[#E2D8E0] px-6 py-2.5 text-base font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg md:w-auto dark:border-[#4A2E46] dark:text-[#F8F4F7]"
             >
               Back
             </button>
             <button
               type="button"
-              onClick={startFreeTrial}
-              disabled={loading}
+              onClick={finishOnboarding}
+              disabled={loading || !planType}
               className="w-full rounded-lg bg-[#85587D] px-6 py-2.5 text-base font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]"
             >
-              {loading ? "Starting…" : "Start Free Trial"}
+              {loading ? "Setting up…" : "Start Free Trial"}
             </button>
           </div>
         </section>

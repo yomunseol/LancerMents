@@ -33,3 +33,4 @@
 - Likes selectable card/grid UIs with explicit selected states (accent-colored border plus a subtle tinted background) and hover elevation (`hover:shadow-lg`), and "Popular"/highlighted cards pre-styled with the accent border. Confidence: 0.45
 - Wants smooth transitions on interactive UI (`transition-all duration-200`) and disabled states styled with reduced opacity (`disabled:opacity-50 disabled:cursor-not-allowed`). Confidence: 0.45
 - Prefers multi-step wizard onboarding flows with a progress indicator (e.g. "Step X of Y" text plus a thin growing progress bar) over a single long form. Confidence: 0.4
+- Treats mobile responsiveness as a required, first-class deliverable (calls it "mobile integration" and expects it done as a follow-up pass), not an optional extra — wants layouts that hold up on small screens via responsive Tailwind utilities (stacked columns, scaling type, full-width buttons/tap targets, responsive padding). Confidence: 0.5
