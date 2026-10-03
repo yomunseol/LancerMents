@@ -69,8 +69,8 @@ export default function Home() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6">
-        <section className="grid grid-cols-1 items-center gap-12 py-24 lg:grid-cols-2">
-          <div>
+        <section className="flex flex-col items-center gap-12 py-24 lg:flex-row">
+          <div className="w-full lg:w-1/2">
             <span className="inline-block rounded-full border border-[#E2D8E0] px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#85587D] dark:border-[#4A2E46] dark:text-[#D8A8D3]">
               THE AUTOPILOT WORKSPACE
             </span>
@@ -103,12 +103,12 @@ export default function Home() {
           <img
             src="/pexels-mart-production-7643791.jpg"
             alt="Two professionals reviewing work on a laptop in a modern office"
-            className="h-[500px] w-full rounded-2xl border border-[#E2D8E0] object-cover dark:border-[#4A2E46]"
+            className="h-[500px] w-full rounded-2xl border border-[#E2D8E0] object-cover dark:border-[#4A2E46] lg:w-1/2"
           />
         </section>
 
-        <section className="grid grid-cols-1 items-center gap-12 py-16 lg:grid-cols-2">
-          <div>
+        <section className="flex flex-col items-center gap-12 py-16 lg:flex-row-reverse">
+          <div className="w-full lg:w-1/2">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Automated Invoicing &amp; Payments.
             </h2>
@@ -121,17 +121,12 @@ export default function Home() {
           <img
             src="/pexels-yankrukov-7698796.jpg"
             alt="Team collaborating over financial charts and documents"
-            className="h-[400px] w-full rounded-2xl border border-[#E2D8E0] object-cover dark:border-[#4A2E46]"
+            className="h-[400px] w-full rounded-2xl border border-[#E2D8E0] object-cover dark:border-[#4A2E46] lg:w-1/2"
           />
         </section>
 
-        <section className="grid grid-cols-1 items-center gap-12 py-16 lg:grid-cols-2">
-          <img
-            src="/pexels-thirdman-7652054.jpg"
-            alt="Team reviewing a client pipeline together on a laptop"
-            className="h-[400px] w-full rounded-2xl border border-[#E2D8E0] object-cover dark:border-[#4A2E46]"
-          />
-          <div>
+        <section className="flex flex-col items-center gap-12 py-16 lg:flex-row">
+          <div className="w-full lg:w-1/2">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Visual Task Grids &amp; Client CRM.
             </h2>
@@ -140,6 +135,11 @@ export default function Home() {
               tasks, and project deadlines in one clean, intuitive view.
             </p>
           </div>
+          <img
+            src="/pexels-thirdman-7652054.jpg"
+            alt="Team reviewing a client pipeline together on a laptop"
+            className="h-[400px] w-full rounded-2xl border border-[#E2D8E0] object-cover dark:border-[#4A2E46] lg:w-1/2"
+          />
         </section>
 
         <section className="grid grid-cols-1 gap-8 border-t border-[#E2D8E0] py-24 md:grid-cols-3 dark:border-[#4A2E46]">

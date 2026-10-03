@@ -21,7 +21,8 @@
 - Wants UI icons as inline SVGs (e.g. sun/moon for a toggle) instead of pulling in an icon library. Confidence: 0.4
 - Expects the agent to commit and push after every significant change/big action on its own initiative, without waiting to be asked. Confidence: 0.85
 - Aims for visual/design consistency across their own projects, pointing at an existing project (e.g. Caremunicate) as the canonical style source and expecting it replicated in the new project with the new project's colors. Confidence: 0.45
-- Prefers brand marks/logos presented as contained "badge" elements — a rounded-corner container with a subtle inner surface background and padding, with the logo centered inside (`object-contain`) rather than a bare image. Confidence: 0.5
+- Rejects decorative slack in icon/logo treatments: dislikes visible padding or empty space around a logo inside its box ("too much padding, making the logo look tiny"), and wants the image to fill its rounded box completely edge-to-edge (`object-cover`). Confidence: 0.6
+- Favors the "cleaner" minimal-markup approach — applies border/rounded/etc. directly to the element instead of introducing an extra wrapper `<div>`, removing wrappers where possible. Confidence: 0.5
 - Wants UI containers to blend subtly into their surrounding surface — background matching the canvas exactly and a low-contrast border pulled from the design palette — rather than a bright/high-contrast border that reads like a "sticker". Confidence: 0.5
 - Scopes decorative visual effects (e.g. `-webkit-text-stroke`, glows) to dark mode only via `dark:` variants, keeping light mode crisp and solid with no unconditional/global effect rule. Confidence: 0.5
 - For theme-dependent assets (e.g. logos), prefers a pure-CSS dual-element approach — separate light and dark `<img>` tags toggled with `dark:hidden` / `hidden dark:block` — so swapping happens automatically from the theme class with no JavaScript state. Confidence: 0.5
