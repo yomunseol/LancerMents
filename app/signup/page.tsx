@@ -4,6 +4,9 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import PasswordStrengthBar, {
+  getPasswordStrength,
+} from "../components/PasswordStrengthBar";
 
 const fieldClass =
   "w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/70 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#151115] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/70 dark:focus:ring-[#D8A8D3]";
@@ -27,10 +30,6 @@ export default function SignupPage() {
   async function handleSignup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const client = supabase;
-    if (!client) {
-      setError("Supabase is not configured.");
-      return;
-    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
@@ -80,7 +79,6 @@ export default function SignupPage() {
   async function handleVerify(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const client = supabase;
-    if (!client) return;
 
     setLoading(true);
     setError(null);
@@ -147,6 +145,7 @@ export default function SignupPage() {
                 className={fieldClass}
               />
             </label>
+            <PasswordStrengthBar password={password} />
             <label className="flex flex-col gap-1 text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
               Confirm Password
               <input
@@ -161,7 +160,11 @@ export default function SignupPage() {
               />
             </label>
 
-            <button type="submit" disabled={loading} className={primaryButtonClass}>
+            <button
+              type="submit"
+              disabled={loading || getPasswordStrength(password) < 3}
+              className={primaryButtonClass}
+            >
               {loading ? "Creating account…" : "Sign Up"}
             </button>
           </form>

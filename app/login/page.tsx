@@ -23,10 +23,6 @@ export default function LoginPage() {
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const client = supabase;
-    if (!client) {
-      setError("Supabase is not configured.");
-      return;
-    }
 
     setLoading(true);
     setError(null);
@@ -67,7 +63,6 @@ export default function LoginPage() {
   async function handleVerify(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const client = supabase;
-    if (!client) return;
 
     setLoading(true);
     setError(null);

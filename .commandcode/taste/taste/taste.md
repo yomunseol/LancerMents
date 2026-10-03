@@ -37,3 +37,10 @@
 - Uses a standard "build → verify → commit → push" ship cycle: expects a typecheck/build plus a runtime verification pass (start the production server, check route status codes/redirects) as a gate before committing and pushing. Confidence: 0.5
 - Treats mobile responsiveness as a required, first-class deliverable (calls it "mobile integration" and expects it done as a follow-up pass), not an optional extra — wants layouts that hold up on small screens via responsive Tailwind utilities (stacked columns, scaling type, full-width buttons/tap targets, responsive padding). Confidence: 0.5
 he text and image vertically centered (`items-center`) and tight leading on large headlines (`leading-tight`). Confidence: 0.4
+- Prefers graceful degradation when required configuration (e.g. `NEXT_PUBLIC_*` env vars) is missing: log a clear, explicit error to the console but keep the app running instead of crashing. Confidence: 0.5
+- Wants client-side form validation that calls `e.preventDefault()`, blocks submission on invalid input (e.g. mismatched confirm-password), and surfaces the failure as an inline red error message rather than alerting or navigating away. Confidence: 0.45
+- Prefers hardcoding third-party service config (e.g. Supabase URL/anon key) directly in the source file as clearly-marked placeholder variables at the top for pasting keys in, instead of reading them from `process.env`. Confidence: 0.45
+- When config is hardcoded/provided, wants the corresponding "not configured" error/notice messages removed from the UI (e.g. on signup/login pages). Confidence: 0.4
+- Prefers visual-only feedback indicators (e.g. a password-strength bar) with no text labels — status communicated purely via color and fill width. Confidence: 0.45
+- Values polished, smooth animation on fill/progress bar elements, using longer eased transitions (e.g. `transition-all duration-500 ease-out`). Confidence: 0.4
+- Organizes reusable UI components under an `app/components/` folder. Confidence: 0.4

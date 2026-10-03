@@ -1,34 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-
-function readSupabaseConfig(): { url: string; anonKey: string } | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (
-    typeof url !== "string" ||
-    !/^https?:\/\//.test(url) ||
-    url === "your_supabase_url" ||
-    typeof anonKey !== "string" ||
-    anonKey.length === 0 ||
-    anonKey === "your_supabase_anon_key"
-  ) {
-    return null;
-  }
-
-  return { url, anonKey };
-}
-
-const supabaseConfig = readSupabaseConfig();
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabase";
 
 const PROTECTED_PREFIXES = ["/dashboard", "/onboarding"];
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
-  if (!supabaseConfig) return response;
-
-  const supabase = createServerClient(supabaseConfig.url, supabaseConfig.anonKey, {
+  const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
