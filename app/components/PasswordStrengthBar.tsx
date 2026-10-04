@@ -1,10 +1,37 @@
-const LEVELS = [
+type Level = {
+  color: string;
+  width: string;
+  textColor: string;
+  label: string;
+};
+
+const LEVELS: (Level | null)[] = [
   null,
-  { color: "bg-red-500", width: "25%" },
-  { color: "bg-orange-500", width: "50%" },
-  { color: "bg-yellow-500", width: "75%" },
-  { color: "bg-green-500", width: "100%" },
-] as const;
+  {
+    color: "bg-red-500",
+    width: "25%",
+    textColor: "text-red-500",
+    label: "Weak - Add numbers or symbols.",
+  },
+  {
+    color: "bg-orange-500",
+    width: "50%",
+    textColor: "text-orange-500",
+    label: "Common - Try a longer phrase.",
+  },
+  {
+    color: "bg-yellow-500",
+    width: "75%",
+    textColor: "text-yellow-500",
+    label: "Moderate - Minimum requirement met.",
+  },
+  {
+    color: "bg-green-500",
+    width: "100%",
+    textColor: "text-green-500",
+    label: "Strong - Excellent security.",
+  },
+];
 
 export function getPasswordStrength(password: string): number {
   if (!password) return 0;
@@ -28,16 +55,25 @@ export default function PasswordStrengthBar({
   password: string;
 }) {
   const level = getPasswordStrength(password);
-  const meta = LEVELS[level];
+  const meta = LEVELS[level] ?? null;
 
   return (
-    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#E2D8E0] dark:bg-[#4A2E46]">
-      <div
-        className={`h-full rounded-full transition-all duration-500 ease-out ${
-          meta ? meta.color : ""
-        }`}
-        style={{ width: meta ? meta.width : "0%" }}
-      />
+    <div>
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#E2D8E0] dark:bg-[#4A2E46]">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ease-out ${
+            meta ? meta.color : ""
+          }`}
+          style={{ width: meta ? meta.width : "0%" }}
+        />
+      </div>
+      {meta && (
+        <p
+          className={`mt-1.5 text-xs font-medium transition-colors duration-500 ${meta.textColor}`}
+        >
+          {meta.label}
+        </p>
+      )}
     </div>
   );
 }

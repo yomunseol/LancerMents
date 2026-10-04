@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -12,35 +12,44 @@ const fieldClass =
   "w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/70 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#151115] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/70 dark:focus:ring-[#D8A8D3]";
 const primaryButtonClass =
   "w-full rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#D8A8D3] dark:text-[#151115]";
+const otpInputClass =
+  "w-full max-w-[280px] mx-auto rounded-xl border border-[#E2D8E0] bg-[#F8F4F7] px-4 py-4 text-center font-mono text-2xl tracking-[0.5em] text-[#151115] outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#151115] dark:text-[#F8F4F7] dark:focus:ring-[#D8A8D3]";
+const errorClass = "text-sm font-medium text-red-600 dark:text-red-400";
 
 export default function SignupPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"credentials" | "mfa">("credentials");
+  const [step, setStep] = useState<"credentials" | "otp">("credentials");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [code, setCode] = useState("");
-  const [factorId, setFactorId] = useState("");
-  const [qrCode, setQrCode] = useState("");
-  const [secret, setSecret] = useState("");
-  const [notice, setNotice] = useState<string | null>(null);
+  const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [resendIn, setResendIn] = useState(0);
+
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const timer = setTimeout(() => setResendIn(resendIn - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendIn]);
 
   async function handleSignup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const client = supabase;
+    setError(null);
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
-    setLoading(true);
-    setError(null);
-    setNotice(null);
+    if (getPasswordStrength(password) < 3) {
+      setError("Please choose a stronger password (at least Moderate).");
+      return;
+    }
 
-    const { data, error: signUpError } = await client.auth.signUp({
+    setLoading(true);
+
+    const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -48,57 +57,25 @@ export default function SignupPage() {
       },
     });
 
+    setLoading(false);
+
     if (signUpError) {
-      setLoading(false);
       setError(signUpError.message);
       return;
     }
 
-    if (!data.session) {
-      setLoading(false);
-      setNotice(
-        "Check your inbox to confirm your email, then sign in to finish setting up 2FA.",
-      );
-      return;
-    }
-
-    const { data: enrolled, error: enrollError } = await client.auth.mfa.enroll({
-      factorType: "totp",
-    });
-
-    setLoading(false);
-
-    if (enrollError) {
-      setError(enrollError.message);
-      return;
-    }
-
-    setFactorId(enrolled.id);
-    setQrCode(enrolled.totp?.qr_code ?? "");
-    setSecret(enrolled.totp?.secret ?? "");
-    setStep("mfa");
+    setStep("otp");
   }
 
   async function handleVerify(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const client = supabase;
-
-    setLoading(true);
     setError(null);
+    setLoading(true);
 
-    const { data: challenge, error: challengeError } =
-      await client.auth.mfa.challenge({ factorId });
-
-    if (challengeError) {
-      setLoading(false);
-      setError(challengeError.message);
-      return;
-    }
-
-    const { error: verifyError } = await client.auth.mfa.verify({
-      factorId,
-      challengeId: challenge.id,
-      code,
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email,
+      token: otpCode,
+      type: "signup",
     });
 
     setLoading(false);
@@ -109,6 +86,23 @@ export default function SignupPage() {
     }
 
     router.push("/onboarding");
+  }
+
+  async function handleResend() {
+    if (resendIn > 0) return;
+    setError(null);
+
+    const { error: resendError } = await supabase.auth.resend({
+      type: "signup",
+      email,
+    });
+
+    if (resendError) {
+      setError(resendError.message);
+      return;
+    }
+
+    setResendIn(30);
   }
 
   return (
@@ -170,18 +164,9 @@ export default function SignupPage() {
             >
               {loading ? "Creating account…" : "Sign Up"}
             </button>
-          </form>
 
-          {notice && (
-            <p className="mt-4 text-sm text-[#85587D] dark:text-[#D8A8D3]">
-              {notice}
-            </p>
-          )}
-          {error && (
-            <p className="mt-4 text-sm font-medium text-red-600 dark:text-red-400">
-              {error}
-            </p>
-          )}
+            {error && <p className={errorClass}>{error}</p>}
+          </form>
 
           <p className="mt-6 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
             Already have an account?{" "}
@@ -195,49 +180,54 @@ export default function SignupPage() {
         </>
       ) : (
         <>
-          <h1 className="text-2xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-            Secure your account
-          </h1>
-          <p className="mt-2 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-            Scan this with your authenticator app, then enter the 6-digit code.
-          </p>
-
-          {qrCode && (
-            <img
-              src={qrCode}
-              alt="Authenticator QR code"
-              className="mx-auto mt-6 h-40 w-40 rounded-lg border border-[#E2D8E0] bg-white p-2 dark:border-[#4A2E46]"
-            />
-          )}
-          {secret && (
-            <p className="mt-3 break-all text-center text-xs text-[#151115]/70 dark:text-[#F8F4F7]/70">
-              Secret: {secret}
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-[#151115] dark:text-[#F8F4F7]">
+              Check your email
+            </h1>
+            <p className="mt-2 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
+              We sent a 6-digit code to{" "}
+              <span className="font-medium text-[#151115] dark:text-[#F8F4F7]">
+                {email}
+              </span>
+              . Enter it below to verify.
             </p>
-          )}
+          </div>
 
-          <form onSubmit={handleVerify} className="mt-6 flex flex-col gap-4">
-            <label className="flex flex-col gap-1 text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
-              6-digit code
-              <input
-                inputMode="numeric"
-                required
-                maxLength={6}
-                value={code}
-                onChange={(event) => setCode(event.target.value)}
-                placeholder="123456"
-                className={fieldClass}
-              />
-            </label>
-            <button type="submit" disabled={loading} className={primaryButtonClass}>
-              {loading ? "Verifying…" : "Verify & Continue"}
+          <form
+            onSubmit={handleVerify}
+            className="mt-6 flex flex-col items-center gap-4"
+          >
+            <input
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              required
+              maxLength={6}
+              value={otpCode}
+              onChange={(event) => setOtpCode(event.target.value)}
+              placeholder="000000"
+              className={otpInputClass}
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full max-w-[280px] rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#D8A8D3] dark:text-[#151115]"
+            >
+              {loading ? "Verifying…" : "Verify"}
             </button>
+
+            {error && <p className={errorClass}>{error}</p>}
           </form>
 
-          {error && (
-            <p className="mt-4 text-sm font-medium text-red-600 dark:text-red-400">
-              {error}
-            </p>
-          )}
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resendIn > 0}
+              className="text-sm font-medium text-[#85587D] transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-60 dark:text-[#D8A8D3]"
+            >
+              {resendIn > 0 ? `Resend in ${resendIn}s...` : "Didn't get the code? Resend"}
+            </button>
+          </div>
         </>
       )}
     </div>
