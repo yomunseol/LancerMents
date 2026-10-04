@@ -55,3 +55,8 @@ he text and image vertically centered (`items-center`) and tight leading on larg
 - Uses small, uppercase, letter-spaced, reduced-opacity labels (`text-xs uppercase tracking-widest opacity-60`) as section headers and UI labels. Confidence: 0.4
 - Deliberately defers internationalization: wants all UI copy written as plain-text string literals for now, with i18n treated as an explicit later retrofit — no translation library or i18n scaffolding built prematurely. Confidence: 0.4
 - Expects auth-gated pages to guard themselves on mount — check the session (e.g. `supabase.auth.getSession()`) and redirect unauthenticated users to the signup/login page rather than rendering the page. Confidence: 0.4
+- Uses `next-intl` for internationalization, shipping English (`en`) and Korean (`ko`) locales and routing all rendered UI strings through `t()`. Confidence: 0.5
+- Prefers config-driven UI: a single source-of-truth data module (e.g. a nav-config array of `{ label, href, icon, tier }`) that components render, rather than duplicating navigation/menu markup inline. Confidence: 0.4
+- Dislikes dead or non-functional UI — every nav link/button must resolve to a real route (no dead buttons, no 404s). Confidence: 0.4
+- For tier-gated features, prefers the route to still load and show an upgrade banner/panel rather than blocking or redirecting the user away. Confidence: 0.4
+- Wants UI animations to respect the user's `prefers-reduced-motion` setting. Confidence: 0.4
