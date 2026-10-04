@@ -41,7 +41,11 @@ he text and image vertically centered (`items-center`) and tight leading on larg
 - Wants client-side form validation that calls `e.preventDefault()`, blocks submission on invalid input (e.g. mismatched confirm-password), and surfaces the failure as an inline red error message rather than alerting or navigating away. Confidence: 0.45
 - Prefers hardcoding third-party service config (e.g. Supabase URL/anon key) directly in the source file as clearly-marked placeholder variables at the top for pasting keys in, instead of reading them from `process.env`. Confidence: 0.45
 - When config is hardcoded/provided, wants the corresponding "not configured" error/notice messages removed from the UI (e.g. on signup/login pages). Confidence: 0.4
-- Prefers visual-only feedback indicators (e.g. a password-strength bar) with no text labels — status communicated purely via color and fill width. Confidence: 0.45
+- For password-strength feedback, wants the colored animated bar paired with a short, color-matched text annotation beneath it (e.g. "Weak - Add numbers or symbols.") that smoothly transitions with the bar. Confidence: 0.5
 - Values polished, smooth animation on fill/progress bar elements, using longer eased transitions (e.g. `transition-all duration-500 ease-out`). Confidence: 0.4
 - Organizes reusable UI components under an `app/components/` folder. Confidence: 0.4
 - Wants to be explicitly reminded of / walked through required manual configuration steps that live outside the codebase (e.g. adding redirect URLs in the Supabase Dashboard → Authentication → URL Configuration) whenever a code change depends on them. Confidence: 0.4
+- Requires every network/data call (e.g. Supabase) to be wrapped in try/catch with the failure surfaced as inline error text on the page, rather than alerting or silently swallowing it. Confidence: 0.5
+- Marks every interactive page/component with `'use client'` in the Next.js App Router, reserving statically-rendered server components for purely visual pages. Confidence: 0.45
+- Wants dashboards/apps fully data-driven against the live backend (real fetches, writes, and persistence) rather than static or mock content. Confidence: 0.5
+- Favors minimal, opinionated product scope and explicitly rejects feature bloat in focused tools — e.g. Notes as a "scratchpad, not a document editor": no folders, no page trees, no WYSIWYG, no collaboration. Confidence: 0.4
