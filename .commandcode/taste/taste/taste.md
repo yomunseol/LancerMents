@@ -49,3 +49,7 @@ he text and image vertically centered (`items-center`) and tight leading on larg
 - Marks every interactive page/component with `'use client'` in the Next.js App Router, reserving statically-rendered server components for purely visual pages. Confidence: 0.45
 - Wants dashboards/apps fully data-driven against the live backend (real fetches, writes, and persistence) rather than static or mock content. Confidence: 0.5
 - Favors minimal, opinionated product scope and explicitly rejects feature bloat in focused tools — e.g. Notes as a "scratchpad, not a document editor": no folders, no page trees, no WYSIWYG, no collaboration. Confidence: 0.4
+- Wants product limits/caps presented softly rather than as dead-ends: an inline usage meter plus a gentle, non-alarming one-line upsell linking to the upgrade/onboarding flow, instead of a hard block or alarming error. Confidence: 0.5
+- Insists that usage caps/limits must never hide, delete, or block existing items (e.g. a task cap only blocks creating new uncompleted tasks) — existing data always renders. Confidence: 0.5
+- Scopes each task tightly to the named file(s)/page(s) and explicitly forbids touching other pages or features; expects the agent to stay within that boundary. Confidence: 0.45
+- Uses small, uppercase, letter-spaced, reduced-opacity labels (`text-xs uppercase tracking-widest opacity-60`) as section headers and UI labels. Confidence: 0.4

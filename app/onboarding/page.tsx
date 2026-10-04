@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -14,7 +14,7 @@ type Plan = {
   id: string;
   name: string;
   price: string;
-  description: string;
+  features: string[];
   popular?: boolean;
 };
 
@@ -22,22 +22,22 @@ const BUSINESS_TYPES: BusinessType[] = [
   {
     id: "content-creator",
     title: "Content Creator",
-    description: "For solo creators managing brands and sponsors",
+    description: "For creators managing brands, sponsors, and drops",
   },
   {
     id: "freelance-artist",
     title: "Freelance Artist",
-    description: "For independent artists booking clients and commissions",
+    description: "For artists juggling commissions and clients",
   },
   {
     id: "sole-entrepreneur",
     title: "Sole Entrepreneur",
-    description: "For founders running the whole show solo",
+    description: "For founders running invoicing and pipeline solo",
   },
   {
     id: "team-company",
     title: "Team Company",
-    description: "For small teams collaborating in one workspace",
+    description: "For small teams coordinating workspaces and roles",
   },
 ];
 
@@ -46,72 +46,142 @@ const PLANS: Plan[] = [
     id: "engine-room",
     name: "The Engine Room",
     price: "9",
-    description: "For solo operators getting organized.",
+    features: ["1 Workspace", "Grid Task List (3 daily)", "Async Calendar"],
   },
   {
     id: "pipeline",
     name: "The Pipeline",
     price: "19",
-    description: "For growing client work and steady revenue.",
+    features: [
+      "2 Workspaces",
+      "CRM Kanban",
+      "Secure Client Links (max 5)",
+      "Direct Invoice Output",
+    ],
     popular: true,
   },
   {
     id: "studio",
     name: "The Studio",
     price: "49",
-    description: "For teams and studios scaling up.",
+    features: [
+      "Up to 5 Workspaces",
+      "White-Label",
+      "Multi-Workspace Switcher",
+      "Secure Client Links (max 15)",
+    ],
   },
 ];
 
-function optionClass(selected: boolean, premium = false): string {
-  if (selected) {
-    return "border-2 border-[#85587D] bg-[#F8F4F7] dark:border-[#D8A8D3] dark:bg-[#2A2229]";
-  }
-  if (premium) {
-    return "border-2 border-[#85587D] bg-white dark:border-[#D8A8D3] dark:bg-[#221C21]";
-  }
-  return "border border-[#E2D8E0] bg-white dark:border-[#4A2E46] dark:bg-[#221C21]";
+const CARD_BASE =
+  "w-full min-h-[100px] cursor-pointer rounded-2xl p-8 text-left transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5";
+
+function businessCardClass(selected: boolean): string {
+  return selected
+    ? "border-2 border-[#85587D] bg-[#85587D]/5 dark:border-[#D8A8D3] dark:bg-[#D8A8D3]/5"
+    : "border border-[#E2D8E0] bg-white dark:border-[#4A2E46] dark:bg-[#221C21]";
+}
+
+function planCardClass(selected: boolean, popular = false): string {
+  const border = popular
+    ? "border-2 border-[#85587D] dark:border-[#D8A8D3]"
+    : "border border-[#E2D8E0] dark:border-[#4A2E46]";
+  const ring = selected ? "ring-2 ring-[#85587D] dark:ring-[#D8A8D3]" : "";
+  return `${border} bg-white dark:bg-[#221C21] ${ring}`;
+}
+
+function messageOf(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback;
+}
+
+function Spinner() {
+  return (
+    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
+      <path
+        d="M22 12a10 10 0 0 0-10-10"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 }
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const [checking, setChecking] = useState(true);
   const [step, setStep] = useState(1);
   const [businessType, setBusinessType] = useState("");
   const [planType, setPlanType] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!active) return;
+        if (!data.session) {
+          router.replace("/signup");
+          return;
+        }
+        setChecking(false);
+      } catch {
+        if (active) router.replace("/signup");
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [router]);
 
   async function finishOnboarding() {
-    const client = supabase;
+    setError(null);
     setLoading(true);
 
-    if (client) {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const {
         data: { user },
-      } = await client.auth.getUser();
+      } = await supabase.auth.getUser();
 
-      if (user) {
-        const { error } = await client
-          .from("profiles")
-          .update({ business_type: businessType, plan_type: planType })
-          .eq("id", user.id);
+      if (!user) throw new Error("Your session expired. Please sign in again.");
 
-        if (error) {
-          console.warn("Could not save onboarding profile:", error.message);
-        }
-      }
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ business_type: businessType, plan_type: planType })
+        .eq("id", user.id);
+
+      if (updateError) throw updateError;
+
+      router.push("/dashboard");
+    } catch (saveError) {
+      setLoading(false);
+      setError(messageOf(saveError, "Could not save your setup. Please try again."));
     }
+  }
 
-    router.push("/dashboard");
+  if (checking) {
+    return (
+      <main className="mx-auto max-w-4xl px-6 py-20">
+        <p className="text-sm opacity-50">Loading…</p>
+      </main>
+    );
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-20 md:px-8 lg:px-12">
+    <main className="mx-auto max-w-4xl px-6 py-20">
       <p className="mb-2 text-sm font-semibold text-[#85587D] dark:text-[#D8A8D3]">
         Step {step} of 2
       </p>
       <div className="h-1 w-full rounded-full bg-[#E2D8E0] dark:bg-[#4A2E46]">
         <div
-          className={`h-1 rounded-full bg-[#85587D] transition-all duration-200 dark:bg-[#D8A8D3] ${
+          className={`h-1 rounded-full bg-[#85587D] transition-all duration-500 dark:bg-[#D8A8D3] ${
             step === 1 ? "w-1/2" : "w-full"
           }`}
         />
@@ -122,7 +192,7 @@ export default function OnboardingPage() {
           <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
             What best describes your work?
           </h1>
-          <p className="mt-2 text-[#151115]/70 dark:text-[#F8F4F7]/70">
+          <p className="mt-2 opacity-70">
             {"We'll tailor your workspace to fit your workflow."}
           </p>
 
@@ -135,14 +205,12 @@ export default function OnboardingPage() {
                   type="button"
                   aria-pressed={selected}
                   onClick={() => setBusinessType(type.id)}
-                  className={`w-full min-h-[100px] cursor-pointer rounded-2xl p-8 text-left transition-all duration-200 hover:shadow-lg ${optionClass(
-                    selected,
-                  )}`}
+                  className={`${CARD_BASE} ${businessCardClass(selected)}`}
                 >
                   <span className="block text-lg font-bold text-[#151115] dark:text-[#F8F4F7]">
                     {type.title}
                   </span>
-                  <span className="mt-1 block text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
+                  <span className="mt-1 block text-sm opacity-70">
                     {type.description}
                   </span>
                 </button>
@@ -166,8 +234,8 @@ export default function OnboardingPage() {
           <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
             Choose your engine.
           </h1>
-          <p className="mt-2 text-[#151115]/70 dark:text-[#F8F4F7]/70">
-            Start with a 14-day free trial. Cancel anytime.
+          <p className="mt-2 opacity-70">
+            All plans are free during Beta. No card required.
           </p>
 
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -179,7 +247,7 @@ export default function OnboardingPage() {
                   type="button"
                   aria-pressed={selected}
                   onClick={() => setPlanType(plan.id)}
-                  className={`relative w-full min-h-[100px] cursor-pointer rounded-2xl p-8 text-left transition-all duration-200 hover:shadow-lg ${optionClass(
+                  className={`relative ${CARD_BASE} ${planCardClass(
                     selected,
                     plan.popular,
                   )}`}
@@ -196,13 +264,21 @@ export default function OnboardingPage() {
                     <span className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
                       ${plan.price}
                     </span>
-                    <span className="text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-                      /mo
-                    </span>
+                    <span className="text-sm opacity-70">/mo</span>
                   </span>
-                  <span className="mt-2 block text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-                    {plan.description}
-                  </span>
+                  <ul className="mt-4 flex flex-col gap-2 text-sm">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-2">
+                        <span
+                          aria-hidden="true"
+                          className="text-[#85587D] dark:text-[#D8A8D3]"
+                        >
+                          •
+                        </span>
+                        <span className="opacity-70">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </button>
               );
             })}
@@ -220,11 +296,24 @@ export default function OnboardingPage() {
               type="button"
               onClick={finishOnboarding}
               disabled={loading || !planType}
-              className="w-full rounded-lg bg-[#85587D] px-6 py-2.5 text-base font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#85587D] px-6 py-2.5 text-base font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]"
             >
-              {loading ? "Setting up…" : "Start Free Trial"}
+              {loading ? (
+                <>
+                  <Spinner />
+                  Setting up…
+                </>
+              ) : (
+                "Start Free Trial"
+              )}
             </button>
           </div>
+
+          {error && (
+            <p className="mt-4 text-sm font-medium text-red-600 dark:text-red-400">
+              {error}
+            </p>
+          )}
         </section>
       )}
     </main>
