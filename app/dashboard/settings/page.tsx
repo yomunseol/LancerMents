@@ -1,5 +1,332 @@
-import SectionStub from "../SectionStub";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import { getStoredTheme, setTheme, type ThemeMode } from "@/lib/theme";
+import { useWorkspace } from "../WorkspaceContext";
+
+const MODES: { id: ThemeMode; label: string; swatch: string[] }[] = [
+  { id: "light", label: "Light", swatch: ["#F8F4F7", "#FFFFFF", "#85587D"] },
+  { id: "dark", label: "Dark", swatch: ["#151115", "#221C21", "#D8A8D3"] },
+  { id: "system", label: "System", swatch: ["#F8F4F7", "#221C21", "#85587D"] },
+];
+
+const LOCALES = [
+  { id: "en", label: "English" },
+  { id: "ko", label: "Korean" },
+] as const;
+
+const DEFAULT_WS_KEY = "lancermonts.defaultWorkspaceId";
+
+const fieldClass =
+  "w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]";
+
+function messageOf(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback;
+}
+
+function SectionCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="border-b border-[#E2D8E0] py-6 first:pt-0 last:border-b-0 last:pb-0 dark:border-[#4A2E46]">
+      <h2 className="text-sm font-semibold uppercase tracking-widest opacity-60">
+        {title}
+      </h2>
+      <div className="mt-4">{children}</div>
+    </section>
+  );
+}
 
 export default function SettingsPage() {
-  return <SectionStub title="Settings" />;
+  const router = useRouter();
+  const { workspaces, activeWorkspace, refresh } = useWorkspace();
+
+  const [mode, setMode] = useState<ThemeMode>("dark");
+  const [locale, setLocale] = useState<"en" | "ko">("en");
+  const [defaultWorkspace, setDefaultWorkspace] = useState("");
+  const [renameValue, setRenameValue] = useState("");
+  const [renameStatus, setRenameStatus] = useState<string | null>(null);
+  const [renameError, setRenameError] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState("");
+  const [profileStatus, setProfileStatus] = useState<string | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [dangerBusy, setDangerBusy] = useState(false);
+
+  useEffect(() => {
+    setMode(getStoredTheme());
+    const storedLocale = window.localStorage.getItem("lancermonts.locale");
+    if (storedLocale === "ko" || storedLocale === "en") setLocale(storedLocale);
+    setDefaultWorkspace(window.localStorage.getItem(DEFAULT_WS_KEY) ?? "");
+
+    (async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data } = await supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("id", user.id)
+          .maybeSingle();
+        setDisplayName((data as { display_name?: string | null } | null)?.display_name ?? "");
+      } catch {
+        /* leave blank */
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    setRenameValue(activeWorkspace?.name ?? "");
+  }, [activeWorkspace?.id, activeWorkspace?.name]);
+
+  function chooseMode(next: ThemeMode) {
+    setMode(next);
+    setTheme(next);
+  }
+
+  function chooseLocale(next: "en" | "ko") {
+    setLocale(next);
+    window.localStorage.setItem("lancermonts.locale", next);
+    document.cookie = `NEXT_LOCALE=${next}; path=/; max-age=31536000; samesite=lax`;
+    router.refresh();
+  }
+
+  function chooseDefaultWorkspace(id: string) {
+    setDefaultWorkspace(id);
+    window.localStorage.setItem(DEFAULT_WS_KEY, id);
+  }
+
+  async function handleRename() {
+    setRenameStatus(null);
+    setRenameError(null);
+    if (!activeWorkspace) return;
+    const name = renameValue.trim();
+    if (!name) {
+      setRenameError("Workspace name cannot be empty.");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("workspaces")
+        .update({ name })
+        .eq("id", activeWorkspace.id);
+      if (error) throw error;
+      await refresh();
+      setRenameStatus("Workspace renamed.");
+    } catch (error) {
+      setRenameError(messageOf(error, "Could not rename the workspace."));
+    }
+  }
+
+  async function handleSaveProfile() {
+    setProfileStatus(null);
+    setProfileError(null);
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Your session expired. Please sign in again.");
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({ display_name: displayName })
+        .eq("id", user.id);
+      if (error) throw error;
+      setProfileStatus("Profile saved.");
+    } catch (error) {
+      setProfileError(messageOf(error, "Could not save your profile."));
+    }
+  }
+
+  async function handleSignOutAll() {
+    setDangerBusy(true);
+    try {
+      const { error } = await supabase.auth.signOut({ scope: "global" });
+      if (error) throw error;
+      router.push("/login");
+    } catch {
+      setDangerBusy(false);
+    }
+  }
+
+  return (
+    <>
+      <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
+        Settings
+      </h1>
+      <p className="mt-1 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
+        Appearance, language, workspace defaults, and your profile.
+      </p>
+
+      <div className="mt-8 max-w-2xl rounded-2xl border border-[#E2D8E0] bg-white p-8 dark:border-[#4A2E46] dark:bg-[#221C21]">
+        <SectionCard title="Appearance">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {MODES.map((option) => {
+              const selected = mode === option.id;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => chooseMode(option.id)}
+                  aria-pressed={selected}
+                  className={`rounded-xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 ${
+                    selected
+                      ? "border-2 border-[#85587D] dark:border-[#D8A8D3]"
+                      : "border-[#E2D8E0] dark:border-[#4A2E46]"
+                  }`}
+                >
+                  <div className="flex gap-1">
+                    {option.swatch.map((color) => (
+                      <span
+                        key={color}
+                        className="h-6 w-6 rounded-md border border-[#E2D8E0] dark:border-[#4A2E46]"
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </div>
+                  <span className="mt-3 block text-sm font-semibold text-[#151115] dark:text-[#F8F4F7]">
+                    {option.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </SectionCard>
+
+        <SectionCard title="Language">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {LOCALES.map((option) => {
+              const selected = locale === option.id;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => chooseLocale(option.id)}
+                  aria-pressed={selected}
+                  className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
+                    selected
+                      ? "border-2 border-[#85587D] dark:border-[#D8A8D3]"
+                      : "border-[#E2D8E0] dark:border-[#4A2E46]"
+                  }`}
+                >
+                  <span
+                    className={`h-4 w-4 rounded-full border ${
+                      selected
+                        ? "border-[#85587D] bg-[#85587D] dark:border-[#D8A8D3] dark:bg-[#D8A8D3]"
+                        : "border-[#E2D8E0] dark:border-[#4A2E46]"
+                    }`}
+                  />
+                  <span className="text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
+                    {option.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </SectionCard>
+
+        <SectionCard title="Workspace defaults">
+          <label className="block text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
+            Default workspace on login
+            <select
+              value={defaultWorkspace}
+              onChange={(event) => chooseDefaultWorkspace(event.target.value)}
+              className={`mt-2 ${fieldClass}`}
+            >
+              <option value="">First available</option>
+              {workspaces.map((workspace) => (
+                <option key={workspace.id} value={workspace.id}>
+                  {workspace.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
+              Rename active workspace
+              <input
+                value={renameValue}
+                onChange={(event) => setRenameValue(event.target.value)}
+                placeholder="Workspace name"
+                className={`mt-2 ${fieldClass}`}
+              />
+            </label>
+            <button
+              type="button"
+              onClick={handleRename}
+              disabled={!activeWorkspace}
+              className="mt-3 rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#D8A8D3] dark:text-[#151115]"
+            >
+              Save name
+            </button>
+            {renameStatus && (
+              <p className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
+                {renameStatus}
+              </p>
+            )}
+            {renameError && (
+              <p className="mt-2 text-sm font-medium text-red-600 dark:text-red-400">
+                {renameError}
+              </p>
+            )}
+          </div>
+        </SectionCard>
+
+        <SectionCard title="Profile">
+          <label className="block text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
+            Display name
+            <input
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+              placeholder="Your name"
+              className={`mt-2 ${fieldClass}`}
+            />
+          </label>
+          <button
+            type="button"
+            onClick={handleSaveProfile}
+            className="mt-3 rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
+          >
+            Save profile
+          </button>
+          {profileStatus && (
+            <p className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
+              {profileStatus}
+            </p>
+          )}
+          {profileError && (
+            <p className="mt-2 text-sm font-medium text-red-600 dark:text-red-400">
+              {profileError}
+            </p>
+          )}
+        </SectionCard>
+
+        <section className="mt-6 rounded-xl border border-red-500/40 bg-red-500/5 p-5">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-red-600 opacity-80 dark:text-red-400">
+            Danger zone
+          </h2>
+          <p className="mt-2 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
+            Sign out of every device where you are logged in.
+          </p>
+          <button
+            type="button"
+            onClick={handleSignOutAll}
+            disabled={dangerBusy}
+            className="mt-3 rounded-lg border border-red-500/40 px-4 py-2 text-sm font-semibold text-red-600 transition-all duration-200 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-400"
+          >
+            {dangerBusy ? "Signing out…" : "Sign out of all sessions"}
+          </button>
+        </section>
+      </div>
+    </>
+  );
 }
