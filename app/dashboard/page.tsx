@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { TIER_LIMITS } from "@/lib/tiers";
+import DatePicker from "@/app/components/DatePicker";
+import { useWorkspace } from "./WorkspaceContext";
 
 type Task = {
   id: string;
@@ -15,7 +16,6 @@ type Task = {
   is_completed: boolean;
 };
 
-const NAV_ITEMS = ["Dashboard", "Tasks", "Settings"];
 const TASK_LIMIT = TIER_LIMITS.basic.maxTasks;
 const TASK_COLUMNS = "id,workspace_id,title,due_date,created_at,is_completed";
 
@@ -132,7 +132,7 @@ function TaskRow({
         type="button"
         onClick={() => onDelete(task)}
         aria-label={`Delete ${task.title}`}
-        className="ml-3 shrink-0 text-[#151115]/60 opacity-0 transition-opacity hover:text-red-400 focus:opacity-100 group-hover:opacity-100 dark:text-[#F8F4F7]/60"
+        className="ml-3 shrink-0 text-[#151115]/60 opacity-0 transition-all duration-200 hover:text-red-400 focus:opacity-100 group-hover:opacity-100 dark:text-[#F8F4F7]/60"
       >
         <XIcon />
       </button>
@@ -141,16 +141,16 @@ function TaskRow({
 }
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [workspaceId, setWorkspaceId] = useState("");
+  const { activeWorkspace, loading: workspaceLoading } = useWorkspace();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [newDue, setNewDue] = useState("");
+  const [newDue, setNewDue] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
+
+  const workspaceId = activeWorkspace?.id ?? "";
 
   const loadTasks = useCallback(async (activeWorkspaceId: string) => {
     try {
@@ -168,44 +168,16 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    let active = true;
-
-    (async () => {
-      try {
-        const { data: userData, error: userError } = await supabase.auth.getUser();
-        if (userError) throw userError;
-
-        const user = userData.user;
-        if (!user) return;
-
-        if (active) setEmail(user.email ?? "");
-
-        const { data: workspaces, error: workspaceError } = await supabase
-          .from("workspaces")
-          .select("id")
-          .eq("owner_id", user.id)
-          .order("created_at", { ascending: true })
-          .limit(1);
-
-        if (workspaceError) throw workspaceError;
-
-        const id = workspaces?.[0]?.id;
-        if (!id) return;
-
-        if (!active) return;
-        setWorkspaceId(id);
-        await loadTasks(id);
-      } catch (loadError) {
-        if (active) setError(messageOf(loadError, "Could not load your workspace."));
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [loadTasks]);
+    if (workspaceLoading) return;
+    if (!workspaceId) {
+      setTasks([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    loadTasks(workspaceId).finally(() => setLoading(false));
+  }, [workspaceId, workspaceLoading, loadTasks]);
 
   async function handleToggle(task: Task) {
     setError(null);
@@ -243,14 +215,14 @@ export default function DashboardPage() {
     try {
       const { data, error: insertError } = await supabase
         .from("tasks")
-        .insert({ workspace_id: workspaceId, title, due_date: newDue || null })
+        .insert({ workspace_id: workspaceId, title, due_date: newDue })
         .select(TASK_COLUMNS)
         .single();
 
       if (insertError) throw insertError;
       setTasks((current) => [...current, data as Task]);
       setNewTitle("");
-      setNewDue("");
+      setNewDue(null);
     } catch (insertError) {
       setError(messageOf(insertError, "Could not add that task."));
     } finally {
@@ -276,11 +248,6 @@ export default function DashboardPage() {
     }
   }
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.push("/login");
-  }
-
   const today = todayIso();
   const uncompleted = tasks.filter((task) => !task.is_completed);
   const todayTasks = uncompleted.filter((task) => {
@@ -295,205 +262,152 @@ export default function DashboardPage() {
     .sort((a, b) => (dueDay(a.due_date) ?? "").localeCompare(dueDay(b.due_date) ?? ""));
   const completed = tasks.filter((task) => task.is_completed);
   const capReached = uncompleted.length >= TASK_LIMIT;
+  const busy = loading || workspaceLoading;
 
   const rowFor = (task: Task) => (
     <TaskRow key={task.id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
   );
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
-      <aside className="w-full border-b border-[#E2D8E0] bg-white p-6 md:w-64 md:shrink-0 md:border-b-0 md:border-r dark:border-[#4A2E46] dark:bg-[#221C21]">
-        <div className="flex items-center gap-3">
-          <img
-            src="/LancerMents-Dark.png"
-            alt="LancerMents"
-            className="h-10 w-10 rounded-xl border border-[#4A2E46] object-cover"
-          />
-          <span className="text-lg font-bold text-[#151115] dark:text-[#F8F4F7]">
-            LancerMents
-          </span>
+    <>
+      <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
+        Welcome back
+      </h1>
+      <p className="mt-1 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
+        {activeWorkspace?.name ?? "No workspace selected"}
+      </p>
+
+      <section className="mt-8">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
+            Daily Tasks
+          </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-xs uppercase tracking-widest opacity-60">
+              Daily grid
+            </span>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: TASK_LIMIT }).map((_, index) => (
+                <span
+                  key={index}
+                  className={`h-1.5 w-6 rounded-full transition-colors duration-200 ${
+                    index < uncompleted.length
+                      ? "bg-[#85587D] dark:bg-[#D8A8D3]"
+                      : "bg-[#E2D8E0] dark:bg-[#4A2E46]"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
-        <nav className="mt-8 flex flex-col gap-1">
-          {NAV_ITEMS.map((item, index) => {
-            const active = index === 0;
-            if (active) {
-              return (
-                <Link
-                  key={item}
-                  href="/dashboard"
-                  className="rounded-lg bg-[#F8F4F7] px-4 py-2.5 text-sm font-semibold text-[#85587D] dark:bg-[#151115] dark:text-[#D8A8D3]"
+        {busy ? (
+          <p className="py-6 text-sm opacity-50">Loading tasks…</p>
+        ) : (
+          <div className="mt-6 space-y-8">
+            <section>
+              <h3 className="text-xs uppercase tracking-widest opacity-60">Today</h3>
+              {todayTasks.length > 0 ? (
+                <ul className="mt-3 space-y-3">{todayTasks.map(rowFor)}</ul>
+              ) : (
+                <p className="py-6 text-sm opacity-50">
+                  Nothing due today. The grid is clear.
+                </p>
+              )}
+            </section>
+
+            {scheduled.length > 0 && (
+              <section>
+                <h3 className="text-xs uppercase tracking-widest opacity-60">
+                  Scheduled
+                </h3>
+                <ul className="mt-3 space-y-3">{scheduled.map(rowFor)}</ul>
+              </section>
+            )}
+
+            {completed.length > 0 && (
+              <section>
+                <button
+                  type="button"
+                  onClick={() => setShowCompleted((open) => !open)}
+                  aria-expanded={showCompleted}
+                  className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-60 transition-all duration-200"
                 >
-                  {item}
-                </Link>
-              );
-            }
-            return (
-              <span
-                key={item}
-                aria-disabled="true"
-                className="cursor-not-allowed rounded-lg px-4 py-2.5 text-sm font-medium text-[#151115]/70 dark:text-[#F8F4F7]/70"
-              >
-                {item}
-              </span>
-            );
-          })}
-        </nav>
+                  Completed ({completed.length})
+                  <ChevronIcon open={showCompleted} />
+                </button>
+                {showCompleted && (
+                  <ul className="mt-3 space-y-3">{completed.map(rowFor)}</ul>
+                )}
+              </section>
+            )}
+          </div>
+        )}
 
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="mt-8 w-full rounded-lg border border-[#E2D8E0] px-4 py-2.5 text-sm font-semibold text-[#151115] transition-colors hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
-        >
-          Logout
-        </button>
-      </aside>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button
+            type="button"
+            onClick={handleAdd}
+            disabled={capReached || adding}
+            aria-label="Add task"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#E2D8E0] text-[#151115] transition-all duration-200 hover:border-[#85587D] disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#4A2E46] dark:text-[#F8F4F7] dark:hover:border-[#D8A8D3]"
+          >
+            <PlusIcon />
+          </button>
+          <input
+            value={newTitle}
+            onChange={(event) => setNewTitle(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") handleAdd();
+            }}
+            disabled={capReached}
+            placeholder="Add a task…"
+            className="min-w-0 flex-1 rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] disabled:opacity-50 dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]"
+          />
+          <div className="w-full sm:w-44">
+            <DatePicker
+              value={newDue}
+              onChange={setNewDue}
+              placeholder="Due date"
+            />
+          </div>
+        </div>
 
-      <main className="flex-1 px-4 py-10 md:px-10">
-        <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-          Welcome back
-        </h1>
-        {email && (
-          <p className="mt-1 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-            {email}
+        {capReached && (
+          <p className="mt-3 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
+            Grid full for today.{" "}
+            <Link
+              href="/onboarding"
+              className="font-medium text-[#85587D] hover:underline dark:text-[#D8A8D3]"
+            >
+              The Pipeline unlocks more.
+            </Link>
           </p>
         )}
 
-        <section className="mt-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
-              Daily Tasks
-            </h2>
-            <div className="flex items-center gap-2">
-              <span className="text-xs uppercase tracking-widest opacity-60">
-                Daily grid
-              </span>
-              <div className="flex items-center gap-1">
-                {Array.from({ length: TASK_LIMIT }).map((_, index) => (
-                  <span
-                    key={index}
-                    className={`h-1.5 w-6 rounded-full transition-colors duration-200 ${
-                      index < uncompleted.length
-                        ? "bg-[#85587D] dark:bg-[#D8A8D3]"
-                        : "bg-[#E2D8E0] dark:bg-[#4A2E46]"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
+        {error && (
+          <p className="mt-3 text-sm font-medium text-red-600 dark:text-red-400">
+            {error}
+          </p>
+        )}
+      </section>
 
-          {loading ? (
-            <p className="py-6 text-sm opacity-50">Loading tasks…</p>
-          ) : (
-            <div className="mt-6 space-y-8">
-              <section>
-                <h3 className="text-xs uppercase tracking-widest opacity-60">
-                  Today
-                </h3>
-                {todayTasks.length > 0 ? (
-                  <ul className="mt-3 space-y-3">{todayTasks.map(rowFor)}</ul>
-                ) : (
-                  <p className="py-6 text-sm opacity-50">
-                    Nothing due today. The grid is clear.
-                  </p>
-                )}
-              </section>
-
-              {scheduled.length > 0 && (
-                <section>
-                  <h3 className="text-xs uppercase tracking-widest opacity-60">
-                    Scheduled
-                  </h3>
-                  <ul className="mt-3 space-y-3">{scheduled.map(rowFor)}</ul>
-                </section>
-              )}
-
-              {completed.length > 0 && (
-                <section>
-                  <button
-                    type="button"
-                    onClick={() => setShowCompleted((open) => !open)}
-                    aria-expanded={showCompleted}
-                    className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-60"
-                  >
-                    Completed ({completed.length})
-                    <ChevronIcon open={showCompleted} />
-                  </button>
-                  {showCompleted && (
-                    <ul className="mt-3 space-y-3">{completed.map(rowFor)}</ul>
-                  )}
-                </section>
-              )}
-            </div>
-          )}
-
-          <div className="mt-8 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleAdd}
-              disabled={capReached || adding}
-              aria-label="Add task"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#E2D8E0] text-[#151115] transition-colors hover:border-[#85587D] disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#4A2E46] dark:text-[#F8F4F7] dark:hover:border-[#D8A8D3]"
-            >
-              <PlusIcon />
-            </button>
-            <input
-              value={newTitle}
-              onChange={(event) => setNewTitle(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") handleAdd();
-              }}
-              disabled={capReached}
-              placeholder="Add a task…"
-              className="min-w-0 flex-1 rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/60 focus:outline-none focus:ring-2 focus:ring-[#85587D] disabled:opacity-50 dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]"
-            />
-            <input
-              type="date"
-              value={newDue}
-              onChange={(event) => setNewDue(event.target.value)}
-              disabled={capReached}
-              aria-label="Due date"
-              className="rounded-lg border border-[#E2D8E0] bg-white px-3 py-3 text-sm text-[#151115] focus:outline-none focus:ring-2 focus:ring-[#85587D] disabled:opacity-50 dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:focus:ring-[#D8A8D3]"
-            />
-          </div>
-
-          {capReached && (
-            <p className="mt-3 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-              Grid full for today.{" "}
-              <Link
-                href="/onboarding"
-                className="font-medium text-[#85587D] hover:underline dark:text-[#D8A8D3]"
-              >
-                The Pipeline unlocks more.
-              </Link>
-            </p>
-          )}
-
-          {error && (
-            <p className="mt-3 text-sm font-medium text-red-600 dark:text-red-400">
-              {error}
-            </p>
-          )}
-        </section>
-
-        <section className="mt-6 flex flex-col gap-4 rounded-2xl border border-[#85587D] bg-white p-6 sm:flex-row sm:items-center sm:justify-between dark:border-[#D8A8D3] dark:bg-[#221C21]">
-          <div>
-            <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
-              Upgrade Plan
-            </h2>
-            <p className="mt-1 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-              Unlock unlimited tasks and CRM. All plans are free during Beta.
-            </p>
-          </div>
-          <Link
-            href="/onboarding"
-            className="w-full rounded-lg bg-[#85587D] px-6 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:opacity-90 sm:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]"
-          >
+      <section className="mt-6 flex flex-col gap-4 rounded-2xl border border-[#85587D] bg-white p-6 sm:flex-row sm:items-center sm:justify-between dark:border-[#D8A8D3] dark:bg-[#221C21]">
+        <div>
+          <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
             Upgrade Plan
-          </Link>
-        </section>
-      </main>
-    </div>
+          </h2>
+          <p className="mt-1 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
+            Unlock unlimited tasks and CRM. All plans are free during Beta.
+          </p>
+        </div>
+        <Link
+          href="/onboarding"
+          className="w-full rounded-lg bg-[#85587D] px-6 py-2.5 text-center text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 sm:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]"
+        >
+          Upgrade Plan
+        </Link>
+      </section>
+    </>
   );
 }

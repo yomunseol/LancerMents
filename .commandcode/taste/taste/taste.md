@@ -53,3 +53,5 @@ he text and image vertically centered (`items-center`) and tight leading on larg
 - Insists that usage caps/limits must never hide, delete, or block existing items (e.g. a task cap only blocks creating new uncompleted tasks) — existing data always renders. Confidence: 0.5
 - Scopes each task tightly to the named file(s)/page(s) and explicitly forbids touching other pages or features; expects the agent to stay within that boundary. Confidence: 0.45
 - Uses small, uppercase, letter-spaced, reduced-opacity labels (`text-xs uppercase tracking-widest opacity-60`) as section headers and UI labels. Confidence: 0.4
+- Deliberately defers internationalization: wants all UI copy written as plain-text string literals for now, with i18n treated as an explicit later retrofit — no translation library or i18n scaffolding built prematurely. Confidence: 0.4
+- Expects auth-gated pages to guard themselves on mount — check the session (e.g. `supabase.auth.getSession()`) and redirect unauthenticated users to the signup/login page rather than rendering the page. Confidence: 0.4
