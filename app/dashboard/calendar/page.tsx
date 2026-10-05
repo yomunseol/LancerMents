@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
-import { useWorkspace } from "../WorkspaceContext";
+import { useWorkspaceGate } from "../useWorkspaceData";
 
 type Task = {
   id: string;
@@ -61,7 +61,7 @@ function Chevron({ dir }: { dir: "left" | "right" }) {
 
 export default function CalendarPage() {
   const t = useTranslations();
-  const { activeWorkspace, loading: workspaceLoading } = useWorkspace();
+  const ws = useWorkspaceGate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -69,8 +69,6 @@ export default function CalendarPage() {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
   });
-
-  const workspaceId = activeWorkspace?.id ?? "";
 
   const load = useCallback(async (id: string) => {
     setError(null);
@@ -89,13 +87,9 @@ export default function CalendarPage() {
   }, []);
 
   useEffect(() => {
-    if (workspaceLoading) return;
-    if (!workspaceId) {
-      setTasks([]);
-      return;
-    }
-    load(workspaceId);
-  }, [workspaceId, workspaceLoading, load]);
+    if (!ws?.id) return; // WS-GATE
+    load(ws.id);
+  }, [ws?.id, load]);
 
   const grid = useMemo(() => {
     const first = new Date(cursor.year, cursor.month, 1);

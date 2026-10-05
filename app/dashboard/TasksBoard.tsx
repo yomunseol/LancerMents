@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { TIER_LIMITS } from "@/lib/tiers";
 import DatePicker from "@/app/components/DatePicker";
-import { useWorkspace } from "./WorkspaceContext";
+import { useWorkspaceGate } from "./useWorkspaceData";
 
 export type Task = {
   id: string;
@@ -124,7 +124,7 @@ function TaskRow({
 
 export default function TasksBoard() {
   const t = useTranslations();
-  const { activeWorkspace, loading: workspaceLoading } = useWorkspace();
+  const ws = useWorkspaceGate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -133,7 +133,7 @@ export default function TasksBoard() {
   const [newDue, setNewDue] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
 
-  const workspaceId = activeWorkspace?.id ?? "";
+  const workspaceId = ws?.id ?? "";
 
   const loadTasks = useCallback(async (activeWorkspaceId: string) => {
     try {
@@ -151,16 +151,11 @@ export default function TasksBoard() {
   }, []);
 
   useEffect(() => {
-    if (workspaceLoading) return;
-    if (!workspaceId) {
-      setTasks([]);
-      setLoading(false);
-      return;
-    }
+    if (!ws?.id) return; // WS-GATE
     setLoading(true);
     setError(null);
-    loadTasks(workspaceId).finally(() => setLoading(false));
-  }, [workspaceId, workspaceLoading, loadTasks]);
+    loadTasks(ws.id).finally(() => setLoading(false));
+  }, [ws?.id, loadTasks]);
 
   async function handleToggle(task: Task) {
     setError(null);
@@ -245,7 +240,7 @@ export default function TasksBoard() {
     .sort((a, b) => (dueDay(a.due_date) ?? "").localeCompare(dueDay(b.due_date) ?? ""));
   const completed = tasks.filter((task) => task.is_completed);
   const capReached = uncompleted.length >= TASK_LIMIT;
-  const busy = loading || workspaceLoading;
+  const busy = loading || !ws;
 
   const rowFor = (task: Task) => (
     <TaskRow key={task.id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
