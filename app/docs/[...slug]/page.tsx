@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MDXRemote } from "next-mdx-remote/rsc";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import Feedback from "../feedback";
 import { getDoc, listDocs } from "../lib/loader";
 import { mdxComponents } from "../mdx-components";
@@ -41,7 +42,9 @@ export default async function DocPage({ params }: Params) {
       </p>
 
       <div className="mt-8">
-        <MDXRemote source={doc.content} components={mdxComponents} />
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdxComponents}>
+          {doc.content}
+        </ReactMarkdown>
       </div>
 
       <Feedback page={slug} />
