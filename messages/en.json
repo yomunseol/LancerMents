@@ -128,5 +128,13 @@
   "block": "Block",
   "unblock": "Unblock",
   "sure": "Sure?",
-  "docs": "Docs"
+  "docs": "Docs",
+  "create": "Create",
+  "address_optional": "Address (optional — powers the Studio map)",
+  "err_add_client": "Could not add the client.",
+  "err_load": "Could not load data.",
+  "err_save": "Could not save changes.",
+  "gate_body": "This part of the workspace is included in a higher plan. Everything is free during Beta — pick a plan to unlock it.",
+  "retry": "Try again",
+  "saved": "Saved"
 }

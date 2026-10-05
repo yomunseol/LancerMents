@@ -95,6 +95,16 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         typeof window === "undefined"
           ? null
           : window.localStorage.getItem(STORAGE_KEY);
+
+      // Clamp a stale id (e.g. a deleted test user's workspace) out of storage.
+      if (
+        stored &&
+        !rows.some((row) => row.id === stored) &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage.removeItem(STORAGE_KEY);
+      }
+
       const next = rows.find((row) => row.id === stored)?.id ?? rows[0]?.id ?? null;
       setActiveId(next);
       if (next && typeof window !== "undefined") {

@@ -128,5 +128,13 @@
   "block": "屏蔽",
   "unblock": "取消屏蔽",
   "sure": "确定？",
-  "docs": "文档"
+  "docs": "文档",
+  "create": "创建",
+  "address_optional": "地址(可选——用于 Studio 地图)",
+  "err_add_client": "无法添加客户。",
+  "err_load": "无法加载数据。",
+  "err_save": "无法保存更改。",
+  "gate_body": "此功能包含在更高级的计划中。Beta 期间一切免费——选择计划即可解锁。",
+  "retry": "重试",
+  "saved": "已保存"
 }

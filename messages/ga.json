@@ -128,5 +128,13 @@
   "block": "Blocáil",
   "unblock": "Díbhlocáil",
   "sure": "An bhfuil tú cinnte?",
-  "docs": "Doiciméid"
+  "docs": "Doiciméid",
+  "create": "Cruthaigh",
+  "address_optional": "Seoladh (roghnach — cumhachtaíonn léarscáil Studio)",
+  "err_add_client": "Níorbh fhéidir an cliant a chur leis.",
+  "err_load": "Níorbh fhéidir na sonraí a lódáil.",
+  "err_save": "Níorbh fhéidir na athruithe a shábháil.",
+  "gate_body": "Tá an chuid seo den spás i bplean níos airde. Tá gach rud saor le linn na Béite — roghnaigh plean chun é a dhíghlasáil.",
+  "retry": "Bain triail eile as",
+  "saved": "Sábháilte"
 }

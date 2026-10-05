@@ -84,7 +84,7 @@ function ClientsInner() {
     try {
       const { data, error: loadError } = await supabase
         .from("clients")
-        .select("id,workspace_id,name,email,status,created_at,address,address_lat,address_lng")
+        .select("id,name,email,status,address,address_lat,address_lng,created_at")
         .eq("workspace_id", id)
         .order("created_at", { ascending: false });
       if (loadError) throw loadError;
@@ -286,10 +286,6 @@ function ClientsInner() {
         </div>
       </div>
 
-      {error && (
-        <p className="mt-3 text-sm text-red-400">{error}</p>
-      )}
-
       <div className="mt-6">
         {loading ? (
           <div className="flex flex-col gap-3">
@@ -299,6 +295,25 @@ function ClientsInner() {
                 className="h-14 animate-pulse rounded-xl bg-[#E2D8E0]/50 dark:bg-[#4A2E46]/40"
               />
             ))}
+          </div>
+        ) : error ? (
+          <div className="rounded-2xl border border-red-500/40 bg-red-500/5 p-6">
+            <p className="text-sm font-medium text-red-600 dark:text-red-400">
+              {t("err_load")}
+            </p>
+            <p className="mt-1 font-mono text-xs text-red-500/80">{error}</p>
+            <button
+              type="button"
+              onClick={() => {
+                if (ws?.id) {
+                  setLoading(true);
+                  load(ws.id).finally(() => setLoading(false));
+                }
+              }}
+              className="mt-4 rounded-lg border border-[#E2D8E0] px-4 py-2 text-sm font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
+            >
+              {t("retry")}
+            </button>
           </div>
         ) : visible.length === 0 ? (
           <EmptyState

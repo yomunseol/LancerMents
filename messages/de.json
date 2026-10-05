@@ -128,5 +128,13 @@
   "block": "Blockieren",
   "unblock": "Entsperren",
   "sure": "Sicher?",
-  "docs": "Dokumente"
+  "docs": "Dokumente",
+  "create": "Erstellen",
+  "address_optional": "Adresse (optional — aktiviert die Studio-Karte)",
+  "err_add_client": "Kunde konnte nicht hinzugefügt werden.",
+  "err_load": "Daten konnten nicht geladen werden.",
+  "err_save": "Änderungen konnten nicht gespeichert werden.",
+  "gate_body": "Dieser Bereich ist in einem höheren Tarif enthalten. In der Beta ist alles kostenlos — Tarif wählen zum Freischalten.",
+  "retry": "Erneut versuchen",
+  "saved": "Gespeichert"
 }

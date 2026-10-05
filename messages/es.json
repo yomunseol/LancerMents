@@ -128,5 +128,13 @@
   "block": "Bloquear",
   "unblock": "Desbloquear",
   "sure": "¿Seguro?",
-  "docs": "Documentos"
+  "docs": "Documentos",
+  "create": "Crear",
+  "address_optional": "Dirección (opcional: activa el mapa de Studio)",
+  "err_add_client": "No se pudo añadir el cliente.",
+  "err_load": "No se pudieron cargar los datos.",
+  "err_save": "No se pudieron guardar los cambios.",
+  "gate_body": "Esta parte del espacio está incluida en un plan superior. Todo es gratis durante la Beta: elige un plan para desbloquearla.",
+  "retry": "Reintentar",
+  "saved": "Guardado"
 }

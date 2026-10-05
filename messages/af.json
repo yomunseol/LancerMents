@@ -128,5 +128,13 @@
   "block": "Blokkeer",
   "unblock": "Deblokkeer",
   "sure": "Sekers?",
-  "docs": "Dokumente"
+  "docs": "Dokumente",
+  "create": "Skep",
+  "address_optional": "Adres (opsioneel — dryf die Studio-kaart)",
+  "err_add_client": "Kon nie die kliënt byvoeg nie.",
+  "err_load": "Kon nie data laai nie.",
+  "err_save": "Kon nie veranderinge stoor nie.",
+  "gate_body": "Hierdie deel van die werkspas is in 'n hoër plan ingesluit. Alles is gratis tydens die Beta — kies 'n plan om dit te ontsluit.",
+  "retry": "Probeer weer",
+  "saved": "Gestoor"
 }

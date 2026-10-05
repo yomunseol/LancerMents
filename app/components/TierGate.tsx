@@ -36,12 +36,15 @@ export default function TierGate({
   }
 
   if (!allows(planType, requiredTier)) {
-    const tierName = requiredTier === "pipeline" ? "The Pipeline" : "The Studio";
+    const pageKey = pathname.split("/").filter(Boolean).pop() ?? "";
     return (
       <div className="rounded-2xl border border-[#85587D] bg-gradient-to-br from-[#85587D]/10 to-transparent p-10 text-center dark:border-[#D8A8D3] dark:from-[#D8A8D3]/10">
         <h2 className="text-2xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-          {t("tier.headline", { tier: tierName })}
+          {t(pageKey)}
         </h2>
+        <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#151115]/80 dark:text-[#F8F4F7]/80">
+          {t("gate_body")}
+        </p>
         <ul className="mx-auto mt-6 flex max-w-sm flex-col gap-2 text-left text-sm text-[#151115]/80 dark:text-[#F8F4F7]/80">
           {TEASERS[requiredTier].map((item) => (
             <li key={item} className="flex items-start gap-2">

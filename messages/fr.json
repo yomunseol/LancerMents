@@ -128,5 +128,13 @@
   "block": "Bloquer",
   "unblock": "Débloquer",
   "sure": "Sûr ?",
-  "docs": "Documentation"
+  "docs": "Documentation",
+  "create": "Créer",
+  "address_optional": "Adresse (optionnel — active la carte Studio)",
+  "err_add_client": "Impossible d'ajouter le client.",
+  "err_load": "Impossible de charger les données.",
+  "err_save": "Impossible d'enregistrer les modifications.",
+  "gate_body": "Cette partie de l'espace est incluse dans un plan supérieur. Tout est gratuit pendant la Beta — choisissez un plan pour débloquer.",
+  "retry": "Réessayer",
+  "saved": "Enregistré"
 }

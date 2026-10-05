@@ -128,5 +128,13 @@
   "block": "Zuia",
   "unblock": "Ondoa zuio",
   "sure": "Una uhakika?",
-  "docs": "Nyaraka"
+  "docs": "Nyaraka",
+  "create": "Unda",
+  "address_optional": "Anwani (hiari — huwasha ramani ya Studio)",
+  "err_add_client": "Imeshindwa kuongeza mteja.",
+  "err_load": "Imeshindwa kupakia data.",
+  "err_save": "Imeshindwa kuhifadhi mabadiliko.",
+  "gate_body": "Sehemu hii ya nafasi iko katika mpango wa juu. Kila kitu ni bure wakati wa Beta — chagua mpango kuifungua.",
+  "retry": "Jaribu tena",
+  "saved": "Imehifadhiwa"
 }
