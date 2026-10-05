@@ -1,12 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { formatCurrency, formatDate } from "@/lib/format";
 import EmptyState from "@/app/components/EmptyState";
 import TierGate from "@/app/components/TierGate";
 import { useWorkspace } from "../WorkspaceContext";
+
+const ClientMap = dynamic(() => import("@/app/components/ClientMap"), {
+  ssr: false,
+});
 
 type Client = {
   id: string;
@@ -15,6 +20,9 @@ type Client = {
   email: string | null;
   status: string | null;
   created_at: string;
+  address: string | null;
+  address_lat: number | null;
+  address_lng: number | null;
 };
 
 type Note = { id: string; title: string | null };
@@ -56,8 +64,10 @@ function ClientsInner() {
   const [addOpen, setAddOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
+  const [newAddress, setNewAddress] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [planType, setPlanType] = useState<string | null>(null);
 
   const [confirmBlockId, setConfirmBlockId] = useState<string | null>(null);
   const [drawerClient, setDrawerClient] = useState<Client | null>(null);
@@ -72,7 +82,7 @@ function ClientsInner() {
     try {
       const { data, error: loadError } = await supabase
         .from("clients")
-        .select("id,workspace_id,name,email,status,created_at")
+        .select("id,workspace_id,name,email,status,created_at,address,address_lat,address_lng")
         .eq("workspace_id", id)
         .order("created_at", { ascending: false });
       if (loadError) throw loadError;
@@ -93,6 +103,25 @@ function ClientsInner() {
     load(workspaceId).finally(() => setLoading(false));
   }, [workspaceId, workspaceLoading, load]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data } = await supabase
+          .from("profiles")
+          .select("plan_type")
+          .eq("id", user.id)
+          .maybeSingle();
+        setPlanType((data as { plan_type?: string | null } | null)?.plan_type ?? null);
+      } catch {
+        /* maps simply stay locked */
+      }
+    })();
+  }, []);
+
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase();
     return clients.filter((client) => {
@@ -112,6 +141,7 @@ function ClientsInner() {
     setFormError(null);
     const name = newName.trim();
     const email = newEmail.trim();
+    const address = newAddress.trim();
 
     if (!name) {
       setFormError("Name is required.");
@@ -125,14 +155,44 @@ function ClientsInner() {
 
     setSaving(true);
     try {
-      const { error: insertError } = await supabase
-        .from("clients")
-        .insert({ workspace_id: workspaceId, name, email: email || null, status: "active" });
+      let lat: number | null = null;
+      let lng: number | null = null;
+      let warning: string | null = null;
+
+      if (address) {
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`,
+          );
+          const results = (await response.json()) as { lat: string; lon: string }[];
+          if (results?.[0]) {
+            lat = Number(results[0].lat);
+            lng = Number(results[0].lon);
+          } else {
+            warning = "Address not found — client saved without map.";
+          }
+        } catch {
+          warning = "Address lookup failed — client saved without map.";
+        }
+      }
+
+      const { error: insertError } = await supabase.from("clients").insert({
+        workspace_id: workspaceId,
+        name,
+        email: email || null,
+        status: "active",
+        address: address || null,
+        address_lat: lat,
+        address_lng: lng,
+      });
       if (insertError) throw insertError;
+
       await load(workspaceId);
       setAddOpen(false);
       setNewName("");
       setNewEmail("");
+      setNewAddress("");
+      if (warning) setError(warning);
     } catch (insertError) {
       setFormError(messageOf(insertError, "Could not add the client."));
     } finally {
@@ -385,6 +445,12 @@ function ClientsInner() {
                 placeholder="Client email (optional)"
                 className={fieldClass}
               />
+              <input
+                value={newAddress}
+                onChange={(event) => setNewAddress(event.target.value)}
+                placeholder="Address (optional — powers the Studio map)"
+                className={fieldClass}
+              />
             </div>
             {formError && <p className="mt-3 text-sm text-red-400">{formError}</p>}
             <div className="mt-6 flex justify-end gap-2">
@@ -483,6 +549,40 @@ function ClientsInner() {
                   </li>
                 ))}
               </ul>
+            </section>
+
+            <section className="mt-6">
+              <h3 className="text-xs uppercase tracking-widest opacity-60">Location</h3>
+              {planType === "studio" ? (
+                drawerClient.address_lat != null && drawerClient.address_lng != null ? (
+                  <div className="mt-2">
+                    <div className="h-48 overflow-hidden rounded-xl border border-[#E2D8E0] dark:border-[#4A2E46]">
+                      <ClientMap
+                        lat={drawerClient.address_lat}
+                        lng={drawerClient.address_lng}
+                        label={drawerClient.name}
+                      />
+                    </div>
+                    {drawerClient.address && (
+                      <p className="mt-2 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
+                        {drawerClient.address}
+                      </p>
+                    )}
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${drawerClient.address_lat},${drawerClient.address_lng}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 inline-block text-sm font-medium text-[#85587D] hover:underline dark:text-[#D8A8D3]"
+                    >
+                      Open in Google Maps
+                    </a>
+                  </div>
+                ) : (
+                  <p className="mt-2 text-sm opacity-60">No address on file.</p>
+                )
+              ) : (
+                <p className="mt-2 text-sm opacity-60">Maps live in The Studio.</p>
+              )}
             </section>
 
             <div className="mt-8 flex gap-2">

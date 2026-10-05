@@ -62,3 +62,11 @@ he text and image vertically centered (`items-center`) and tight leading on larg
 - Wants UI animations to respect the user's `prefers-reduced-motion` setting. Confidence: 0.4
 - Prefers staying on the latest versions of the stack: when dependencies have been bumped to newer majors (e.g. via `npm audit fix --force`), chooses to migrate the code forward to the new versions rather than downgrade/revert to the previously-specified older stack — even when the migration requires breaking changes. Confidence: 0.6
 - Is comfortable letting the agent carry out large, breaking framework/config migrations (e.g. Next.js + Tailwind major upgrades, rewriting configs) autonomously as a single step before continuing other feature work. Confidence: 0.5
+- Treats full SaaS-grade polish as a baseline requirement for every page, not an optional extra: loading skeletons (`animate-pulse`), empty states, inline errors, and smooth motion ("every page must feel like a real SaaS"). Confidence: 0.5
+- Wants shared building blocks extracted first (shared components plus format/util helpers) and reused across pages by import, rather than re-implementing the same UI per page. Confidence: 0.45
+- Renders the same list data as a full table on desktop and stacked cards on mobile (e.g. `hidden md:block` table plus a `md:hidden` card `<ul>`) rather than one layout that stretches. Confidence: 0.45
+- Prefers optimistic UI mutations that update state immediately and revert on failure, surfacing the failure as a non-blocking inline toast (e.g. "Move failed — reverted"), and re-fetches lists after mutations so the UI matches stored data. Confidence: 0.45
+- Wants destructive/irreversible row actions confirmed by a small inline confirm control (e.g. a "Sure?" button appearing next to the action) rather than a native browser dialog. Confidence: 0.4
+- Expects overlays (modals, drawers) to close on Escape key and outside-click, with the panel content stopping click propagation. Confidence: 0.4
+- Wants keyboard focus states styled with the design accent (accent-colored focus rings) rather than default browser outlines. Confidence: 0.4
+- Explicitly excludes third-party payment integration ("no Stripe") from these app builds. Confidence: 0.4
