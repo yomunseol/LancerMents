@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import { RTL_LOCALES } from "@/lib/i18n/vocab";
+import GlobalNav from "@/app/components/GlobalNav";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,7 +22,10 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={dir} className="dark">
       <body className="bg-[#F8F4F7] text-[#151115] transition-colors duration-300 dark:bg-[#151115] dark:text-[#F8F4F7]">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <GlobalNav />
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

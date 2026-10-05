@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -64,46 +63,11 @@ function LockIcon() {
   );
 }
 
-function GlobeIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      aria-hidden="true"
-      className="shrink-0"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
-    </svg>
-  );
-}
-
-const LOCALES = ["en", "ko"] as const;
-type Locale = (typeof LOCALES)[number];
-
 function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const t = useTranslations();
   const { planType } = useProfile();
-  const [locale, setLocale] = useState<Locale>("en");
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem("lancermonts.locale");
-    if (stored === "en" || stored === "ko") setLocale(stored);
-  }, []);
-
-  function changeLocale(next: Locale) {
-    setLocale(next);
-    window.localStorage.setItem("lancermonts.locale", next);
-    document.cookie = `lm_locale=${next}; path=/; max-age=31536000; samesite=lax`;
-    document.cookie = `NEXT_LOCALE=${next}; path=/; max-age=31536000; samesite=lax`;
-    router.refresh();
-  }
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -153,29 +117,6 @@ function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-8 flex items-center gap-2">
-        <span className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-60">
-          <GlobeIcon />
-          {t("language")}
-        </span>
-        <div className="ml-auto flex items-center gap-1">
-          {LOCALES.map((code) => (
-            <button
-              key={code}
-              type="button"
-              onClick={() => changeLocale(code)}
-              className={`rounded-lg px-2 py-1 text-xs font-semibold uppercase transition-all duration-200 ${
-                locale === code
-                  ? "bg-[#85587D] text-white dark:bg-[#D8A8D3] dark:text-[#151115]"
-                  : "text-[#151115]/70 hover:bg-[#85587D]/10 dark:text-[#F8F4F7]/70 dark:hover:bg-[#D8A8D3]/10"
-              }`}
-            >
-              {code}
-            </button>
-          ))}
-        </div>
-      </div>
-
       <button
         type="button"
         onClick={handleLogout}
@@ -195,7 +136,7 @@ export default function DashboardLayout({
   return (
     <ProfileProvider>
       <WorkspaceProvider>
-        <div className="flex min-h-screen flex-col md:flex-row">
+        <div className="flex min-h-screen flex-col pt-16 md:flex-row">
           <Sidebar />
           <main className="min-w-0 flex-1 px-4 py-10 md:px-10">{children}</main>
         </div>
