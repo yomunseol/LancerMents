@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { getStoredTheme, resolveDark, setTheme, type ThemeMode } from "@/lib/theme";
@@ -42,12 +42,22 @@ function MoonIcon() {
   );
 }
 
+function BookOpenIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 6.5C10.5 5 8.5 4.5 6 4.5H4v13h2c2.5 0 4.5.5 6 2 1.5-1.5 3.5-2 6-2h2v-13h-2c-2.5 0-4.5.5-6 2Z" />
+      <path d="M12 6.5v13" />
+    </svg>
+  );
+}
+
 const iconButtonClass =
   "flex h-10 w-10 items-center justify-center rounded-lg border border-[#E2D8E0] text-[#151115] transition-all duration-200 hover:bg-[#85587D]/10 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:text-[#F8F4F7] dark:hover:bg-[#D8A8D3]/10 dark:focus:ring-[#D8A8D3]";
 
 export default function GlobalNav() {
   const t = useTranslations();
   const router = useRouter();
+  const pathname = usePathname();
   const activeLocale = useLocale();
 
   const [plan, setPlan] = useState<"guest" | "authed">("guest");
@@ -166,6 +176,19 @@ export default function GlobalNav() {
       )}
 
       <div className="flex items-center gap-3">
+        <Link
+          href="/docs"
+          aria-label={t("docs")}
+          className={`flex h-10 items-center gap-2 rounded-lg px-3 transition-all duration-200 hover:bg-[#85587D]/10 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:hover:bg-[#D8A8D3]/10 dark:focus:ring-[#D8A8D3] ${
+            pathname.startsWith("/docs")
+              ? "border border-[#85587D]/20 bg-[#85587D]/5 text-[#85587D] dark:border-[#D8A8D3]/20 dark:bg-[#D8A8D3]/5 dark:text-[#D8A8D3]"
+              : "text-[#151115] dark:text-[#F8F4F7]"
+          }`}
+        >
+          <BookOpenIcon />
+          <span className="hidden md:inline">{t("docs")}</span>
+        </Link>
+
         <div ref={langRef} className="relative">
           <button
             type="button"

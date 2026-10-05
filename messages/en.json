@@ -127,5 +127,6 @@
   "view": "View",
   "block": "Block",
   "unblock": "Unblock",
-  "sure": "Sure?"
+  "sure": "Sure?",
+  "docs": "Docs"
 }

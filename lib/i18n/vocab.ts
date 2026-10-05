@@ -60,6 +60,7 @@ export const VOCAB = {
   revoke: { en:'Revoke', zh:'撤销', es:'Revocar', fr:'Révoquer', ar:'إلغاء الجلسة', pt:'Revogar', ru:'Отозвать', de:'Widerrufen', ja:'取り消す', ko:'해제', sw:'Batilisha', it:'Revoca', he:'בטל', af:'Herroep', ga:'Cúlghair' },
   sign_out_all: { en:'Sign out all other sessions', zh:'登出所有其他会话', es:'Cerrar las demás sesiones', fr:'Déconnecter les autres sessions', ar:'تسجيل الخروج من الجلسات الأخرى', pt:'Sair das outras sessões', ru:'Выйти на других устройствах', de:'Andere Sitzungen abmelden', ja:'他のセッションをログアウト', ko:'다른 세션 모두 로그아웃', sw:'Toka kwenye vipindi vingine vyote', it:'Esci dalle altre sessioni', he:'התנתק מכל שאר ההפעלות', af:'Meld alle ander sessies af', ga:'Logáil amach as gach seisiún eile' },
   change_password: { en:'Change password', zh:'修改密码', es:'Cambiar contraseña', fr:'Changer le mot de passe', ar:'تغيير كلمة المرور', pt:'Alterar senha', ru:'Сменить пароль', de:'Passwort ändern', ja:'パスワードを変更', ko:'비밀번호 변경', sw:'Badilisha nenosiri', it:'Cambia password', he:'שינוי סיסמה', af:'Verander wagwoord', ga:'Athraigh pasfhocal' },
+  docs: { en:'Docs', zh:'文档', es:'Documentos', fr:'Documentation', ar:'المستندات', pt:'Documentação', ru:'Документация', de:'Dokumente', ja:'ドキュメント', ko:'문서', sw:'Nyaraka', it:'Documentazione', he:'מסכים', af:'Dokumente', ga:'Doiciméid' },
 }
 
 export const VOCAB2 = {
