@@ -100,6 +100,7 @@ function Sidebar() {
   function changeLocale(next: Locale) {
     setLocale(next);
     window.localStorage.setItem("lancermonts.locale", next);
+    document.cookie = `lm_locale=${next}; path=/; max-age=31536000; samesite=lax`;
     document.cookie = `NEXT_LOCALE=${next}; path=/; max-age=31536000; samesite=lax`;
     router.refresh();
   }
@@ -145,7 +146,7 @@ function Sidebar() {
               }`}
             >
               <NavIconSvg icon={item.icon} />
-              <span className="flex-1 truncate">{t(`nav.${item.key}`)}</span>
+              <span className="flex-1 truncate">{t(item.key)}</span>
               {locked && <LockIcon />}
             </Link>
           );
@@ -155,7 +156,7 @@ function Sidebar() {
       <div className="mt-8 flex items-center gap-2">
         <span className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-60">
           <GlobeIcon />
-          {t("common.language")}
+          {t("language")}
         </span>
         <div className="ml-auto flex items-center gap-1">
           {LOCALES.map((code) => (
@@ -180,7 +181,7 @@ function Sidebar() {
         onClick={handleLogout}
         className="mt-4 w-full rounded-lg border border-[#E2D8E0] px-4 py-2.5 text-sm font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
       >
-        {t("common.logout")}
+        {t("logout")}
       </button>
     </aside>
   );
