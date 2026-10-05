@@ -12,11 +12,6 @@ const MODES: { id: ThemeMode; label: string; swatch: string[] }[] = [
   { id: "system", label: "System", swatch: ["#F8F4F7", "#221C21", "#85587D"] },
 ];
 
-const LOCALES = [
-  { id: "en", label: "English" },
-  { id: "ko", label: "Korean" },
-] as const;
-
 const DEFAULT_WS_KEY = "lancermonts.defaultWorkspaceId";
 
 const fieldClass =
@@ -48,7 +43,6 @@ export default function SettingsPage() {
   const { workspaces, activeWorkspace, refresh } = useWorkspace();
 
   const [mode, setMode] = useState<ThemeMode>("dark");
-  const [locale, setLocale] = useState<"en" | "ko">("en");
   const [defaultWorkspace, setDefaultWorkspace] = useState("");
   const [renameValue, setRenameValue] = useState("");
   const [renameStatus, setRenameStatus] = useState<string | null>(null);
@@ -57,8 +51,6 @@ export default function SettingsPage() {
 
   useEffect(() => {
     setMode(getStoredTheme());
-    const storedLocale = window.localStorage.getItem("lancermonts.locale");
-    if (storedLocale === "ko" || storedLocale === "en") setLocale(storedLocale);
     setDefaultWorkspace(window.localStorage.getItem(DEFAULT_WS_KEY) ?? "");
   }, []);
 
@@ -69,13 +61,6 @@ export default function SettingsPage() {
   function chooseMode(next: ThemeMode) {
     setMode(next);
     setTheme(next);
-  }
-
-  function chooseLocale(next: "en" | "ko") {
-    setLocale(next);
-    window.localStorage.setItem("lancermonts.locale", next);
-    document.cookie = `NEXT_LOCALE=${next}; path=/; max-age=31536000; samesite=lax`;
-    router.refresh();
   }
 
   function chooseDefaultWorkspace(id: string) {
@@ -153,38 +138,6 @@ export default function SettingsPage() {
                     ))}
                   </div>
                   <span className="mt-3 block text-sm font-semibold text-[#151115] dark:text-[#F8F4F7]">
-                    {option.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </SectionCard>
-
-        <SectionCard title="Language">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {LOCALES.map((option) => {
-              const selected = locale === option.id;
-              return (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => chooseLocale(option.id)}
-                  aria-pressed={selected}
-                  className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
-                    selected
-                      ? "border-2 border-[#85587D] dark:border-[#D8A8D3]"
-                      : "border-[#E2D8E0] dark:border-[#4A2E46]"
-                  }`}
-                >
-                  <span
-                    className={`h-4 w-4 rounded-full border ${
-                      selected
-                        ? "border-[#85587D] bg-[#85587D] dark:border-[#D8A8D3] dark:bg-[#D8A8D3]"
-                        : "border-[#E2D8E0] dark:border-[#4A2E46]"
-                    }`}
-                  />
-                  <span className="text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
                     {option.label}
                   </span>
                 </button>

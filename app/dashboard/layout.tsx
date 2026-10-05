@@ -75,21 +75,8 @@ function Sidebar() {
   }
 
   return (
-    <aside className="w-full shrink-0 border-b border-[#E2D8E0] bg-white p-6 md:w-64 md:border-b-0 md:border-r dark:border-[#4A2E46] dark:bg-[#221C21]">
-      <div className="flex items-center gap-3">
-        <img
-          src="/LancerMents-Dark.png"
-          alt="LancerMents"
-          className="h-10 w-10 rounded-xl border border-[#4A2E46] object-cover"
-        />
-        <span className="text-lg font-bold text-[#151115] dark:text-[#F8F4F7]">
-          LancerMents
-        </span>
-      </div>
-
-      <div className="mt-6">
-        <WorkspaceSwitcher />
-      </div>
+    <aside className="w-full shrink-0 border-b border-[#E2D8E0] bg-white p-6 pt-6 md:w-64 md:border-b-0 md:border-r dark:border-[#4A2E46] dark:bg-[#221C21]">
+      <WorkspaceSwitcher />
 
       <nav className="mt-6 flex flex-col gap-1">
         {NAV_ITEMS.map((item) => {
