@@ -27,7 +27,7 @@ export default function TierGate({
 }) {
   const t = useTranslations();
   const pathname = usePathname();
-  const { planType, loading } = useProfile();
+  const { planCanonical, loading } = useProfile();
 
   if (loading) {
     return (
@@ -35,7 +35,7 @@ export default function TierGate({
     );
   }
 
-  if (!allows(planType, requiredTier)) {
+  if (!allows(planCanonical, requiredTier)) {
     const pageKey = pathname.split("/").filter(Boolean).pop() ?? "";
     return (
       <div className="rounded-2xl border border-[#85587D] bg-gradient-to-br from-[#85587D]/10 to-transparent p-10 text-center dark:border-[#D8A8D3] dark:from-[#D8A8D3]/10">

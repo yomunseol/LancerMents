@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
+import { saveProfile } from "@/lib/profile";
 import { useProfile } from "@/app/dashboard/ProfileContext";
 
 type BusinessType = {
@@ -198,28 +199,12 @@ export default function OnboardingPage() {
           : null) ??
         "en";
 
-      const { error: updateError } = editMode
-        ? await supabase
-            .from("profiles")
-            .update({ plan_type: planType })
-            .eq("id", user.id)
-        : await supabase
-            .from("profiles")
-            .update({ business_type: businessType, plan_type: planType, locale: currentLocale })
-            .eq("id", user.id);
+      const patch = editMode
+        ? { plan_type: planType }
+        : { business_type: businessType, plan_type: planType, locale: currentLocale };
 
-      if (updateError) throw updateError;
-
-      // Assert the write actually landed before navigating away.
-      const { data: persisted } = await supabase
-        .from("profiles")
-        .select("plan_type")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if ((persisted as { plan_type?: string | null } | null)?.plan_type !== planType) {
-        throw new Error("plan_type not persisted");
-      }
+      const result = await saveProfile(user.id, patch);
+      if (!result.ok) throw new Error(result.error);
 
       await refresh();
       router.push(returnTo || "/dashboard");

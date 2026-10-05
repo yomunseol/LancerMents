@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
+import { saveProfile } from "@/lib/profile";
 import { getStoredTheme, resolveDark, setTheme, type ThemeMode } from "@/lib/theme";
 import { LOCALE_LABELS, LOCALE_ORDER } from "@/lib/i18n/vocab";
 
@@ -130,9 +131,11 @@ export default function GlobalNav() {
 
     supabase.auth
       .getUser()
-      .then(({ data }) => {
+      .then(async ({ data }) => {
         if (!data.user) return;
-        return supabase.from("profiles").update({ locale: code }).eq("id", data.user.id);
+        const result = await saveProfile(data.user.id, { locale: code });
+        if (!result.ok) throw new Error(result.error);
+        return result;
       })
       .catch(() => undefined);
 

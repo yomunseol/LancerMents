@@ -10,6 +10,7 @@ import {
 } from "react";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { canonicalPlan, type CanonicalPlan } from "@/lib/profile";
 
 export type Profile = {
   id: string;
@@ -23,9 +24,11 @@ export type Profile = {
 type ProfileContextValue = {
   profile: Profile | null;
   planType: string | null;
+  planCanonical: CanonicalPlan | null;
   loading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 };
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
@@ -90,9 +93,11 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     () => ({
       profile,
       planType: profile?.plan_type ?? null,
+      planCanonical: canonicalPlan(profile?.plan_type ?? null),
       loading,
       error,
       refresh,
+      refreshProfile: refresh,
     }),
     [profile, loading, error, refresh],
   );
