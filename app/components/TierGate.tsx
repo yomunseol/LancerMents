@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { supabase } from "@/lib/supabase";
+import { useProfile } from "@/app/dashboard/ProfileContext";
 
 export type GatedTier = "pipeline" | "studio";
 
@@ -26,51 +25,15 @@ export default function TierGate({
   children: React.ReactNode;
 }) {
   const t = useTranslations("tier");
-  const [status, setStatus] = useState<"loading" | "allowed" | "locked">("loading");
+  const { planType, loading } = useProfile();
 
-  useEffect(() => {
-    let active = true;
-
-    (async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (!active) return;
-        if (!user) {
-          setStatus("locked");
-          return;
-        }
-
-        const { data } = await supabase
-          .from("profiles")
-          .select("plan_type")
-          .eq("id", user.id)
-          .maybeSingle();
-
-        if (!active) return;
-        setStatus(
-          allows((data as { plan_type?: string | null } | null)?.plan_type, requiredTier)
-            ? "allowed"
-            : "locked",
-        );
-      } catch {
-        if (active) setStatus("locked");
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [requiredTier]);
-
-  if (status === "loading") {
+  if (loading) {
     return (
       <div className="h-64 animate-pulse rounded-2xl border border-[#E2D8E0] bg-[#E2D8E0]/40 dark:border-[#4A2E46] dark:bg-[#4A2E46]/30" />
     );
   }
 
-  if (status === "locked") {
+  if (!allows(planType, requiredTier)) {
     const tierName = requiredTier === "pipeline" ? "The Pipeline" : "The Studio";
     return (
       <div className="rounded-2xl border border-[#85587D] bg-gradient-to-br from-[#85587D]/10 to-transparent p-10 text-center dark:border-[#D8A8D3] dark:from-[#D8A8D3]/10">

@@ -29,6 +29,31 @@ export default function LoginPage() {
     }
   }, []);
 
+  async function routeAfterAuth() {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+
+      const { data } = await supabase
+        .from("profiles")
+        .select("business_type,plan_type")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      const business = (data as { business_type?: string | null } | null)?.business_type;
+      const plan = (data as { plan_type?: string | null } | null)?.plan_type;
+
+      router.push(business && plan ? "/dashboard" : "/onboarding");
+    } catch {
+      router.push("/dashboard");
+    }
+  }
+
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const client = supabase;
@@ -56,7 +81,7 @@ export default function LoginPage() {
       setLoading(false);
 
       if (!totp) {
-        router.push("/dashboard");
+          await routeAfterAuth();
         return;
       }
 
@@ -66,7 +91,7 @@ export default function LoginPage() {
     }
 
     setLoading(false);
-    router.push("/dashboard");
+      await routeAfterAuth();
   }
 
   async function handleVerify(event: FormEvent<HTMLFormElement>) {
@@ -98,7 +123,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/dashboard");
+      await routeAfterAuth();
   }
 
   return (

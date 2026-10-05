@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { NAV_ITEMS, isNavLocked, type NavIcon } from "./nav-config";
+import { ProfileProvider, useProfile } from "./ProfileContext";
 import { WorkspaceProvider, useWorkspace } from "./WorkspaceContext";
 import WorkspaceSwitcher from "./WorkspaceSwitcher";
 
@@ -19,6 +20,7 @@ const ICON_PATHS: Record<NavIcon, string> = {
   invoices: "M6 3h12v18H6zM9 8h6M9 12h6M9 16h4",
   analytics: "M4 20V4M4 20h16M8 16v-5M12 16V8M16 16v-3",
   spreadsheet: "M3 5h18v14H3zM3 10h18M3 15h18M9 5v14M15 5v14",
+  profile: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M5 20a7 7 0 0 1 14 0",
   security: "M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z",
   settings:
     "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M19.4 13.5l1.6-.9-2-3.4-1.6.9a7.6 7.6 0 0 0-1.8-1L15.4 7h-4l-.2 2.1a7.6 7.6 0 0 0-1.8 1l-1.6-.9-2 3.4 1.6.9a7.6 7.6 0 0 0 0 2.1l-1.6.9 2 3.4 1.6-.9c.5.4 1.1.8 1.8 1l.2 2.1h4l.2-2.1c.7-.2 1.3-.6 1.8-1l1.6.9 2-3.4-1.6-.9a7.6 7.6 0 0 0 0-2.1Z",
@@ -87,7 +89,7 @@ function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const t = useTranslations();
-  const { tier } = useWorkspace();
+  const { planType } = useProfile();
   const [locale, setLocale] = useState<Locale>("en");
 
   useEffect(() => {
@@ -130,7 +132,7 @@ function Sidebar() {
             item.href === "/dashboard"
               ? pathname === "/dashboard"
               : pathname.startsWith(item.href);
-          const locked = isNavLocked(item, tier);
+          const locked = isNavLocked(item, planType ?? "basic");
 
           return (
             <Link
@@ -190,11 +192,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <WorkspaceProvider>
-      <div className="flex min-h-screen flex-col md:flex-row">
-        <Sidebar />
-        <main className="min-w-0 flex-1 px-4 py-10 md:px-10">{children}</main>
-      </div>
-    </WorkspaceProvider>
+    <ProfileProvider>
+      <WorkspaceProvider>
+        <div className="flex min-h-screen flex-col md:flex-row">
+          <Sidebar />
+          <main className="min-w-0 flex-1 px-4 py-10 md:px-10">{children}</main>
+        </div>
+      </WorkspaceProvider>
+    </ProfileProvider>
   );
 }

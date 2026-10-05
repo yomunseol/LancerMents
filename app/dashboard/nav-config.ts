@@ -8,6 +8,7 @@ export type NavIcon =
   | "invoices"
   | "analytics"
   | "spreadsheet"
+  | "profile"
   | "security"
   | "settings";
 
@@ -30,6 +31,7 @@ export const NAV_ITEMS: NavItem[] = [
   { key: "invoices", href: "/dashboard/invoices", icon: "invoices", tier: "pipeline" },
   { key: "analytics", href: "/dashboard/analytics", icon: "analytics", tier: "pipeline" },
   { key: "spreadsheet", href: "/dashboard/spreadsheet", icon: "spreadsheet", tier: "studio" },
+  { key: "profile", href: "/dashboard/profile", icon: "profile" },
   { key: "security", href: "/dashboard/security", icon: "security" },
   { key: "settings", href: "/dashboard/settings", icon: "settings" },
 ];

@@ -122,12 +122,30 @@ export default function OnboardingPage() {
 
     (async () => {
       try {
-        const { data } = await supabase.auth.getSession();
+        const { data: sessionData } = await supabase.auth.getSession();
         if (!active) return;
-        if (!data.session) {
+        if (!sessionData.session) {
           router.replace("/signup");
           return;
         }
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("business_type,plan_type")
+          .eq("id", sessionData.session.user.id)
+          .maybeSingle();
+
+        if (!active) return;
+
+        const business = (profile as { business_type?: string | null } | null)?.business_type;
+        const plan = (profile as { plan_type?: string | null } | null)?.plan_type;
+
+        if (business && plan) {
+          router.replace("/dashboard");
+          return;
+        }
+
+        setStep(business ? 2 : 1);
         setChecking(false);
       } catch {
         if (active) router.replace("/signup");
@@ -152,9 +170,18 @@ export default function OnboardingPage() {
 
       if (!user) throw new Error("Your session expired. Please sign in again.");
 
+      const currentLocale =
+        (typeof document !== "undefined"
+          ? document.cookie.match(/NEXT_LOCALE=([^;]+)/)?.[1]
+          : null) ??
+        (typeof window !== "undefined"
+          ? window.localStorage.getItem("lancermonts.locale")
+          : null) ??
+        "en";
+
       const { error: updateError } = await supabase
         .from("profiles")
-        .update({ business_type: businessType, plan_type: planType })
+        .update({ business_type: businessType, plan_type: planType, locale: currentLocale })
         .eq("id", user.id);
 
       if (updateError) throw updateError;

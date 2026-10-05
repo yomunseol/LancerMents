@@ -19,6 +19,7 @@
     "invoices": "인보이스",
     "analytics": "분석",
     "spreadsheet": "스프레드시트",
+    "profile": "프로필",
     "security": "보안",
     "settings": "설정"
   },
@@ -54,6 +55,6 @@
   },
   "tier": {
     "headline": "이 기능은 {tier}에 포함되어 있습니다",
-    "cta": "요금제 변경 (베타 기간 무료)"
+    "cta": "요금제 변경 — 베타 기간 무료"
   }
 }

@@ -72,7 +72,19 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
       if (workspaceResult.error) throw workspaceResult.error;
 
-      const rows = (workspaceResult.data ?? []) as Workspace[];
+      let rows = (workspaceResult.data ?? []) as Workspace[];
+
+      if (rows.length === 0) {
+        const { data: created, error: createError } = await supabase
+          .from("workspaces")
+          .insert({ owner_id: user.id, name: "My Workspace" })
+          .select("id,name,owner_id")
+          .single();
+
+        if (createError) throw createError;
+        rows = created ? [created as Workspace] : [];
+      }
+
       setWorkspaces(rows);
       setTier(
         normalizeTier((subscriptionResult.data as { tier?: string | null } | null)?.tier),

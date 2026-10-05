@@ -19,6 +19,7 @@
     "invoices": "Invoices",
     "analytics": "Analytics",
     "spreadsheet": "Spreadsheet",
+    "profile": "Profile",
     "security": "Security",
     "settings": "Settings"
   },
@@ -54,6 +55,6 @@
   },
   "tier": {
     "headline": "This lives in {tier}",
-    "cta": "Switch Plan (Free during Beta)"
+    "cta": "Switch plan — free during Beta"
   }
 }

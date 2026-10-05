@@ -53,9 +53,6 @@ export default function SettingsPage() {
   const [renameValue, setRenameValue] = useState("");
   const [renameStatus, setRenameStatus] = useState<string | null>(null);
   const [renameError, setRenameError] = useState<string | null>(null);
-  const [displayName, setDisplayName] = useState("");
-  const [profileStatus, setProfileStatus] = useState<string | null>(null);
-  const [profileError, setProfileError] = useState<string | null>(null);
   const [dangerBusy, setDangerBusy] = useState(false);
 
   useEffect(() => {
@@ -63,23 +60,6 @@ export default function SettingsPage() {
     const storedLocale = window.localStorage.getItem("lancermonts.locale");
     if (storedLocale === "ko" || storedLocale === "en") setLocale(storedLocale);
     setDefaultWorkspace(window.localStorage.getItem(DEFAULT_WS_KEY) ?? "");
-
-    (async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (!user) return;
-        const { data } = await supabase
-          .from("profiles")
-          .select("display_name")
-          .eq("id", user.id)
-          .maybeSingle();
-        setDisplayName((data as { display_name?: string | null } | null)?.display_name ?? "");
-      } catch {
-        /* leave blank */
-      }
-    })();
   }, []);
 
   useEffect(() => {
@@ -123,26 +103,6 @@ export default function SettingsPage() {
       setRenameStatus("Workspace renamed.");
     } catch (error) {
       setRenameError(messageOf(error, "Could not rename the workspace."));
-    }
-  }
-
-  async function handleSaveProfile() {
-    setProfileStatus(null);
-    setProfileError(null);
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Your session expired. Please sign in again.");
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({ display_name: displayName })
-        .eq("id", user.id);
-      if (error) throw error;
-      setProfileStatus("Profile saved.");
-    } catch (error) {
-      setProfileError(messageOf(error, "Could not save your profile."));
     }
   }
 
@@ -279,35 +239,6 @@ export default function SettingsPage() {
               </p>
             )}
           </div>
-        </SectionCard>
-
-        <SectionCard title="Profile">
-          <label className="block text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
-            Display name
-            <input
-              value={displayName}
-              onChange={(event) => setDisplayName(event.target.value)}
-              placeholder="Your name"
-              className={`mt-2 ${fieldClass}`}
-            />
-          </label>
-          <button
-            type="button"
-            onClick={handleSaveProfile}
-            className="mt-3 rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
-          >
-            Save profile
-          </button>
-          {profileStatus && (
-            <p className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
-              {profileStatus}
-            </p>
-          )}
-          {profileError && (
-            <p className="mt-2 text-sm font-medium text-red-600 dark:text-red-400">
-              {profileError}
-            </p>
-          )}
         </SectionCard>
 
         <section className="mt-6 rounded-xl border border-red-500/40 bg-red-500/5 p-5">

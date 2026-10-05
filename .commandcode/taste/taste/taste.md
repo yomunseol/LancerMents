@@ -70,3 +70,6 @@ he text and image vertically centered (`items-center`) and tight leading on larg
 - Expects overlays (modals, drawers) to close on Escape key and outside-click, with the panel content stopping click propagation. Confidence: 0.4
 - Wants keyboard focus states styled with the design accent (accent-colored focus rings) rather than default browser outlines. Confidence: 0.4
 - Explicitly excludes third-party payment integration ("no Stripe") from these app builds. Confidence: 0.4
+- Treats browser-only/server-incompatible libraries (e.g. Leaflet) as a hard SSR constraint: they must be wrapped in a dedicated client component and imported everywhere via `next/dynamic(() => import(...), { ssr: false })` so they never render during server rendering. Confidence: 0.5
+- Wants chart-library components (e.g. recharts) always wrapped in a `ResponsiveContainer` with an explicit fixed height, rather than relying on the chart's own intrinsic sizing. Confidence: 0.45
+- When extending or upgrading an existing page/feature, explicitly requires all prior behavior — especially lower-tier flows — to keep working unchanged (no regressions to previously built functionality). Confidence: 0.45
