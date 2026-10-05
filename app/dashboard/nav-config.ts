@@ -14,24 +14,24 @@ export type NavIcon =
 export type NavTier = "pipeline" | "studio";
 
 export type NavItem = {
-  label: string;
+  key: NavIcon;
   href: string;
   icon: NavIcon;
   tier?: NavTier;
 };
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
-  { label: "Tasks", href: "/dashboard/tasks", icon: "tasks" },
-  { label: "Notes", href: "/dashboard/notes", icon: "notes" },
-  { label: "Calendar", href: "/dashboard/calendar", icon: "calendar" },
-  { label: "Clients", href: "/dashboard/clients", icon: "clients", tier: "pipeline" },
-  { label: "CRM", href: "/dashboard/crm", icon: "crm", tier: "pipeline" },
-  { label: "Invoices", href: "/dashboard/invoices", icon: "invoices", tier: "pipeline" },
-  { label: "Analytics", href: "/dashboard/analytics", icon: "analytics", tier: "pipeline" },
-  { label: "Spreadsheet", href: "/dashboard/spreadsheet", icon: "spreadsheet", tier: "studio" },
-  { label: "Security", href: "/dashboard/security", icon: "security" },
-  { label: "Settings", href: "/dashboard/settings", icon: "settings" },
+  { key: "dashboard", href: "/dashboard", icon: "dashboard" },
+  { key: "tasks", href: "/dashboard/tasks", icon: "tasks" },
+  { key: "notes", href: "/dashboard/notes", icon: "notes" },
+  { key: "calendar", href: "/dashboard/calendar", icon: "calendar" },
+  { key: "clients", href: "/dashboard/clients", icon: "clients", tier: "pipeline" },
+  { key: "crm", href: "/dashboard/crm", icon: "crm", tier: "pipeline" },
+  { key: "invoices", href: "/dashboard/invoices", icon: "invoices", tier: "pipeline" },
+  { key: "analytics", href: "/dashboard/analytics", icon: "analytics", tier: "pipeline" },
+  { key: "spreadsheet", href: "/dashboard/spreadsheet", icon: "spreadsheet", tier: "studio" },
+  { key: "security", href: "/dashboard/security", icon: "security" },
+  { key: "settings", href: "/dashboard/settings", icon: "settings" },
 ];
 
 const TIER_RANK: Record<string, number> = { basic: 0, plus: 1, pro: 2 };

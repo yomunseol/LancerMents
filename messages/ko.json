@@ -1,0 +1,55 @@
+{
+  "common": {
+    "logout": "로그아웃",
+    "language": "언어",
+    "loading": "불러오는 중…",
+    "save": "저장",
+    "cancel": "취소",
+    "clear": "지우기",
+    "today": "오늘",
+    "error": "문제가 발생했습니다."
+  },
+  "nav": {
+    "dashboard": "대시보드",
+    "tasks": "작업",
+    "notes": "노트",
+    "calendar": "캘린더",
+    "clients": "고객",
+    "crm": "CRM",
+    "invoices": "인보이스",
+    "analytics": "분석",
+    "spreadsheet": "스프레드시트",
+    "security": "보안",
+    "settings": "설정"
+  },
+  "dashboard": {
+    "welcome": "다시 오신 것을 환영합니다",
+    "noWorkspace": "선택된 워크스페이스가 없습니다",
+    "upgradeTitle": "요금제 업그레이드",
+    "upgradeBody": "무제한 작업과 CRM을 사용하세요. 베타 기간에는 모든 요금제가 무료입니다.",
+    "upgradeCta": "요금제 업그레이드"
+  },
+  "tasks": {
+    "title": "작업",
+    "subtitle": "오늘의 그리드에 있는 모든 항목을 한곳에서.",
+    "dailyTasks": "오늘의 작업",
+    "dailyGrid": "오늘의 그리드",
+    "today": "오늘",
+    "scheduled": "예정됨",
+    "completed": "완료됨",
+    "emptyToday": "오늘 마감인 작업이 없습니다. 그리드가 비어 있습니다.",
+    "addPlaceholder": "작업 추가…",
+    "addTask": "작업 추가",
+    "dueDate": "마감일",
+    "capNudge": "오늘 그리드가 가득 찼습니다.",
+    "capLink": "The Pipeline에서 더 많은 작업을 사용할 수 있습니다.",
+    "loading": "작업을 불러오는 중…"
+  },
+  "calendar": {
+    "title": "캘린더",
+    "subtitle": "마감일이 있는 모든 작업을 월별로 확인하세요.",
+    "nothingScheduled": "그날 예정된 작업이 없습니다.",
+    "prevMonth": "이전 달",
+    "nextMonth": "다음 달"
+  }
+}

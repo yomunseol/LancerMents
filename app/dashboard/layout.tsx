@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { NAV_ITEMS, isNavLocked, type NavIcon } from "./nav-config";
 import { WorkspaceProvider, useWorkspace } from "./WorkspaceContext";
@@ -85,6 +86,7 @@ type Locale = (typeof LOCALES)[number];
 function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations();
   const { tier } = useWorkspace();
   const [locale, setLocale] = useState<Locale>("en");
 
@@ -141,7 +143,7 @@ function Sidebar() {
               }`}
             >
               <NavIconSvg icon={item.icon} />
-              <span className="flex-1 truncate">{item.label}</span>
+              <span className="flex-1 truncate">{t(`nav.${item.key}`)}</span>
               {locked && <LockIcon />}
             </Link>
           );
@@ -151,7 +153,7 @@ function Sidebar() {
       <div className="mt-8 flex items-center gap-2">
         <span className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-60">
           <GlobeIcon />
-          Language
+          {t("common.language")}
         </span>
         <div className="ml-auto flex items-center gap-1">
           {LOCALES.map((code) => (
@@ -176,7 +178,7 @@ function Sidebar() {
         onClick={handleLogout}
         className="mt-4 w-full rounded-lg border border-[#E2D8E0] px-4 py-2.5 text-sm font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
       >
-        Logout
+        {t("common.logout")}
       </button>
     </aside>
   );

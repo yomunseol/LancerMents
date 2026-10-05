@@ -1,0 +1,55 @@
+{
+  "common": {
+    "logout": "Logout",
+    "language": "Language",
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "clear": "Clear",
+    "today": "Today",
+    "error": "Something went wrong."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "tasks": "Tasks",
+    "notes": "Notes",
+    "calendar": "Calendar",
+    "clients": "Clients",
+    "crm": "CRM",
+    "invoices": "Invoices",
+    "analytics": "Analytics",
+    "spreadsheet": "Spreadsheet",
+    "security": "Security",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "noWorkspace": "No workspace selected",
+    "upgradeTitle": "Upgrade Plan",
+    "upgradeBody": "Unlock unlimited tasks and CRM. All plans are free during Beta.",
+    "upgradeCta": "Upgrade Plan"
+  },
+  "tasks": {
+    "title": "Tasks",
+    "subtitle": "Everything on your daily grid, in one place.",
+    "dailyTasks": "Daily Tasks",
+    "dailyGrid": "Daily grid",
+    "today": "Today",
+    "scheduled": "Scheduled",
+    "completed": "Completed",
+    "emptyToday": "Nothing due today. The grid is clear.",
+    "addPlaceholder": "Add a task…",
+    "addTask": "Add task",
+    "dueDate": "Due date",
+    "capNudge": "Grid full for today.",
+    "capLink": "The Pipeline unlocks more.",
+    "loading": "Loading tasks…"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "subtitle": "Every task with a due date, month by month.",
+    "nothingScheduled": "Nothing scheduled that day.",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month"
+  }
+}
