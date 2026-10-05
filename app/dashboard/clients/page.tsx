@@ -173,16 +173,25 @@ function ClientsInner() {
         }
       }
 
-      const { error: insertError } = await supabase.from("clients").insert({
+      const payload: Record<string, unknown> = {
         workspace_id: workspaceId,
         name,
         email: email || null,
-        status: "active",
-        address: address || null,
-        address_lat: lat,
-        address_lng: lng,
-      });
-      if (insertError) throw insertError;
+      };
+
+      // Only send coordinates when the geocode produced real numbers — never
+      // "", NaN, or a null-string.
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        payload.address_lat = lat;
+        payload.address_lng = lng;
+      }
+
+      const { error: insertError } = await supabase.from("clients").insert(payload);
+
+      if (insertError) {
+        setFormError(insertError.message);
+        return;
+      }
 
       await load(workspaceId);
       setAddOpen(false);
