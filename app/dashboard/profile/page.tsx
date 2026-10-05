@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
+import { LOCALE_LABELS, LOCALE_ORDER } from "@/lib/i18n/vocab";
 import { useProfile } from "../ProfileContext";
 
 const BUSINESS_TYPES = [
@@ -11,24 +13,6 @@ const BUSINESS_TYPES = [
   { id: "freelance-artist", label: "Freelance Artist" },
   { id: "sole-entrepreneur", label: "Sole Entrepreneur" },
   { id: "team-company", label: "Team Company" },
-];
-
-const LOCALES = [
-  { code: "en", label: "English" },
-  { code: "ko", label: "한국어" },
-  { code: "ja", label: "日本語" },
-  { code: "zh", label: "中文" },
-  { code: "es", label: "Español" },
-  { code: "fr", label: "Français" },
-  { code: "de", label: "Deutsch" },
-  { code: "pt", label: "Português" },
-  { code: "it", label: "Italiano" },
-  { code: "nl", label: "Nederlands" },
-  { code: "ru", label: "Русский" },
-  { code: "ar", label: "العربية" },
-  { code: "hi", label: "हिन्दी" },
-  { code: "th", label: "ไทย" },
-  { code: "vi", label: "Tiếng Việt" },
 ];
 
 const PLAN_LABELS: Record<string, { name: string; price: string }> = {
@@ -54,6 +38,7 @@ function SectionCard({ title, children }: { title: string; children: React.React
 }
 
 export default function ProfilePage() {
+  const t = useTranslations();
   const router = useRouter();
   const { profile, refresh } = useProfile();
   const [displayName, setDisplayName] = useState("");
@@ -189,9 +174,9 @@ export default function ProfilePage() {
             onChange={(event) => chooseLocale(event.target.value)}
             className={fieldClass}
           >
-            {LOCALES.map((option) => (
-              <option key={option.code} value={option.code}>
-                {option.label}
+            {LOCALE_ORDER.map((code) => (
+              <option key={code} value={code}>
+                {LOCALE_LABELS[code]}
               </option>
             ))}
           </select>

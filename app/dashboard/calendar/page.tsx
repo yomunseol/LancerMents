@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { useWorkspace } from "../WorkspaceContext";
 
@@ -59,6 +60,7 @@ function Chevron({ dir }: { dir: "left" | "right" }) {
 }
 
 export default function CalendarPage() {
+  const t = useTranslations();
   const { activeWorkspace, loading: workspaceLoading } = useWorkspace();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -124,10 +126,10 @@ export default function CalendarPage() {
   return (
     <>
       <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-        Calendar
+        {t("calendar")}
       </h1>
       <p className="mt-1 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-        Every task with a due date, month by month.
+        {t("cal_sub")}
       </p>
 
       <section className="mt-8 rounded-2xl border border-[#E2D8E0] bg-white p-6 dark:border-[#4A2E46] dark:bg-[#221C21]">
@@ -233,7 +235,7 @@ export default function CalendarPage() {
               ))}
             </ul>
           ) : (
-            <p className="py-6 text-sm opacity-50">Nothing scheduled that day.</p>
+            <p className="py-6 text-sm opacity-50">{t("no_tasks_day")}</p>
           )}
         </section>
       )}
