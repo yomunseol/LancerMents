@@ -11,7 +11,7 @@ export function resolveLocale(value: string | undefined): Locale {
 }
 
 export default getRequestConfig(async () => {
-  const store = cookies();
+  const store = await cookies();
   const locale = resolveLocale(store.get(LOCALE_COOKIE)?.value);
 
   return {

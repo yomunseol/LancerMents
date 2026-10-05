@@ -1,6 +1,16 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Class-based dark mode (v4 replaces the old darkMode: "class" JS option). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Deep Mauve Studio design tokens (v4 replaces theme.extend.colors). */
+@theme {
+  --color-background: #151115;
+  --color-surface: #221c21;
+  --color-primary-text: #f8f4f7;
+  --color-accent-mauve: #d8a8d3;
+  --color-deep-border: #4a2e46;
+}
 
 @media (prefers-reduced-motion: reduce) {
   *,
