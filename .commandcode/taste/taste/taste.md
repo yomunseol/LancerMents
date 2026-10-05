@@ -60,3 +60,5 @@ he text and image vertically centered (`items-center`) and tight leading on larg
 - Dislikes dead or non-functional UI — every nav link/button must resolve to a real route (no dead buttons, no 404s). Confidence: 0.4
 - For tier-gated features, prefers the route to still load and show an upgrade banner/panel rather than blocking or redirecting the user away. Confidence: 0.4
 - Wants UI animations to respect the user's `prefers-reduced-motion` setting. Confidence: 0.4
+- Prefers staying on the latest versions of the stack: when dependencies have been bumped to newer majors (e.g. via `npm audit fix --force`), chooses to migrate the code forward to the new versions rather than downgrade/revert to the previously-specified older stack — even when the migration requires breaking changes. Confidence: 0.6
+- Is comfortable letting the agent carry out large, breaking framework/config migrations (e.g. Next.js + Tailwind major upgrades, rewriting configs) autonomously as a single step before continuing other feature work. Confidence: 0.5

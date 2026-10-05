@@ -51,5 +51,9 @@
     "nothingScheduled": "Nothing scheduled that day.",
     "prevMonth": "Previous month",
     "nextMonth": "Next month"
+  },
+  "tier": {
+    "headline": "This lives in {tier}",
+    "cta": "Switch Plan (Free during Beta)"
   }
 }
