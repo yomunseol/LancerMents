@@ -1,46 +1,17 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
+import type { SessionRow } from "@/lib/sessions";
+import { isSessionRevoked, relativeTime, trackSession, touchSession } from "@/lib/sessions";
 import PasswordStrengthBar, {
   getPasswordStrength,
 } from "@/app/components/PasswordStrengthBar";
 
-type Session = {
-  id: string;
-  device: string;
-  browser: string;
-  location: string;
-  lastActive: string;
-  current: boolean;
-};
-
-const INITIAL_SESSIONS: Session[] = [
-  {
-    id: "s1",
-    device: "MacBook Pro",
-    browser: "Chrome 130",
-    location: "Seoul, KR",
-    lastActive: "Active now",
-    current: true,
-  },
-  {
-    id: "s2",
-    device: "iPhone 15",
-    browser: "Safari",
-    location: "Seoul, KR",
-    lastActive: "2 hours ago",
-    current: false,
-  },
-  {
-    id: "s3",
-    device: "Windows PC",
-    browser: "Edge",
-    location: "Busan, KR",
-    lastActive: "3 days ago",
-    current: false,
-  },
-];
+type Method = "none" | "email" | "totp";
+type Stage = "idle" | "confirm" | "verify";
 
 const fieldClass =
   "w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]";
@@ -49,67 +20,128 @@ function messageOf(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
-function SectionCard({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="border-b border-[#E2D8E0] py-6 first:pt-0 last:border-b-0 last:pb-0 dark:border-[#4A2E46]">
-      <h2 className="text-sm font-semibold uppercase tracking-widest opacity-60">
-        {title}
-      </h2>
+      <h2 className="text-sm font-semibold uppercase tracking-widest opacity-60">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
   );
 }
 
 export default function SecurityPage() {
+  const t = useTranslations();
+  const locale = useLocale();
+  const pathname = usePathname();
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [pwStatus, setPwStatus] = useState<string | null>(null);
   const [pwError, setPwError] = useState<string | null>(null);
-  const [pwSuccess, setPwSuccess] = useState<string | null>(null);
-  const [pwLoading, setPwLoading] = useState(false);
 
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [factorId, setFactorId] = useState("");
+  const [userId, setUserId] = useState("");
+  const [sessionId, setSessionId] = useState("");
+  const [mode, setMode] = useState<Method>("none");
+  const [selected, setSelected] = useState<Method | null>(null);
+  const [stage, setStage] = useState<Stage>("idle");
+  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
   const [qr, setQr] = useState("");
   const [secret, setSecret] = useState("");
-  const [code, setCode] = useState("");
-  const [tfaError, setTfaError] = useState<string | null>(null);
-  const [tfaLoading, setTfaLoading] = useState(false);
-  const [confirmDisable, setConfirmDisable] = useState(false);
+  const [factorId, setFactorId] = useState("");
+  const [confirmNone, setConfirmNone] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const [sessions, setSessions] = useState<Session[]>(INITIAL_SESSIONS);
-  const [revokeId, setRevokeId] = useState<string | null>(null);
-  const [leavingId, setLeavingId] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<SessionRow[]>([]);
+  const [revoking, setRevoking] = useState<string | null>(null);
+
+  const loadSessions = useCallback(async () => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) return;
+      const { data, error: loadError } = await supabase
+        .from("session_ledger")
+        .select("session_id,device,browser,os,location,ip,last_active,revoked")
+        .eq("user_id", session.user.id)
+        .order("last_active", { ascending: false });
+      if (loadError) throw loadError;
+      setSessions((data ?? []) as SessionRow[]);
+    } catch (loadError) {
+      setError(messageOf(loadError, "Could not load your sessions."));
+    }
+  }, []);
 
   useEffect(() => {
     (async () => {
       try {
-        const { data, error } = await supabase.auth.mfa.listFactors();
-        if (error) throw error;
-        const verified = data?.totp?.find((factor) => factor.status === "verified");
-        if (verified) {
-          setTwoFactorEnabled(true);
-          setFactorId(verified.id);
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) return;
+
+        setSessionId(session.access_token);
+        setUserId(session.user.id);
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("mfa_method")
+          .eq("id", session.user.id)
+          .maybeSingle();
+        const method = ((profile as { mfa_method?: string | null } | null)?.mfa_method ??
+          "none") as Method;
+        setMode(method);
+
+        if (method === "totp") {
+          const { data: factors } = await supabase.auth.mfa.listFactors();
+          const totp = factors?.totp?.find((factor) => factor.status === "verified");
+          setFactorId(totp?.id ?? "");
         }
-      } catch {
-        /* status simply stays Disabled */
+
+        await trackSession(session.access_token, session.user.id);
+        await loadSessions();
+      } catch (loadError) {
+        setError(messageOf(loadError, "Could not load your security settings."));
       }
     })();
-  }, []);
+  }, [loadSessions]);
+
+  // Heartbeat: refresh last_active on load, every 5 minutes, and on route change.
+  useEffect(() => {
+    if (!sessionId) return;
+    touchSession(sessionId);
+    const interval = setInterval(() => touchSession(sessionId), 300000);
+    return () => clearInterval(interval);
+  }, [sessionId, pathname]);
+
+  // Revoked enforcement: focus + every 60s.
+  useEffect(() => {
+    if (!sessionId) return;
+    const check = async () => {
+      if (await isSessionRevoked(sessionId)) {
+        await supabase.auth.signOut();
+        window.location.replace("/login?revoked=1");
+      }
+    };
+    const onFocus = () => void check();
+    window.addEventListener("focus", onFocus);
+    const interval = setInterval(() => void check(), 60000);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      clearInterval(interval);
+    };
+  }, [sessionId]);
 
   async function handleChangePassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPwError(null);
-    setPwSuccess(null);
+    setPwStatus(null);
 
     if (newPassword !== confirmPassword) {
-      setPwError("Passwords do not match.");
+      setPwError(t("passwords_mismatch"));
       return;
     }
     if (getPasswordStrength(newPassword) < 3) {
@@ -117,7 +149,6 @@ export default function SecurityPage() {
       return;
     }
 
-    setPwLoading(true);
     try {
       const {
         data: { user },
@@ -138,272 +169,331 @@ export default function SecurityPage() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setPwSuccess("Password updated.");
-    } catch (error) {
-      setPwError(messageOf(error, "Could not update your password."));
-    } finally {
-      setPwLoading(false);
+      setPwStatus("Password updated.");
+    } catch (changeError) {
+      setPwError(messageOf(changeError, "Could not update your password."));
     }
   }
 
-  async function handleEnable2fa() {
-    setTfaError(null);
-    setTfaLoading(true);
-    try {
-      const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp" });
-      if (error) throw error;
-      setFactorId(data.id);
-      setQr(data.totp?.qr_code ?? "");
-      setSecret(data.totp?.secret ?? "");
-    } catch (error) {
-      setTfaError(messageOf(error, "Could not start 2FA setup."));
-    } finally {
-      setTfaLoading(false);
-    }
+  function chooseMethod(next: Method) {
+    if (next === mode) return;
+    setError(null);
+    setStatus(null);
+    setCode("");
+    setQr("");
+    setSecret("");
+    setConfirmNone(false);
+    setSelected(next);
+    setStage(next === "none" ? "confirm" : "confirm");
+    setPassword("");
   }
 
-  async function handleVerify2fa(event: FormEvent<HTMLFormElement>) {
+  async function handleConfirmPassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setTfaError(null);
-    setTfaLoading(true);
+    setError(null);
+    if (!selected) return;
+
     try {
-      const { data: challenge, error: challengeError } =
-        await supabase.auth.mfa.challenge({ factorId });
-      if (challengeError) throw challengeError;
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user?.email) throw new Error("Your session expired. Please sign in again.");
 
-      const { error: verifyError } = await supabase.auth.mfa.verify({
-        factorId,
-        challengeId: challenge.id,
-        code,
+      const { error: reauthError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password,
       });
-      if (verifyError) throw verifyError;
+      if (reauthError) throw new Error("Incorrect password.");
 
-      setTwoFactorEnabled(true);
+      setPassword("");
+
+      if (selected === "none") {
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ mfa_method: "none" })
+          .eq("id", userId);
+        if (updateError) throw updateError;
+
+        if (factorId) await supabase.auth.mfa.unenroll({ factorId });
+        await supabase.from("session_2fa").delete().eq("user_id", userId);
+
+        setMode("none");
+        setFactorId("");
+        setStage("idle");
+        setStatus("Password-only sign-in enabled.");
+        return;
+      }
+
+      if (selected === "email") {
+        const { error: rpcError } = await supabase.rpc("request_2fa_code", {
+          p_locale: locale,
+        });
+        if (rpcError) throw rpcError;
+        setStage("verify");
+        return;
+      }
+
+      const { data: enrolled, error: enrollError } = await supabase.auth.mfa.enroll({
+        factorType: "totp",
+      });
+      if (enrollError) throw enrollError;
+      setFactorId(enrolled.id);
+      setQr(enrolled.totp?.qr_code ?? "");
+      setSecret(enrolled.totp?.secret ?? "");
+      setStage("verify");
+    } catch (confirmError) {
+      setError(messageOf(confirmError, "Could not verify your password."));
+    }
+  }
+
+  async function submitCode(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+
+    try {
+      if (selected === "email") {
+        const { data, error: rpcError } = await supabase.rpc("verify_2fa_code", {
+          p_code: code,
+          p_session_id: sessionId,
+        });
+        if (rpcError) throw rpcError;
+        if (data !== true) {
+          setError(t("invalid_code"));
+          return;
+        }
+      } else {
+        const { data: challenge, error: challengeError } =
+          await supabase.auth.mfa.challenge({ factorId });
+        if (challengeError) throw challengeError;
+        const { error: verifyError } = await supabase.auth.mfa.verify({
+          factorId,
+          challengeId: challenge.id,
+          code,
+        });
+        if (verifyError) {
+          setError(t("invalid_code"));
+          return;
+        }
+      }
+
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ mfa_method: selected })
+        .eq("id", userId);
+      if (updateError) throw updateError;
+
+      setMode(selected === "totp" ? "totp" : "email");
+      setStage("idle");
+      setCode("");
       setQr("");
       setSecret("");
-      setCode("");
-    } catch (error) {
-      setTfaError(messageOf(error, "That code didn't work. Try again."));
-    } finally {
-      setTfaLoading(false);
+      setStatus(
+        selected === "totp"
+          ? "Authenticator 2FA enabled."
+          : "Email 2FA enabled.",
+      );
+    } catch (codeError) {
+      setError(messageOf(codeError, t("invalid_code")));
     }
   }
 
-  async function handleDisable2fa() {
-    setTfaError(null);
-    setTfaLoading(true);
+  async function revoke(id: string) {
+    setError(null);
+    setRevoking(id);
     try {
-      const { error } = await supabase.auth.mfa.unenroll({ factorId });
-      if (error) throw error;
-      setTwoFactorEnabled(false);
-      setFactorId("");
-      setConfirmDisable(false);
-    } catch (error) {
-      setTfaError(messageOf(error, "Could not disable 2FA."));
-    } finally {
-      setTfaLoading(false);
+      const { error: revokeError } = await supabase
+        .from("session_ledger")
+        .update({ revoked: true })
+        .eq("session_id", id);
+      if (revokeError) throw revokeError;
+      setTimeout(() => {
+        setSessions((current) => current.filter((row) => row.session_id !== id));
+        setRevoking(null);
+      }, 200);
+    } catch (revokeError) {
+      setRevoking(null);
+      setError(messageOf(revokeError, "Could not revoke that session."));
     }
   }
 
-  function handleRevoke(id: string) {
-    setRevokeId(null);
-    setLeavingId(id);
-    setTimeout(() => {
-      setSessions((current) => current.filter((session) => session.id !== id));
-      setLeavingId(null);
-    }, 200);
+  async function signOutAll() {
+    setError(null);
+    try {
+      await supabase.auth.signOut({ scope: "others" });
+      if (userId) {
+        await supabase
+          .from("session_ledger")
+          .update({ revoked: true })
+          .eq("user_id", userId)
+          .neq("session_id", sessionId);
+      }
+      await loadSessions();
+    } catch (signOutError) {
+      setError(messageOf(signOutError, "Could not sign out the other sessions."));
+    }
   }
+
+  const METHODS: { id: Method; title: string; sub: string }[] = [
+    { id: "none", title: t("method_none"), sub: "Password only. Not recommended." },
+    { id: "email", title: t("method_email"), sub: "A 6-digit code emailed in your language at each login." },
+    { id: "totp", title: t("method_totp"), sub: "TOTP codes from Google Authenticator / Authy." },
+  ];
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-        Security
-      </h1>
+      <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">{t("security")}</h1>
       <p className="mt-1 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-        Manage your password, two-factor authentication, and devices.
+        {t("two_factor")}, {t("change_password")}, {t("sessions")}.
       </p>
 
       <div className="mt-8 max-w-2xl rounded-2xl border border-[#E2D8E0] bg-white p-8 dark:border-[#4A2E46] dark:bg-[#221C21]">
-        <SectionCard title="Change password">
+        <SectionCard title={t("change_password")}>
           <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
-            <input
-              type="password"
-              required
-              autoComplete="current-password"
-              value={currentPassword}
-              onChange={(event) => setCurrentPassword(event.target.value)}
-              placeholder="Current password"
-              className={fieldClass}
-            />
-            <input
-              type="password"
-              required
-              autoComplete="new-password"
-              value={newPassword}
-              onChange={(event) => setNewPassword(event.target.value)}
-              placeholder="New password"
-              className={fieldClass}
-            />
+            <input type="password" required autoComplete="current-password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder={t("password")} className={fieldClass} />
+            <input type="password" required autoComplete="new-password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={`${t("password")} (new)`} className={fieldClass} />
             <PasswordStrengthBar password={newPassword} />
-            <input
-              type="password"
-              required
-              autoComplete="new-password"
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
-              placeholder="Confirm new password"
-              className={fieldClass}
-            />
-
-            <button
-              type="submit"
-              disabled={pwLoading}
-              className="w-full rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]"
-            >
-              {pwLoading ? "Updating…" : "Update password"}
+            <input type="password" required autoComplete="new-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder={t("confirm_password")} className={fieldClass} />
+            <button type="submit" className="w-full rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 sm:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]">
+              {t("save")}
             </button>
-
-            {pwSuccess && (
-              <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                {pwSuccess}
-              </p>
-            )}
-            {pwError && (
-              <p className="text-sm font-medium text-red-600 dark:text-red-400">
-                {pwError}
-              </p>
-            )}
+            {pwStatus && <p className="text-sm font-medium text-green-600 dark:text-green-400">{pwStatus}</p>}
+            {pwError && <p className="text-sm text-red-400">{pwError}</p>}
           </form>
         </SectionCard>
 
-        <SectionCard title="Two-factor authentication">
-          <div className="flex flex-wrap items-center gap-3">
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                twoFactorEnabled
-                  ? "bg-green-500/15 text-green-600 dark:text-green-400"
-                  : "bg-red-500/15 text-red-600 dark:text-red-400"
-              }`}
-            >
-              {twoFactorEnabled ? "Enabled" : "Disabled"}
-            </span>
-
-            {!twoFactorEnabled && !qr && (
-              <button
-                type="button"
-                onClick={handleEnable2fa}
-                disabled={tfaLoading}
-                className="rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#D8A8D3] dark:text-[#151115]"
-              >
-                {tfaLoading ? "Starting…" : "Enable 2FA"}
-              </button>
-            )}
-
-            {twoFactorEnabled && (
-              <div className="flex items-center gap-2">
+        <SectionCard title={t("two_factor")}>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            {METHODS.map((option) => {
+              const active = mode === option.id;
+              return (
                 <button
+                  key={option.id}
                   type="button"
-                  onClick={() => setConfirmDisable(true)}
-                  className="rounded-lg border border-[#E2D8E0] px-4 py-2 text-sm font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
+                  onClick={() => chooseMethod(option.id)}
+                  aria-pressed={active}
+                  className={`rounded-xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 ${
+                    active
+                      ? "border-2 border-[#85587D] dark:border-[#D8A8D3]"
+                      : "border-[#E2D8E0] dark:border-[#4A2E46]"
+                  }`}
                 >
-                  Disable 2FA
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-semibold text-[#151115] dark:text-[#F8F4F7]">
+                      {option.title}
+                    </span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                        active
+                          ? "bg-green-500/15 text-green-600 dark:text-green-400"
+                          : "bg-red-500/15 text-red-600 dark:text-red-400"
+                      }`}
+                    >
+                      {active ? "Enabled" : "Disabled"}
+                    </span>
+                  </span>
+                  <span className="mt-2 block text-xs opacity-70">{option.sub}</span>
                 </button>
-                {confirmDisable && (
-                  <button
-                    type="button"
-                    onClick={handleDisable2fa}
-                    disabled={tfaLoading}
-                    className="rounded-lg bg-red-500/15 px-3 py-2 text-sm font-semibold text-red-600 transition-all duration-200 disabled:opacity-50 dark:text-red-400"
-                  >
-                    Sure?
-                  </button>
-                )}
-              </div>
-            )}
+              );
+            })}
           </div>
 
-          {!twoFactorEnabled && qr && (
-            <form onSubmit={handleVerify2fa} className="mt-4 flex flex-col gap-3">
-              <img
-                src={qr}
-                alt="Authenticator QR code"
-                className="h-36 w-36 rounded-lg border border-[#E2D8E0] bg-white p-2 dark:border-[#4A2E46]"
-              />
-              {secret && (
-                <p className="break-all text-xs opacity-60">Secret: {secret}</p>
+          {stage === "confirm" && selected && (
+            <form onSubmit={handleConfirmPassword} className="mt-4 flex flex-col gap-3">
+              <p className="text-sm opacity-70">
+                Confirm your password to switch to {METHODS.find((m) => m.id === selected)?.title}.
+              </p>
+              {selected === "none" && !confirmNone ? (
+                <button type="button" onClick={() => setConfirmNone(true)} className="w-full rounded-lg bg-red-500/15 px-4 py-2 text-sm font-semibold text-red-600 transition-all duration-200 sm:w-auto dark:text-red-400">
+                  {t("sure")}
+                </button>
+              ) : (
+                <>
+                  <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t("password")} className={fieldClass} />
+                  <div className="flex gap-2">
+                    <button type="submit" className="rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]">
+                      {t("continue")}
+                    </button>
+                    <button type="button" onClick={() => { setStage("idle"); setSelected(null); setPassword(""); }} className="rounded-lg border border-[#E2D8E0] px-4 py-2 text-sm font-semibold transition-all duration-200 dark:border-[#4A2E46]">
+                      {t("cancel")}
+                    </button>
+                  </div>
+                </>
               )}
-              <input
-                inputMode="numeric"
-                required
-                maxLength={6}
-                value={code}
-                onChange={(event) => setCode(event.target.value)}
-                placeholder="6-digit code"
-                className={fieldClass}
-              />
-              <button
-                type="submit"
-                disabled={tfaLoading}
-                className="w-full rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]"
-              >
-                {tfaLoading ? "Verifying…" : "Verify & enable"}
+            </form>
+          )}
+
+          {stage === "verify" && (
+            <form onSubmit={submitCode} className="mt-4 flex flex-col gap-3">
+              {qr && (
+                <img src={qr} alt="Authenticator QR code" className="h-36 w-36 rounded-lg border border-[#E2D8E0] bg-white p-2 dark:border-[#4A2E46]" />
+              )}
+              {secret && (
+                <div className="flex items-center gap-2">
+                  <code className="break-all text-xs opacity-70">{secret}</code>
+                  <button type="button" onClick={() => void navigator.clipboard.writeText(secret)} className="rounded-lg border border-[#E2D8E0] px-3 py-1.5 text-xs font-semibold transition-all duration-200 dark:border-[#4A2E46]">
+                    Copy
+                  </button>
+                </div>
+              )}
+              <input inputMode="numeric" required maxLength={6} value={code} onChange={(e) => setCode(e.target.value)} placeholder="000000" className={fieldClass} />
+              <button type="submit" className="w-full rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 sm:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]">
+                {t("continue")}
               </button>
             </form>
           )}
 
-          {tfaError && (
-            <p className="mt-3 text-sm font-medium text-red-600 dark:text-red-400">
-              {tfaError}
-            </p>
-          )}
+          {status && <p className="mt-3 text-sm font-medium text-green-600 dark:text-green-400">{status}</p>}
+          {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
         </SectionCard>
 
-        <SectionCard title="Active sessions">
+        <SectionCard title={t("sessions")}>
           <ul className="flex flex-col gap-3">
-            {sessions.map((session) => (
-              <li
-                key={session.id}
-                className={`flex flex-wrap items-center gap-3 rounded-xl border border-[#E2D8E0] bg-white px-4 py-3 transition-all duration-200 dark:border-[#4A2E46] dark:bg-[#221C21] ${
-                  leavingId === session.id ? "scale-95 opacity-0" : "scale-100 opacity-100"
-                }`}
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-[#151115] dark:text-[#F8F4F7]">
-                    {session.device}
-                    {session.current && (
-                      <span className="ml-2 rounded-full bg-[#85587D]/15 px-2 py-0.5 text-xs font-medium text-[#85587D] dark:bg-[#D8A8D3]/15 dark:text-[#D8A8D3]">
-                        This device
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-xs opacity-60">
-                    {session.browser} · {session.location} · {session.lastActive}
-                  </p>
-                </div>
-
-                {!session.current && (
-                  <div className="flex items-center gap-2">
+            {sessions.map((row) => {
+              const isCurrent = row.session_id === sessionId;
+              return (
+                <li
+                  key={row.session_id}
+                  className={`flex flex-wrap items-center gap-3 rounded-xl border border-[#E2D8E0] px-4 py-3 transition-all duration-200 dark:border-[#4A2E46] ${
+                    revoking === row.session_id ? "scale-95 opacity-0" : "scale-100 opacity-100"
+                  }`}
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-[#151115] dark:text-[#F8F4F7]">
+                      {row.device ?? "Device"}
+                      {isCurrent && (
+                        <span className="ml-2 rounded-full bg-[#85587D]/15 px-2 py-0.5 text-xs font-medium text-[#85587D] dark:bg-[#D8A8D3]/15 dark:text-[#D8A8D3]">
+                          {t("this_device")}
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-xs opacity-60">
+                      {row.browser ?? "—"} • {row.location ?? "Unknown location"} • {relativeTime(row.last_active)}
+                    </p>
+                  </div>
+                  {!isCurrent && (
                     <button
                       type="button"
-                      onClick={() => setRevokeId(session.id)}
-                      className="rounded-lg border border-[#E2D8E0] px-3 py-1.5 text-xs font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
+                      onClick={() => revoke(row.session_id)}
+                      className="rounded-lg border border-[#E2D8E0] px-3 py-1.5 text-xs font-semibold transition-all duration-200 hover:shadow-lg dark:border-[#4A2E46]"
                     >
-                      Revoke
+                      {t("revoke")}
                     </button>
-                    {revokeId === session.id && (
-                      <button
-                        type="button"
-                        onClick={() => handleRevoke(session.id)}
-                        className="rounded-lg bg-red-500/15 px-3 py-1.5 text-xs font-semibold text-red-600 transition-all duration-200 dark:text-red-400"
-                      >
-                        Sure?
-                      </button>
-                    )}
-                  </div>
-                )}
-              </li>
-            ))}
+                  )}
+                </li>
+              );
+            })}
+            {sessions.length === 0 && (
+              <li className="text-sm opacity-60">{t("loading")}</li>
+            )}
           </ul>
+
+          <button
+            type="button"
+            onClick={signOutAll}
+            className="mt-4 w-full rounded-lg border border-[#E2D8E0] px-4 py-2.5 text-sm font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg sm:w-auto dark:border-[#4A2E46] dark:text-[#F8F4F7]"
+          >
+            {t("sign_out_all")}
+          </button>
         </SectionCard>
       </div>
     </>
