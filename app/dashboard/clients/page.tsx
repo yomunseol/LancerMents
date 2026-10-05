@@ -3,11 +3,12 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { formatCurrency, formatDate } from "@/lib/format";
 import EmptyState from "@/app/components/EmptyState";
 import TierGate from "@/app/components/TierGate";
-import { useWorkspace } from "../WorkspaceContext";
+import { useWorkspaceGate } from "../useWorkspaceData";
 
 const ClientMap = dynamic(() => import("@/app/components/ClientMap"), {
   ssr: false,
@@ -54,7 +55,8 @@ function StatusPill({ status }: { status: string | null }) {
 }
 
 function ClientsInner() {
-  const { activeWorkspace, loading: workspaceLoading } = useWorkspace();
+  const t = useTranslations();
+  const ws = useWorkspaceGate();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +77,7 @@ function ClientsInner() {
   const [drawerDeals, setDrawerDeals] = useState<Deal[]>([]);
   const [drawerInvoices, setDrawerInvoices] = useState<Invoice[]>([]);
 
-  const workspaceId = activeWorkspace?.id ?? "";
+  const workspaceId = ws?.id ?? "";
 
   const load = useCallback(async (id: string) => {
     setError(null);
@@ -93,15 +95,10 @@ function ClientsInner() {
   }, []);
 
   useEffect(() => {
-    if (workspaceLoading) return;
-    if (!workspaceId) {
-      setClients([]);
-      setLoading(false);
-      return;
-    }
+    if (!ws?.id) return; // WS-GATE
     setLoading(true);
-    load(workspaceId).finally(() => setLoading(false));
-  }, [workspaceId, workspaceLoading, load]);
+    load(ws.id).finally(() => setLoading(false));
+  }, [ws?.id, load]);
 
   useEffect(() => {
     (async () => {
@@ -245,13 +242,13 @@ function ClientsInner() {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">Clients</h1>
+        <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">{t("clients")}</h1>
         <button
           type="button"
           onClick={() => setAddOpen(true)}
           className="rounded-lg bg-[#85587D] px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
         >
-          Add Client
+          {t("add_client")}
         </button>
       </div>
 
@@ -259,7 +256,7 @@ function ClientsInner() {
         <input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search by name or email…"
+          placeholder={t("search")}
           className={`sm:max-w-xs ${fieldClass}`}
         />
         <div className="flex items-center gap-2">
@@ -274,7 +271,7 @@ function ClientsInner() {
                   : "border border-[#E2D8E0] text-[#151115]/70 hover:border-[#85587D] dark:border-[#4A2E46] dark:text-[#F8F4F7]/70 dark:hover:border-[#D8A8D3]"
               }`}
             >
-              {option}
+              {t(option)}
             </button>
           ))}
         </div>
@@ -296,13 +293,11 @@ function ClientsInner() {
           </div>
         ) : visible.length === 0 ? (
           <EmptyState
-            title={clients.length === 0 ? "No clients yet." : "No matches."}
+            title={clients.length === 0 ? t("empty_clients") : "No matches."}
             subtitle={
-              clients.length === 0
-                ? "Your first client is one click away."
-                : "Try a different search or filter."
+              clients.length === 0 ? t("empty_clients_sub") : "Try a different search or filter."
             }
-            actionLabel={clients.length === 0 ? "Add your first client" : undefined}
+            actionLabel={clients.length === 0 ? t("add_first_client") : undefined}
             onAction={clients.length === 0 ? () => setAddOpen(true) : undefined}
           />
         ) : (
@@ -311,10 +306,10 @@ function ClientsInner() {
               <table className="w-full text-left text-sm">
                 <thead className="bg-[#F8F4F7] text-xs uppercase tracking-widest opacity-60 dark:bg-[#151115]">
                   <tr>
-                    <th className="px-5 py-3">Name</th>
-                    <th className="px-5 py-3">Email</th>
-                    <th className="px-5 py-3">Status</th>
-                    <th className="px-5 py-3 text-right">Actions</th>
+                    <th className="px-5 py-3">{t("client_name")}</th>
+                    <th className="px-5 py-3">{t("email")}</th>
+                    <th className="px-5 py-3">{t("status")}</th>
+                    <th className="px-5 py-3 text-right">{t("actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -341,7 +336,7 @@ function ClientsInner() {
                             onClick={() => setConfirmBlockId(client.id)}
                             className="rounded-lg border border-[#E2D8E0] px-3 py-1.5 text-xs font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
                           >
-                            {client.status === "blocked" ? "Unblock" : "Block"}
+                            {client.status === "blocked" ? t("unblock") : t("block")}
                           </button>
                           {confirmBlockId === client.id && (
                             <button
@@ -349,7 +344,7 @@ function ClientsInner() {
                               onClick={() => toggleBlock(client)}
                               className="rounded-lg bg-red-500/15 px-3 py-1.5 text-xs font-semibold text-red-600 transition-all duration-200 dark:text-red-400"
                             >
-                              Sure?
+                              {t("sure")}
                             </button>
                           )}
                           <button
@@ -357,7 +352,7 @@ function ClientsInner() {
                             onClick={() => openDrawer(client)}
                             className="rounded-lg px-3 py-1.5 text-xs font-semibold text-[#85587D] transition-all duration-200 hover:bg-[#85587D]/10 dark:text-[#D8A8D3] dark:hover:bg-[#D8A8D3]/10"
                           >
-                            View
+                            {t("view")}
                           </button>
                         </div>
                       </td>
@@ -400,7 +395,7 @@ function ClientsInner() {
                         onClick={() => toggleBlock(client)}
                         className="rounded-lg bg-red-500/15 px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400"
                       >
-                        Sure?
+                        {t("sure")}
                       </button>
                     )}
                     <button
@@ -408,7 +403,7 @@ function ClientsInner() {
                       onClick={() => openDrawer(client)}
                       className="ml-auto rounded-lg px-3 py-1.5 text-xs font-semibold text-[#85587D] dark:text-[#D8A8D3]"
                     >
-                      View
+                      {t("view")}
                     </button>
                   </div>
                 </li>
@@ -429,7 +424,7 @@ function ClientsInner() {
             className="w-full max-w-md rounded-2xl border border-[#E2D8E0] bg-white p-6 dark:border-[#4A2E46] dark:bg-[#221C21]"
           >
             <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
-              Add Client
+              {t("add_client")}
             </h2>
             <div className="mt-4 flex flex-col gap-3">
               <input

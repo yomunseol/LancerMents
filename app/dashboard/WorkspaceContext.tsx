@@ -24,6 +24,7 @@ type WorkspaceContextValue = {
   refresh: () => Promise<void>;
   tier: Tier;
   loading: boolean;
+  ready: boolean;
   error: string | null;
 };
 
@@ -134,6 +135,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       refresh: load,
       tier,
       loading,
+      ready: !loading,
       error,
     }),
     [workspaces, activeWorkspace, switchWorkspace, load, tier, loading, error],
