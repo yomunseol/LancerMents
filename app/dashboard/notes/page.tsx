@@ -149,19 +149,19 @@ export default function NotesPage() {
           <p className="text-[11px] font-semibold uppercase tracking-wider text-[#151115]/50 dark:text-[#F8F4F7]/50">
             {t("pinned")}
           </p>
-          <ul className="mt-2 flex flex-col gap-1">
+          <ul className="mt-2 flex gap-2 overflow-x-auto pb-1 md:flex-col md:gap-1 md:overflow-visible md:pb-0">
             {pinned.map((note) => (
-              <li key={note.id}>
+              <li key={note.id} className="shrink-0 md:shrink">
                 <button
                   type="button"
                   onClick={() => setSelectedId(note.id)}
-                  className={`w-full truncate rounded-lg px-3 py-2 text-left text-sm transition-colors duration-200 ${
+                  className={`max-w-[14rem] shrink-0 truncate rounded-lg px-3 py-2 text-left text-sm transition-colors duration-200 md:w-full ${
                     note.id === selectedId
                       ? "bg-[#85587D]/10 text-[#85587D] dark:bg-[#D8A8D3]/10 dark:text-[#D8A8D3]"
                       : "text-[#151115]/80 hover:bg-[#85587D]/5 dark:text-[#F8F4F7]/80"
                   }`}
                 >
-                  {note.title || t("untitled")}
+                  {note.title || t("new_note")}
                 </button>
               </li>
             ))}
@@ -172,9 +172,9 @@ export default function NotesPage() {
       <p className="mt-6 text-[11px] font-semibold uppercase tracking-wider text-[#151115]/50 dark:text-[#F8F4F7]/50">
         {t("notes")}
       </p>
-      <ul className="mt-2 flex flex-col gap-1 md:max-h-[45vh] md:overflow-y-auto">
+      <ul className="mt-2 flex gap-2 overflow-x-auto pb-1 md:max-h-[45vh] md:flex-col md:gap-1 md:overflow-x-visible md:overflow-y-auto md:pb-0">
         {notes.map((note) => (
-          <li key={note.id}>
+          <li key={note.id} className="shrink-0 md:shrink">
             <button
               type="button"
               onClick={() => setSelectedId(note.id)}
@@ -184,7 +184,7 @@ export default function NotesPage() {
                   : "text-[#151115]/80 hover:bg-[#85587D]/5 dark:text-[#F8F4F7]/80"
               }`}
             >
-              {note.title || t("untitled")}
+              {note.title || t("new_note")}
             </button>
           </li>
         ))}

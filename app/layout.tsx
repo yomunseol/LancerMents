@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import { RTL_LOCALES } from "@/lib/i18n/vocab";
@@ -9,7 +9,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "LancerMents",
   description: "Tactical Configuration Blueprint",
-  icons: { icon: "/LancerMents-Light.png" },
+  icons: { apple: "/apple-touch-icon.png" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#151115",
 };
 
 export default async function RootLayout({
