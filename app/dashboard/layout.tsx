@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { NAV_ITEMS, isNavLocked, type NavIcon } from "./nav-config";
-import { ProfileProvider, useProfile } from "./ProfileContext";
+import { useProfile } from "./ProfileContext";
 import { WorkspaceProvider, useWorkspace } from "./WorkspaceContext";
 import WorkspaceSwitcher from "./WorkspaceSwitcher";
 
@@ -121,13 +121,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProfileProvider>
-      <WorkspaceProvider>
-        <div className="flex min-h-screen flex-col pt-16 md:flex-row">
-          <Sidebar />
-          <main className="min-w-0 flex-1 px-4 py-10 md:px-10">{children}</main>
-        </div>
-      </WorkspaceProvider>
-    </ProfileProvider>
+    <WorkspaceProvider>
+      <div className="flex min-h-screen flex-col pt-16 md:flex-row">
+        <Sidebar />
+        <main className="min-w-0 flex-1 px-4 py-10 md:px-10">{children}</main>
+      </div>
+    </WorkspaceProvider>
   );
 }

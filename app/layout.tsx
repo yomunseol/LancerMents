@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import { RTL_LOCALES } from "@/lib/i18n/vocab";
+import { ProfileProvider } from "@/app/dashboard/ProfileContext";
 import GlobalNav from "@/app/components/GlobalNav";
 import "./globals.css";
 
@@ -23,8 +24,10 @@ export default async function RootLayout({
     <html lang={locale} dir={dir} className="dark">
       <body className="bg-[#F8F4F7] text-[#151115] transition-colors duration-300 dark:bg-[#151115] dark:text-[#F8F4F7]">
         <NextIntlClientProvider>
-          <GlobalNav />
-          {children}
+          <ProfileProvider>
+            <GlobalNav />
+            {children}
+          </ProfileProvider>
         </NextIntlClientProvider>
       </body>
     </html>

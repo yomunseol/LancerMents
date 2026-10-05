@@ -160,10 +160,10 @@ export default function ProfilePage() {
               </p>
             </div>
             <Link
-              href="/onboarding"
+              href="/onboarding?edit=1&from=%2Fdashboard%2Fprofile"
               className="rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
             >
-              Change plan
+              {t("change_plan")}
             </Link>
           </div>
         </SectionCard>

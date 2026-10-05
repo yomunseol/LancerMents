@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
+import { useProfile } from "@/app/dashboard/ProfileContext";
 
 type BusinessType = {
   id: string;
@@ -110,7 +112,11 @@ function Spinner() {
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const t = useTranslations();
+  const { refresh } = useProfile();
   const [checking, setChecking] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [returnTo, setReturnTo] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const [businessType, setBusinessType] = useState("");
   const [planType, setPlanType] = useState("");
@@ -121,6 +127,11 @@ export default function OnboardingPage() {
     let active = true;
 
     (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const edit = params.get("edit") === "1";
+      const from = params.get("from");
+      if (from) setReturnTo(decodeURIComponent(from));
+
       try {
         const { data: sessionData } = await supabase.auth.getSession();
         if (!active) return;
@@ -141,7 +152,15 @@ export default function OnboardingPage() {
         const plan = (profile as { plan_type?: string | null } | null)?.plan_type;
 
         if (business && plan) {
-          router.replace("/dashboard");
+          if (!edit) {
+            router.replace("/dashboard");
+            return;
+          }
+          // PLAN-CHANGE MODE
+          setEditMode(true);
+          setPlanType(plan);
+          setStep(2);
+          setChecking(false);
           return;
         }
 
@@ -179,14 +198,31 @@ export default function OnboardingPage() {
           : null) ??
         "en";
 
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ business_type: businessType, plan_type: planType, locale: currentLocale })
-        .eq("id", user.id);
+      const { error: updateError } = editMode
+        ? await supabase
+            .from("profiles")
+            .update({ plan_type: planType })
+            .eq("id", user.id)
+        : await supabase
+            .from("profiles")
+            .update({ business_type: businessType, plan_type: planType, locale: currentLocale })
+            .eq("id", user.id);
 
       if (updateError) throw updateError;
 
-      router.push("/dashboard");
+      // Assert the write actually landed before navigating away.
+      const { data: persisted } = await supabase
+        .from("profiles")
+        .select("plan_type")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if ((persisted as { plan_type?: string | null } | null)?.plan_type !== planType) {
+        throw new Error("plan_type not persisted");
+      }
+
+      await refresh();
+      router.push(returnTo || "/dashboard");
     } catch (saveError) {
       setLoading(false);
       setError(messageOf(saveError, "Could not save your setup. Please try again."));
@@ -209,7 +245,7 @@ export default function OnboardingPage() {
       <div className="h-1 w-full rounded-full bg-[#E2D8E0] dark:bg-[#4A2E46]">
         <div
           className={`h-1 rounded-full bg-[#85587D] transition-all duration-500 dark:bg-[#D8A8D3] ${
-            step === 1 ? "w-1/2" : "w-full"
+            editMode || step === 2 ? "w-full" : "w-1/2"
           }`}
         />
       </div>
@@ -259,11 +295,9 @@ export default function OnboardingPage() {
       ) : (
         <section className="mt-12">
           <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-            Choose your engine.
+            {t("plan_title")}
           </h1>
-          <p className="mt-2 opacity-70">
-            All plans are free during Beta. No card required.
-          </p>
+          <p className="mt-2 opacity-70">{t("plan_sub")}</p>
 
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
             {PLANS.map((plan) => {
@@ -279,6 +313,11 @@ export default function OnboardingPage() {
                     plan.popular,
                   )}`}
                 >
+                  {editMode && planType === plan.id && (
+                    <span className="absolute left-4 top-4 rounded-full bg-[#85587D]/15 px-2 py-1 text-xs font-bold text-[#85587D] dark:bg-[#D8A8D3]/15 dark:text-[#D8A8D3]">
+                      {t("current_plan")}
+                    </span>
+                  )}
                   {plan.popular && (
                     <span className="absolute right-4 top-4 rounded-full bg-[#85587D] px-2 py-1 text-xs font-bold text-white dark:bg-[#D8A8D3] dark:text-[#151115]">
                       POPULAR
@@ -312,13 +351,15 @@ export default function OnboardingPage() {
           </div>
 
           <div className="mt-12 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="w-full rounded-lg border border-[#E2D8E0] px-6 py-2.5 text-base font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg md:w-auto dark:border-[#4A2E46] dark:text-[#F8F4F7]"
-            >
-              Back
-            </button>
+            {!editMode && (
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="w-full rounded-lg border border-[#E2D8E0] px-6 py-2.5 text-base font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg md:w-auto dark:border-[#4A2E46] dark:text-[#F8F4F7]"
+              >
+                {t("back")}
+              </button>
+            )}
             <button
               type="button"
               onClick={finishOnboarding}
@@ -328,10 +369,12 @@ export default function OnboardingPage() {
               {loading ? (
                 <>
                   <Spinner />
-                  Setting up…
+                  {t("loading")}
                 </>
+              ) : editMode ? (
+                t("change_plan")
               ) : (
-                "Start Free Trial"
+                t("start_trial")
               )}
             </button>
           </div>
