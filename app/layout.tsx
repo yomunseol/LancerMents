@@ -9,7 +9,6 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "LancerMents",
   description: "Tactical Configuration Blueprint",
-  icons: { apple: "/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
