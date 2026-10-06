@@ -1,5 +1,4 @@
 import Link from "next/link";
-import ThemeToggle from "./components/ThemeToggle";
 
 const engineRoomFeatures = [
   "1 Workspace",
@@ -39,42 +38,6 @@ function FeatureList({ items }: { items: string[] }) {
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#F8F4F7] text-[#151115] transition-colors duration-300 dark:bg-[#151115] dark:text-[#F8F4F7]">
-      <header className="sticky top-0 z-50">
-        <nav className="flex min-h-[80px] items-center justify-between border-b border-[#E2D8E0] bg-white px-4 py-4 transition-colors duration-300 md:px-8 md:py-6 lg:px-12 dark:border-[#4A2E46] dark:bg-[#151115]">
-          <div className="flex items-center gap-4">
-            <img
-              src="/LancerMents-Light.png"
-              alt="LancerMents Light"
-              className="block h-10 w-10 rounded-xl border border-[#E2D8E0] object-cover dark:hidden dark:border-[#D8A8D3] md:h-12 md:w-12"
-            />
-            <img
-              src="/LancerMents-Dark.png"
-              alt="LancerMents Dark"
-              className="hidden h-10 w-10 rounded-xl border border-[#E2D8E0] object-cover dark:block dark:border-[#D8A8D3] md:h-12 md:w-12"
-            />
-            <span className="hidden text-xl font-bold text-[#151115] dark:text-[#F8F4F7] md:inline md:text-3xl">
-              LancerMents
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 md:gap-4">
-            <ThemeToggle />
-            <Link
-              href="/login"
-              className="rounded-lg px-3 py-2 text-sm font-semibold text-[#151115] transition-opacity hover:opacity-70 dark:text-[#F8F4F7]"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/signup"
-              className="rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-colors dark:bg-[#D8A8D3] dark:text-[#151115]"
-            >
-              Sign Up
-            </Link>
-          </div>
-        </nav>
-      </header>
-
       <main className="mx-auto max-w-6xl px-4 md:px-8 lg:px-12">
         <section className="flex flex-col items-center gap-12 py-24 lg:flex-row">
           <div className="w-full lg:w-1/2">

@@ -150,13 +150,20 @@ export default function GlobalNav() {
 
   return (
     <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-[#E2D8E0] bg-white/80 px-6 backdrop-blur transition-colors duration-200 dark:border-[#4A2E46] dark:bg-[#151115]/80">
-      <Link href="/" className="flex items-center gap-2">
-        <img
-          src="/LancerMents-Dark.png"
-          alt="LancerMents"
-          className="h-9 w-9 rounded-lg border border-[#4A2E46] object-cover"
-        />
-        <span className="text-lg font-bold text-[#151115] dark:text-[#F8F4F7]">
+      <Link href="/" className="flex items-center gap-3">
+        <span className="block h-10 w-10 shrink-0 overflow-hidden rounded-xl ring-1 ring-[#E2D8E0] transition-transform duration-200 hover:scale-105 dark:ring-[#4A2E46]">
+          <img
+            src="/LancerMents-Light.png"
+            alt="LancerMents"
+            className="block h-full w-full object-cover dark:hidden"
+          />
+          <img
+            src="/LancerMents-Dark.png"
+            alt="LancerMents"
+            className="hidden h-full w-full object-cover dark:block"
+          />
+        </span>
+        <span className="text-xl font-extrabold tracking-tight text-[#151115] dark:text-[#F8F4F7]">
           LancerMents
         </span>
       </Link>
