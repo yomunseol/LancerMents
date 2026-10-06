@@ -40,7 +40,7 @@ function SectionCard({
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { workspaces, activeWorkspace, refresh } = useWorkspace();
+  const { workspaces, activeWorkspace, refreshWorkspaces } = useWorkspace();
 
   const [mode, setMode] = useState<ThemeMode>("dark");
   const [defaultWorkspace, setDefaultWorkspace] = useState("");
@@ -84,7 +84,7 @@ export default function SettingsPage() {
         .update({ name })
         .eq("id", activeWorkspace.id);
       if (error) throw error;
-      await refresh();
+      await refreshWorkspaces();
       setRenameStatus("Workspace renamed.");
     } catch (error) {
       setRenameError(messageOf(error, "Could not rename the workspace."));

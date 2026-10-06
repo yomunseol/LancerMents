@@ -21,14 +21,14 @@ type WorkspaceContextValue = {
   workspaces: Workspace[];
   activeWorkspace: Workspace | null;
   switchWorkspace: (id: string) => void;
-  refresh: () => Promise<void>;
+  refreshWorkspaces: () => Promise<void>;
   tier: Tier;
   loading: boolean;
   ready: boolean;
   error: string | null;
 };
 
-const STORAGE_KEY = "lancermonts.activeWorkspaceId";
+const STORAGE_KEY = "lm_active_ws";
 
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 
@@ -44,11 +44,13 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
-      if (userError) throw userError;
+      if (sessionError) throw sessionError;
+
+      const user = session?.user ?? null;
 
       if (!user) {
         setWorkspaces([]);
@@ -142,7 +144,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       workspaces,
       activeWorkspace,
       switchWorkspace,
-      refresh: load,
+      refreshWorkspaces: load,
       tier,
       loading,
       ready: !loading,

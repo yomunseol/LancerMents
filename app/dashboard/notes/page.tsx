@@ -52,7 +52,7 @@ export default function NotesPage() {
 
   useEffect(() => {
     let active = true;
-    if (!ws?.id) return;
+    if (!ws?.id) return; // WS-GATE
 
     setLoading(true);
     setError(null);
