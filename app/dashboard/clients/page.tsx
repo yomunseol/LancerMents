@@ -9,6 +9,7 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import EmptyState from "@/app/components/EmptyState";
 import TierGate from "@/app/components/TierGate";
 import { useWorkspaceGate } from "../useWorkspaceData";
+import { useProfile } from "../ProfileContext";
 
 const ClientMap = dynamic(() => import("@/app/components/ClientMap"), {
   ssr: false,
@@ -57,6 +58,7 @@ function StatusPill({ status }: { status: string | null }) {
 function ClientsInner() {
   const t = useTranslations();
   const ws = useWorkspaceGate();
+  const { planCanonical } = useProfile();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +71,6 @@ function ClientsInner() {
   const [newAddress, setNewAddress] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [planType, setPlanType] = useState<string | null>(null);
 
   const [confirmBlockId, setConfirmBlockId] = useState<string | null>(null);
   const [drawerClient, setDrawerClient] = useState<Client | null>(null);
@@ -99,25 +100,6 @@ function ClientsInner() {
     setLoading(true);
     load(ws.id).finally(() => setLoading(false));
   }, [ws?.id, load]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (!user) return;
-        const { data } = await supabase
-          .from("profiles")
-          .select("plan_type")
-          .eq("id", user.id)
-          .maybeSingle();
-        setPlanType((data as { plan_type?: string | null } | null)?.plan_type ?? null);
-      } catch {
-        /* maps simply stay locked */
-      }
-    })();
-  }, []);
 
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -572,7 +554,7 @@ function ClientsInner() {
 
             <section className="mt-6">
               <h3 className="text-xs uppercase tracking-widest opacity-60">Location</h3>
-              {planType === "studio" ? (
+              {planCanonical === "studio" ? (
                 drawerClient.address_lat != null && drawerClient.address_lng != null ? (
                   <div className="mt-2">
                     <div className="h-48 overflow-hidden rounded-xl border border-[#E2D8E0] dark:border-[#4A2E46]">
@@ -600,7 +582,9 @@ function ClientsInner() {
                   <p className="mt-2 text-sm opacity-60">No address on file.</p>
                 )
               ) : (
-                <p className="mt-2 text-sm opacity-60">Maps live in The Studio.</p>
+                <div className="mt-2">
+                  <TierGate requiredTier="studio" featureKey="clients" compact />
+                </div>
               )}
             </section>
 
@@ -627,7 +611,7 @@ function ClientsInner() {
 
 export default function ClientsPage() {
   return (
-    <TierGate requiredTier="pipeline">
+    <TierGate requiredTier="pipeline" featureKey="clients">
       <ClientsInner />
     </TierGate>
   );

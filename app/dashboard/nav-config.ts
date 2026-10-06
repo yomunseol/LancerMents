@@ -1,3 +1,5 @@
+import { planLocked, type CanonicalPlan } from "@/lib/profile";
+
 export type NavIcon =
   | "dashboard"
   | "tasks"
@@ -36,10 +38,7 @@ export const NAV_ITEMS: NavItem[] = [
   { key: "settings", href: "/dashboard/settings", icon: "settings" },
 ];
 
-const TIER_RANK: Record<string, number> = { basic: 0, plus: 1, pro: 2 };
-const TIER_REQUIRED: Record<NavTier, number> = { pipeline: 1, studio: 2 };
-
-export function isNavLocked(item: NavItem, tier: string): boolean {
+export function isNavLocked(item: NavItem, plan: CanonicalPlan | null): boolean {
   if (!item.tier) return false;
-  return (TIER_RANK[tier] ?? 0) < TIER_REQUIRED[item.tier];
+  return planLocked(plan, item.tier);
 }

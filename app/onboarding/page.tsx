@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
-import { saveProfile } from "@/lib/profile";
+import { canonicalPlan, saveProfile, type CanonicalPlan } from "@/lib/profile";
 import { useProfile } from "@/app/dashboard/ProfileContext";
 
 type BusinessType = {
@@ -114,13 +114,14 @@ function Spinner() {
 export default function OnboardingPage() {
   const router = useRouter();
   const t = useTranslations();
-  const { refresh } = useProfile();
+  const { refreshProfile } = useProfile();
   const [checking, setChecking] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [returnTo, setReturnTo] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const [businessType, setBusinessType] = useState("");
   const [planType, setPlanType] = useState("");
+  const [currentPlan, setCurrentPlan] = useState<CanonicalPlan | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -159,6 +160,7 @@ export default function OnboardingPage() {
           }
           // PLAN-CHANGE MODE
           setEditMode(true);
+          setCurrentPlan(canonicalPlan(plan));
           setPlanType(plan);
           setStep(2);
           setChecking(false);
@@ -206,7 +208,7 @@ export default function OnboardingPage() {
       const result = await saveProfile(user.id, patch);
       if (!result.ok) throw new Error(result.error);
 
-      await refresh();
+      await refreshProfile();
       router.push(returnTo || "/dashboard");
     } catch (saveError) {
       setLoading(false);
@@ -286,7 +288,8 @@ export default function OnboardingPage() {
 
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
             {PLANS.map((plan) => {
-              const selected = planType === plan.id;
+              const canonical = canonicalPlan(plan.id);
+              const selected = canonicalPlan(planType) === canonical;
               return (
                 <button
                   key={plan.id}
@@ -298,7 +301,7 @@ export default function OnboardingPage() {
                     plan.popular,
                   )}`}
                 >
-                  {editMode && planType === plan.id && (
+                  {editMode && canonical !== null && canonical === currentPlan && (
                     <span className="absolute left-4 top-4 rounded-full bg-[#85587D]/15 px-2 py-1 text-xs font-bold text-[#85587D] dark:bg-[#D8A8D3]/15 dark:text-[#D8A8D3]">
                       {t("current_plan")}
                     </span>

@@ -23,6 +23,22 @@ export function canonicalPlan(
   return LEGACY_PLAN_MAP[key] ?? null;
 }
 
+export type RequiredPlan = "pipeline" | "studio";
+
+export const PLAN_RANK: Record<CanonicalPlan, number> = {
+  engine: 0,
+  pipeline: 1,
+  studio: 2,
+};
+
+/** engine < pipeline < studio. null / incomplete is always locked. */
+export function planLocked(
+  plan: CanonicalPlan | null | undefined,
+  required: RequiredPlan,
+): boolean {
+  return (plan ? PLAN_RANK[plan] : -1) < PLAN_RANK[required];
+}
+
 export type SaveResult =
   | { ok: true; row: Record<string, unknown> }
   | { ok: false; error: string };

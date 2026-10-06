@@ -55,7 +55,7 @@ function LockIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       aria-hidden="true"
-      className="shrink-0 opacity-60"
+      className="shrink-0 opacity-50"
     >
       <rect x="4" y="10" width="16" height="10" rx="2" />
       <path d="M8 10V7a4 4 0 0 1 8 0v3" />
@@ -67,7 +67,7 @@ function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const t = useTranslations();
-  const { planType } = useProfile();
+  const { planCanonical } = useProfile();
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -84,7 +84,7 @@ function Sidebar() {
             item.href === "/dashboard"
               ? pathname === "/dashboard"
               : pathname.startsWith(item.href);
-          const locked = isNavLocked(item, planType ?? "basic");
+          const locked = isNavLocked(item, planCanonical);
 
           return (
             <Link
