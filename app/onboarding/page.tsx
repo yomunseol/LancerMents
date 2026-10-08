@@ -5,20 +5,14 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { canonicalPlan, saveProfile, type CanonicalPlan } from "@/lib/profile";
+import { PLAN_TIERS } from "@/lib/plans";
+import PlanCard from "@/app/components/PlanCard";
 import { useProfile } from "@/app/dashboard/ProfileContext";
 
 type BusinessType = {
   id: string;
   title: string;
   description: string;
-};
-
-type Plan = {
-  id: string;
-  name: string;
-  price: string;
-  features: string[];
-  popular?: boolean;
 };
 
 const BUSINESS_TYPES: BusinessType[] = [
@@ -44,38 +38,6 @@ const BUSINESS_TYPES: BusinessType[] = [
   },
 ];
 
-const PLANS: Plan[] = [
-  {
-    id: "engine-room",
-    name: "The Engine Room",
-    price: "9",
-    features: ["1 Workspace", "Grid Task List (3 daily)", "Async Calendar"],
-  },
-  {
-    id: "pipeline",
-    name: "The Pipeline",
-    price: "19",
-    features: [
-      "2 Workspaces",
-      "CRM Kanban",
-      "Secure Client Links (max 5)",
-      "Direct Invoice Output",
-    ],
-    popular: true,
-  },
-  {
-    id: "studio",
-    name: "The Studio",
-    price: "49",
-    features: [
-      "Up to 5 Workspaces",
-      "White-Label",
-      "Multi-Workspace Switcher",
-      "Secure Client Links (max 15)",
-    ],
-  },
-];
-
 const CARD_BASE =
   "w-full min-h-[100px] cursor-pointer rounded-2xl p-8 text-left transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5";
 
@@ -83,14 +45,6 @@ function businessCardClass(selected: boolean): string {
   return selected
     ? "border-2 border-[#85587D] bg-[#85587D]/5 dark:border-[#D8A8D3] dark:bg-[#D8A8D3]/5"
     : "border border-[#E2D8E0] bg-white dark:border-[#4A2E46] dark:bg-[#221C21]";
-}
-
-function planCardClass(selected: boolean, popular = false): string {
-  const border = popular
-    ? "border-2 border-[#85587D] dark:border-[#D8A8D3]"
-    : "border border-[#E2D8E0] dark:border-[#4A2E46]";
-  const ring = selected ? "ring-2 ring-[#85587D] dark:ring-[#D8A8D3]" : "";
-  return `${border} bg-white dark:bg-[#221C21] ${ring}`;
 }
 
 function messageOf(error: unknown, fallback: string): string {
@@ -161,7 +115,7 @@ export default function OnboardingPage() {
           // PLAN-CHANGE MODE
           setEditMode(true);
           setCurrentPlan(canonicalPlan(plan));
-          setPlanType(plan);
+          setPlanType(canonicalPlan(plan) ?? "");
           setStep(2);
           setChecking(false);
           return;
@@ -286,56 +240,17 @@ export default function OnboardingPage() {
           </h1>
           <p className="mt-2 opacity-70">{t("plan_sub")}</p>
 
-          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {PLANS.map((plan) => {
-              const canonical = canonicalPlan(plan.id);
-              const selected = canonicalPlan(planType) === canonical;
-              return (
-                <button
-                  key={plan.id}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => setPlanType(plan.id)}
-                  className={`relative ${CARD_BASE} ${planCardClass(
-                    selected,
-                    plan.popular,
-                  )}`}
-                >
-                  {editMode && canonical !== null && canonical === currentPlan && (
-                    <span className="absolute left-4 top-4 rounded-full bg-[#85587D]/15 px-2 py-1 text-xs font-bold text-[#85587D] dark:bg-[#D8A8D3]/15 dark:text-[#D8A8D3]">
-                      {t("current_plan")}
-                    </span>
-                  )}
-                  {plan.popular && (
-                    <span className="absolute right-4 top-4 rounded-full bg-[#85587D] px-2 py-1 text-xs font-bold text-white dark:bg-[#D8A8D3] dark:text-[#151115]">
-                      POPULAR
-                    </span>
-                  )}
-                  <span className="block text-lg font-bold text-[#151115] dark:text-[#F8F4F7]">
-                    {plan.name}
-                  </span>
-                  <span className="mt-2 block">
-                    <span className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-                      ${plan.price}
-                    </span>
-                    <span className="text-sm opacity-70">/mo</span>
-                  </span>
-                  <ul className="mt-4 flex flex-col gap-2 text-sm">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2">
-                        <span
-                          aria-hidden="true"
-                          className="text-[#85587D] dark:text-[#D8A8D3]"
-                        >
-                          •
-                        </span>
-                        <span className="opacity-70">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </button>
-              );
-            })}
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+            {PLAN_TIERS.map((plan) => (
+              <PlanCard
+                key={plan.slug}
+                plan={plan}
+                compact
+                selected={planType === plan.slug}
+                current={editMode && currentPlan === plan.slug}
+                onSelect={setPlanType}
+              />
+            ))}
           </div>
 
           <div className="mt-12 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

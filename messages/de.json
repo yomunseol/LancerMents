@@ -136,5 +136,13 @@
   "err_save": "Änderungen konnten nicht gespeichert werden.",
   "gate_body": "Dieser Bereich ist in einem höheren Tarif enthalten. In der Beta ist alles kostenlos — Tarif wählen zum Freischalten.",
   "retry": "Erneut versuchen",
-  "saved": "Gespeichert"
+  "saved": "Gespeichert",
+  "coming_soon": "Bald verfügbar",
+  "most_popular": "Am beliebtesten",
+  "annual_save": "Jährlich: 2 Monate gratis",
+  "billing_after_beta": "Abrechnung erst nach der Beta. Jetzt alles kostenlos.",
+  "pos_starter": "Für Side-Project-Kreative.",
+  "pos_pro": "Für Vollzeit-Freelancer.",
+  "pos_expert": "Für Solo-Agenturen.",
+  "pos_business": "Für kleine Teams mit White-Label."
 }

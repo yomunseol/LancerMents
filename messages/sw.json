@@ -136,5 +136,13 @@
   "err_save": "Imeshindwa kuhifadhi mabadiliko.",
   "gate_body": "Sehemu hii ya nafasi iko katika mpango wa juu. Kila kitu ni bure wakati wa Beta — chagua mpango kuifungua.",
   "retry": "Jaribu tena",
-  "saved": "Imehifadhiwa"
+  "saved": "Imehifadhiwa",
+  "coming_soon": "Inakuja hivi karibuni",
+  "most_popular": "Maarufu zaidi",
+  "annual_save": "Kila mwaka: miezi 2 bure",
+  "billing_after_beta": "Malipo yanaanza baada ya Beta. Kila kitu ni bure sasa.",
+  "pos_starter": "Kwa waumbaji wa miradi ya pembeni.",
+  "pos_pro": "Kwa wafanyakazi huru wa muda wote.",
+  "pos_expert": "Kwa waumbaji wenye mashirika ya mtu mmoja.",
+  "pos_business": "Kwa timu ndogo zinazotaka white-label."
 }

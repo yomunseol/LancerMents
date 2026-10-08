@@ -136,5 +136,13 @@
   "err_save": "无法保存更改。",
   "gate_body": "此功能包含在更高级的计划中。Beta 期间一切免费——选择计划即可解锁。",
   "retry": "重试",
-  "saved": "已保存"
+  "saved": "已保存",
+  "coming_soon": "即将推出",
+  "most_popular": "最受欢迎",
+  "annual_save": "年付:免 2 个月",
+  "billing_after_beta": "Beta 结束后开始计费。现在一切免费。",
+  "pos_starter": "适合试水的副业创作者。",
+  "pos_pro": "适合有固定客户的全职自由职业者。",
+  "pos_expert": "适合经营一人公司的重度创作者。",
+  "pos_business": "适合想要白标的小团队与机构。"
 }

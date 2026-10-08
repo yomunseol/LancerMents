@@ -136,5 +136,13 @@
   "err_save": "No se pudieron guardar los cambios.",
   "gate_body": "Esta parte del espacio está incluida en un plan superior. Todo es gratis durante la Beta: elige un plan para desbloquearla.",
   "retry": "Reintentar",
-  "saved": "Guardado"
+  "saved": "Guardado",
+  "coming_soon": "Próximamente",
+  "most_popular": "Más popular",
+  "annual_save": "Anual: 2 meses gratis",
+  "billing_after_beta": "El cobro empieza tras la Beta. Todo es gratis ahora.",
+  "pos_starter": "Para creadores de proyectos paralelos.",
+  "pos_pro": "Para freelancers a tiempo completo.",
+  "pos_expert": "Para creadores intensivos con agencias unipersonales.",
+  "pos_business": "Para equipos pequeños que quieren marca blanca."
 }

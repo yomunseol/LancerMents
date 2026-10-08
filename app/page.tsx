@@ -1,39 +1,5 @@
 import Link from "next/link";
-
-const engineRoomFeatures = [
-  "1 Workspace",
-  "Grid Task List (3 daily tasks)",
-  "Async Calendar",
-];
-
-const pipelineFeatures = [
-  "2 Workspaces",
-  "CRM Kanban",
-  "Secure Client Links (max 5)",
-  "Direct Invoice Output",
-];
-
-const studioFeatures = [
-  "Up to 5 Workspaces",
-  "White-Label Customization",
-  "Multi-Workspace Switcher",
-  "Secure Client Links (max 15)",
-];
-
-function FeatureList({ items }: { items: string[] }) {
-  return (
-    <ul className="mb-8 mt-6 flex flex-col gap-3 text-sm">
-      {items.map((item) => (
-        <li key={item} className="flex items-start gap-2">
-          <span aria-hidden="true" className="text-[#85587D] dark:text-[#D8A8D3]">
-            •
-          </span>
-          <span>{item}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
+import PricingGrid from "./components/PricingGrid";
 
 export default function Home() {
   return (
@@ -106,58 +72,7 @@ export default function Home() {
           />
         </section>
 
-        <section className="grid grid-cols-1 gap-8 border-t border-[#E2D8E0] py-24 md:grid-cols-3 dark:border-[#4A2E46]">
-          <p className="col-span-full text-center text-sm font-semibold text-[#85587D] dark:text-[#D8A8D3]">
-            All plans are free during Beta.
-          </p>
-          <article className="flex flex-col rounded-2xl border border-[#E2D8E0] bg-white p-8 dark:border-[#4A2E46] dark:bg-[#221C21]">
-            <h3 className="text-lg font-semibold">The Engine Room</h3>
-            <p className="mt-2">
-              <span className="text-3xl font-bold">$9</span>
-              <span className="text-sm opacity-80">/mo</span>
-            </p>
-            <FeatureList items={engineRoomFeatures} />
-            <Link
-              href="/signup"
-              className="mt-auto block rounded-lg border border-[#E2D8E0] py-2 text-center text-sm font-semibold text-[#151115] transition-colors hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
-            >
-              Get Started Free
-            </Link>
-          </article>
-
-          <article className="relative flex flex-col rounded-2xl border border-[#85587D] bg-white p-8 dark:border-[#D8A8D3] dark:bg-[#221C21]">
-            <span className="absolute right-4 top-4 rounded-full bg-[#85587D] px-2 py-1 text-xs font-bold text-white dark:bg-[#D8A8D3] dark:text-[#151115]">
-              POPULAR
-            </span>
-            <h3 className="text-lg font-semibold">The Pipeline</h3>
-            <p className="mt-2">
-              <span className="text-3xl font-bold">$19</span>
-              <span className="text-sm opacity-80">/mo</span>
-            </p>
-            <FeatureList items={pipelineFeatures} />
-            <Link
-              href="/signup"
-              className="mt-auto block rounded-lg bg-[#85587D] py-2 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
-            >
-              Get Started Free
-            </Link>
-          </article>
-
-          <article className="flex flex-col rounded-2xl border border-[#E2D8E0] bg-white p-8 dark:border-[#4A2E46] dark:bg-[#221C21]">
-            <h3 className="text-lg font-semibold">The Studio</h3>
-            <p className="mt-2">
-              <span className="text-3xl font-bold">$49</span>
-              <span className="text-sm opacity-80">/mo</span>
-            </p>
-            <FeatureList items={studioFeatures} />
-            <Link
-              href="/signup"
-              className="mt-auto block rounded-lg border border-[#E2D8E0] py-2 text-center text-sm font-semibold text-[#151115] transition-colors hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
-            >
-              Get Started Free
-            </Link>
-          </article>
-        </section>
+        <PricingGrid />
       </main>
 
       <footer className="border-t border-[#E2D8E0] py-8 text-center text-sm text-[#151115]/70 dark:border-[#4A2E46] dark:text-[#F8F4F7]/70">

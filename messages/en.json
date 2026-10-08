@@ -136,5 +136,13 @@
   "err_save": "Could not save changes.",
   "gate_body": "This part of the workspace is included in a higher plan. Everything is free during Beta — pick a plan to unlock it.",
   "retry": "Try again",
-  "saved": "Saved"
+  "saved": "Saved",
+  "coming_soon": "Coming soon",
+  "most_popular": "Most popular",
+  "annual_save": "Annual: 2 months free",
+  "billing_after_beta": "Billing starts after Beta. Everything is free now.",
+  "pos_starter": "For side-project creators testing the waters.",
+  "pos_pro": "For full-time freelancers with recurring clients.",
+  "pos_expert": "For heavy creators running one-person agencies.",
+  "pos_business": "For small teams & agencies that want white-label."
 }

@@ -136,5 +136,13 @@
   "err_save": "Kon nie veranderinge stoor nie.",
   "gate_body": "Hierdie deel van die werkspas is in 'n hoër plan ingesluit. Alles is gratis tydens die Beta — kies 'n plan om dit te ontsluit.",
   "retry": "Probeer weer",
-  "saved": "Gestoor"
+  "saved": "Gestoor",
+  "coming_soon": "Binnekort beskikbaar",
+  "most_popular": "Gewildste",
+  "annual_save": "Jaarliks: 2 maande gratis",
+  "billing_after_beta": "Faktuur eers ná die Beta. Alles is nou gratis.",
+  "pos_starter": "Vir syprojek-skeppers.",
+  "pos_pro": "Vir voltydse vryskutters.",
+  "pos_expert": "Vir swaar skeppers met eenmansagentskappe.",
+  "pos_business": "Vir klein spanne met wit etiket."
 }

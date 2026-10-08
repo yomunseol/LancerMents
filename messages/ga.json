@@ -136,5 +136,13 @@
   "err_save": "Níorbh fhéidir na athruithe a shábháil.",
   "gate_body": "Tá an chuid seo den spás i bplean níos airde. Tá gach rud saor le linn na Béite — roghnaigh plean chun é a dhíghlasáil.",
   "retry": "Bain triail eile as",
-  "saved": "Sábháilte"
+  "saved": "Sábháilte",
+  "coming_soon": "Ag teacht go luath",
+  "most_popular": "Is coitianta",
+  "annual_save": "Bliantúil: 2 mhí saor in aisce",
+  "billing_after_beta": "Tosaíonn billeadh tar éis na Béite. Tá gach rud saor anois.",
+  "pos_starter": "Do chruthaitheoirí tionscadal taobh.",
+  "pos_pro": "Do shaoririseoirí lánaimseartha.",
+  "pos_expert": "Do chruthaitheoirí trom le gníomhaireacht aonduine.",
+  "pos_business": "Do fhoirne beaga le white-label."
 }

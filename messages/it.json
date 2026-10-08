@@ -136,5 +136,13 @@
   "err_save": "Impossibile salvare le modifiche.",
   "gate_body": "Questa parte dello spazio è inclusa in un piano superiore. Tutto è gratis durante la Beta — scegli un piano per sbloccarla.",
   "retry": "Riprova",
-  "saved": "Salvato"
+  "saved": "Salvato",
+  "coming_soon": "Prossimamente",
+  "most_popular": "Più popolare",
+  "annual_save": "Annuale: 2 mesi gratis",
+  "billing_after_beta": "La fatturazione inizia dopo la Beta. Tutto gratis ora.",
+  "pos_starter": "Per creatori di progetti paralleli.",
+  "pos_pro": "Per freelance a tempo pieno.",
+  "pos_expert": "Per creatori intensivi con agenzia individuale.",
+  "pos_business": "Per piccoli team con white-label."
 }

@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 
-export const CANONICAL_PLANS = ["engine", "pipeline", "studio"] as const;
+export const CANONICAL_PLANS = ["engine", "pipeline", "studio", "business"] as const;
 export type CanonicalPlan = (typeof CANONICAL_PLANS)[number];
 
 const LEGACY_PLAN_MAP: Record<string, CanonicalPlan> = {
@@ -9,6 +9,9 @@ const LEGACY_PLAN_MAP: Record<string, CanonicalPlan> = {
   "the engine room": "engine",
   "the pipeline": "pipeline",
   "the studio": "studio",
+  "the business": "business",
+  "business plan": "business",
+  "business tier": "business",
 };
 
 export function canonicalPlan(
@@ -29,9 +32,10 @@ export const PLAN_RANK: Record<CanonicalPlan, number> = {
   engine: 0,
   pipeline: 1,
   studio: 2,
+  business: 3,
 };
 
-/** engine < pipeline < studio. null / incomplete is always locked. */
+/** engine < pipeline < studio < business. null / incomplete is always locked. */
 export function planLocked(
   plan: CanonicalPlan | null | undefined,
   required: RequiredPlan,
