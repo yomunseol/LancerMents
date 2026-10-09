@@ -122,7 +122,7 @@ export default function DashboardLayout({
 }) {
   return (
     <WorkspaceProvider>
-      <div className="flex min-h-screen flex-col pt-16 md:flex-row">
+      <div className="flex min-h-screen flex-col pt-20 md:flex-row">
         <Sidebar />
         <main className="min-w-0 flex-1 px-4 py-10 md:px-10">{children}</main>
       </div>

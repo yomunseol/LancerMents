@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { formatCurrency, formatDate } from "@/lib/format";
 import EmptyState from "@/app/components/EmptyState";
@@ -41,22 +41,24 @@ const fieldClass =
   "w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]";
 
 function StatusPill({ status }: { status: string | null }) {
-  const blocked = status === "blocked";
+  const t = useTranslations();
+  const value = status === "blocked" ? "blocked" : "active";
   return (
     <span
       className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-        blocked
+        value === "blocked"
           ? "bg-red-500/15 text-red-600 dark:text-red-400"
           : "bg-green-500/15 text-green-600 dark:text-green-400"
       }`}
     >
-      {blocked ? "Blocked" : "Active"}
+      {t("status_" + value)}
     </span>
   );
 }
 
 function ClientsInner() {
   const t = useTranslations();
+  const locale = useLocale();
   const ws = useWorkspaceGate();
   const { planCanonical } = useProfile();
   const [clients, setClients] = useState<Client[]>([]);
@@ -452,7 +454,7 @@ function ClientsInner() {
                       onClick={() => setConfirmBlockId(client.id)}
                       className="rounded-lg border border-[#E2D8E0] px-3 py-1.5 text-xs font-semibold text-[#151115] transition-all duration-200 dark:border-[#4A2E46] dark:text-[#F8F4F7]"
                     >
-                      {client.status === "blocked" ? "Unblock" : "Block"}
+                      {client.status === "blocked" ? t("unblock") : t("block")}
                     </button>
                     {confirmBlockId === client.id && (
                       <button
@@ -495,20 +497,20 @@ function ClientsInner() {
               <input
                 value={newName}
                 onChange={(event) => setNewName(event.target.value)}
-                placeholder="Client name"
+                placeholder={t("client_name")}
                 className={fieldClass}
               />
               <input
                 type="email"
                 value={newEmail}
                 onChange={(event) => setNewEmail(event.target.value)}
-                placeholder="Client email (optional)"
+                placeholder={t("client_email_optional")}
                 className={fieldClass}
               />
               <input
                 value={newAddress}
                 onChange={(event) => setNewAddress(event.target.value)}
-                placeholder="Address (optional — powers the Studio map)"
+                placeholder={t("address_optional")}
                 className={fieldClass}
               />
             </div>
@@ -528,7 +530,7 @@ function ClientsInner() {
                 onClick={() => setAddOpen(false)}
                 className="rounded-lg border border-[#E2D8E0] px-4 py-2 text-sm font-semibold text-[#151115] transition-all duration-200 dark:border-[#4A2E46] dark:text-[#F8F4F7]"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 type="submit"
@@ -561,10 +563,10 @@ function ClientsInner() {
             </div>
 
             <section className="mt-6">
-              <h3 className="text-xs uppercase tracking-widest opacity-60">Notes</h3>
+              <h3 className="text-xs uppercase tracking-widest opacity-60">{t("notes")}</h3>
               <div className="mt-2 flex flex-wrap gap-2">
                 {drawerNotes.length === 0 && (
-                  <p className="text-sm opacity-60">No linked notes.</p>
+                  <p className="text-sm opacity-60">{t("no_linked_notes")}</p>
                 )}
                 {drawerNotes.map((note) => (
                   <Link
@@ -579,10 +581,10 @@ function ClientsInner() {
             </section>
 
             <section className="mt-6">
-              <h3 className="text-xs uppercase tracking-widest opacity-60">Deals</h3>
+              <h3 className="text-xs uppercase tracking-widest opacity-60">{t("deals")}</h3>
               <ul className="mt-2 flex flex-col gap-2">
                 {drawerDeals.length === 0 && (
-                  <li className="text-sm opacity-60">No deals yet.</li>
+                  <li className="text-sm opacity-60">{t("no_deals_yet")}</li>
                 )}
                 {drawerDeals.map((deal) => (
                   <li
@@ -591,7 +593,7 @@ function ClientsInner() {
                   >
                     <span className="text-[#151115] dark:text-[#F8F4F7]">{deal.title}</span>
                     <span className="font-semibold text-[#85587D] dark:text-[#D8A8D3]">
-                      {formatCurrency(deal.value)}
+                      {formatCurrency(deal.value, locale)}
                     </span>
                   </li>
                 ))}
@@ -599,10 +601,10 @@ function ClientsInner() {
             </section>
 
             <section className="mt-6">
-              <h3 className="text-xs uppercase tracking-widest opacity-60">Invoices</h3>
+              <h3 className="text-xs uppercase tracking-widest opacity-60">{t("invoices")}</h3>
               <ul className="mt-2 flex flex-col gap-2">
                 {drawerInvoices.length === 0 && (
-                  <li className="text-sm opacity-60">No invoices yet.</li>
+                  <li className="text-sm opacity-60">{t("no_invoices_yet")}</li>
                 )}
                 {drawerInvoices.map((invoice) => (
                   <li
@@ -610,10 +612,10 @@ function ClientsInner() {
                     className="flex items-center justify-between rounded-lg border border-[#E2D8E0] px-3 py-2 text-sm dark:border-[#4A2E46]"
                   >
                     <span className="capitalize text-[#151115]/70 dark:text-[#F8F4F7]/70">
-                      {invoice.status ?? "draft"}
+                      {t(`status_${invoice.status ?? "draft"}`)}
                     </span>
                     <span className="font-semibold text-[#151115] dark:text-[#F8F4F7]">
-                      {formatCurrency(invoice.amount)}
+                      {formatCurrency(invoice.amount, locale)}
                     </span>
                   </li>
                 ))}
@@ -621,7 +623,7 @@ function ClientsInner() {
             </section>
 
             <section className="mt-6">
-              <h3 className="text-xs uppercase tracking-widest opacity-60">Location</h3>
+              <h3 className="text-xs uppercase tracking-widest opacity-60">{t("location")}</h3>
               {planCanonical === "studio" ? (
                 drawerClient.address_lat != null && drawerClient.address_lng != null ? (
                   <div className="mt-2">
@@ -643,11 +645,11 @@ function ClientsInner() {
                       rel="noreferrer"
                       className="mt-2 inline-block text-sm font-medium text-[#85587D] hover:underline dark:text-[#D8A8D3]"
                     >
-                      Open in Google Maps
+                      {t("open_in_maps")}
                     </a>
                   </div>
                 ) : (
-                  <p className="mt-2 text-sm opacity-60">No address on file.</p>
+                  <p className="mt-2 text-sm opacity-60">{t("no_address")}</p>
                 )
               ) : (
                 <div className="mt-2">
@@ -661,13 +663,13 @@ function ClientsInner() {
                 href={`/dashboard/crm?client=${drawerClient.id}`}
                 className="flex-1 rounded-lg bg-[#85587D] px-4 py-2.5 text-center text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
               >
-                New Deal
+                {t("new_deal")}
               </Link>
               <Link
                 href={`/dashboard/invoices?client=${drawerClient.id}`}
                 className="flex-1 rounded-lg border border-[#E2D8E0] px-4 py-2.5 text-center text-sm font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
               >
-                New Invoice
+                {t("new_invoice")}
               </Link>
             </div>
           </aside>

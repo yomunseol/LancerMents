@@ -48,7 +48,7 @@ export default function Feedback({ page }: { page: string }) {
       ) : (
         <>
           <p className="text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
-            Was this helpful?
+            {t("helpful_q")}
           </p>
           <div className="mt-3 flex gap-2">
             <button

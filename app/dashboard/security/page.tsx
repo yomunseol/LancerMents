@@ -466,13 +466,13 @@ export default function SecurityPage() {
           {stage === "verify" && (
             <form onSubmit={submitCode} className="mt-4 flex flex-col gap-3">
               {qr && (
-                <img src={qr} alt="Authenticator QR code" className="h-36 w-36 rounded-lg border border-[#E2D8E0] bg-white p-2 dark:border-[#4A2E46]" />
+                <img src={qr} alt={t("qr_alt")} className="h-36 w-36 rounded-lg border border-[#E2D8E0] bg-white p-2 dark:border-[#4A2E46]" />
               )}
               {secret && (
                 <div className="flex items-center gap-2">
                   <code className="break-all text-xs opacity-70">{secret}</code>
                   <button type="button" onClick={() => void navigator.clipboard.writeText(secret)} className="rounded-lg border border-[#E2D8E0] px-3 py-1.5 text-xs font-semibold transition-all duration-200 dark:border-[#4A2E46]">
-                    Copy
+                    {t("copy")}
                   </button>
                 </div>
               )}
@@ -505,7 +505,7 @@ export default function SecurityPage() {
                       )}
                     </p>
                     <p className="text-xs opacity-60">
-                      {row.browser ?? "—"} • {row.location ?? "Unknown location"} • {relativeTime(row.last_active)}
+                      {row.browser ?? "—"} • {row.location ?? t("unknown_location")} • {relativeTime(row.last_active, locale)}
                     </p>
                   </div>
                   {!isCurrent && (

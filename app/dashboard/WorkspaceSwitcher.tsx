@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useWorkspace } from "./WorkspaceContext";
 
 function Chevron({ open }: { open: boolean }) {
@@ -42,6 +43,7 @@ function CheckIcon() {
 }
 
 export default function WorkspaceSwitcher() {
+  const t = useTranslations();
   const { workspaces, activeWorkspace, switchWorkspace, ready } = useWorkspace();
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
@@ -102,7 +104,7 @@ export default function WorkspaceSwitcher() {
           }`}
         >
           {workspaces.length === 0 && (
-            <li className="px-4 py-2.5 text-sm opacity-60">No workspaces yet</li>
+            <li className="px-4 py-2.5 text-sm opacity-60">{t("no_workspaces")}</li>
           )}
           {workspaces.map((workspace) => {
             const active = workspace.id === activeWorkspace?.id;

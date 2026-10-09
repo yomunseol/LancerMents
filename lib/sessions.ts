@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { formatRelative } from "@/lib/format";
 
 export type SessionRow = {
   session_id: string;
@@ -103,14 +104,6 @@ export async function isSessionRevoked(sessionId: string): Promise<boolean> {
   }
 }
 
-export function relativeTime(iso: string | null): string {
-  if (!iso) return "unknown";
-  const diff = Date.now() - new Date(iso).getTime();
-  if (Number.isNaN(diff)) return "unknown";
-  const minutes = Math.round(diff / 60000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.round(hours / 24)}d ago`;
+export function relativeTime(iso: string | null, locale?: string | null): string {
+  return formatRelative(iso, locale);
 }

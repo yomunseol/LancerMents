@@ -109,14 +109,14 @@ export default function SettingsPage() {
   return (
     <>
       <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-        Settings
+        {t("settings")}
       </h1>
       <p className="mt-1 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-        Appearance, language, workspace defaults, and your profile.
+        {t("settings_sub")}
       </p>
 
       <div className="mt-8 max-w-2xl rounded-2xl border border-[#E2D8E0] bg-white p-8 dark:border-[#4A2E46] dark:bg-[#221C21]">
-        <SectionCard title="Appearance">
+        <SectionCard title={t("appearance")}>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {MODES.map((option) => {
               const selected = mode === option.id;
@@ -150,15 +150,15 @@ export default function SettingsPage() {
           </div>
         </SectionCard>
 
-        <SectionCard title="Workspace defaults">
+        <SectionCard title={t("workspace_defaults")}>
           <label className="block text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
-            Default workspace on login
+            {t("default_workspace")}
             <select
               value={defaultWorkspace}
               onChange={(event) => chooseDefaultWorkspace(event.target.value)}
               className={`mt-2 ${fieldClass}`}
             >
-              <option value="">First available</option>
+              <option value="">{t("first_available")}</option>
               {workspaces.map((workspace) => (
                 <option key={workspace.id} value={workspace.id}>
                   {workspace.name}
@@ -169,11 +169,11 @@ export default function SettingsPage() {
 
           <div className="mt-4">
             <label className="block text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
-              Rename active workspace
+              {t("rename_workspace")}
               <input
                 value={renameValue}
                 onChange={(event) => setRenameValue(event.target.value)}
-                placeholder="Workspace name"
+                placeholder={t("workspace_name")}
                 className={`mt-2 ${fieldClass}`}
               />
             </label>
@@ -183,7 +183,7 @@ export default function SettingsPage() {
               disabled={!activeWorkspace}
               className="mt-3 rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#D8A8D3] dark:text-[#151115]"
             >
-              Save name
+              {t("save_name")}
             </button>
             {fb && (
               <FeedbackBanner
@@ -198,10 +198,10 @@ export default function SettingsPage() {
 
         <section className="mt-6 rounded-xl border border-red-500/40 bg-red-500/5 p-5">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-red-600 opacity-80 dark:text-red-400">
-            Danger zone
+            {t("danger_zone")}
           </h2>
           <p className="mt-2 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-            Sign out of every device where you are logged in.
+            {t("danger_sub")}
           </p>
           <button
             type="button"

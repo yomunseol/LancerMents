@@ -145,15 +145,15 @@ export default function LoginPage() {
       {step === "credentials" ? (
         <>
           <h1 className="text-2xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-            Welcome back
+            {t("welcome")}
           </h1>
           <p className="mt-2 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-            Log in to your workspace.
+            {t("login_sub")}
           </p>
 
           <form onSubmit={handleLogin} className="mt-6 flex flex-col gap-4">
             <label className="flex flex-col gap-1 text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
-              Email
+              {t("email")}
               <input
                 type="email"
                 required
@@ -165,7 +165,7 @@ export default function LoginPage() {
               />
             </label>
             <label className="flex flex-col gap-1 text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
-              Password
+              {t("password")}
               <input
                 type="password"
                 required
@@ -199,17 +199,17 @@ export default function LoginPage() {
               href="/signup"
               className="font-medium text-[#85587D] hover:underline dark:text-[#D8A8D3]"
             >
-              Sign up
+              {t("signup")}
             </Link>
           </p>
         </>
       ) : (
         <>
           <h1 className="text-2xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-            Two-factor authentication
+            {t("two_factor")}
           </h1>
           <p className="mt-2 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-            Enter the 6-digit code from your authenticator app.
+            {t("verify_sub")}
           </p>
 
           <form onSubmit={handleVerify} className="mt-6 flex flex-col gap-4">
@@ -246,7 +246,7 @@ export default function LoginPage() {
             onClick={() => setStep("credentials")}
             className="mt-6 text-sm font-medium text-[#151115]/70 hover:opacity-70 dark:text-[#F8F4F7]/70"
           >
-            Back to login
+            {t("back_to_login")}
           </button>
         </>
       )}

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { CATEGORY_LABELS, CATEGORY_ORDER, HELP_MAP } from "./docs-nav";
 import type { DocMeta } from "./lib/loader";
 
@@ -29,6 +30,7 @@ function Highlight({ text, query }: { text: string; query: string }) {
 }
 
 export default function DocsSidebar({ docs }: { docs: DocMeta[] }) {
+  const t = useTranslations();
   const pathname = usePathname();
   const [index, setIndex] = useState<IndexEntry[]>([]);
   const [query, setQuery] = useState("");
@@ -76,7 +78,7 @@ export default function DocsSidebar({ docs }: { docs: DocMeta[] }) {
       <div className="md:sticky md:top-20">
         <div className="relative">
           <label htmlFor="docs-search" className="sr-only">
-            Search docs
+            {t("search_docs")}
           </label>
           <input
             id="docs-search"
@@ -85,7 +87,7 @@ export default function DocsSidebar({ docs }: { docs: DocMeta[] }) {
             onKeyDown={(event) => {
               if (event.key === "Escape") setQuery("");
             }}
-            placeholder="Search docs…"
+            placeholder={t("search_docs_hint")}
             className="w-full rounded-lg border border-[#E2D8E0] bg-white px-3 py-2 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]"
           />
 

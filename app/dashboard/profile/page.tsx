@@ -94,13 +94,13 @@ export default function ProfilePage() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">Profile</h1>
+      <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">{t("profile")}</h1>
       <p className="mt-1 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-        Your identity, plan, and preferences.
+        {t("profile_sub")}
       </p>
 
       <div className="mt-8 max-w-2xl rounded-2xl border border-[#E2D8E0] bg-white p-8 dark:border-[#4A2E46] dark:bg-[#221C21]">
-        <SectionCard title="Identity">
+        <SectionCard title={t("identity")}>
           <div className="flex items-center gap-4">
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#85587D] text-lg font-bold text-white dark:bg-[#D8A8D3] dark:text-[#151115]">
               {initials || "?"}
@@ -109,7 +109,7 @@ export default function ProfilePage() {
               <input
                 value={displayName}
                 onChange={(event) => setDisplayName(event.target.value)}
-                placeholder="Display name"
+                placeholder={t("display_name")}
                 className={fieldClass}
               />
             </div>
@@ -119,13 +119,13 @@ export default function ProfilePage() {
             onClick={() => save({ display_name: displayName })}
             className="mt-3 rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
           >
-            Save name
+            {t("save_name")}
           </button>
-          <p className="mt-4 text-xs uppercase tracking-widest opacity-60">Email</p>
+          <p className="mt-4 text-xs uppercase tracking-widest opacity-60">{t("email")}</p>
           <p className="mt-1 text-sm text-[#151115] dark:text-[#F8F4F7]">{email || "—"}</p>
         </SectionCard>
 
-        <SectionCard title="Business type">
+        <SectionCard title={t("business_type")}>
           <div className="flex flex-wrap gap-2">
             {BUSINESS_TYPES.map((type) => {
               const selected = profile?.business_type === type.id;
@@ -147,7 +147,7 @@ export default function ProfilePage() {
           </div>
         </SectionCard>
 
-        <SectionCard title="Plan">
+        <SectionCard title={t("plan")}>
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#85587D] p-4 dark:border-[#D8A8D3]">
             <div>
               <p className="text-base font-semibold text-[#151115] dark:text-[#F8F4F7]">
@@ -166,7 +166,7 @@ export default function ProfilePage() {
           </div>
         </SectionCard>
 
-        <SectionCard title="Language">
+        <SectionCard title={t("language")}>
           <select
             value={locale}
             onChange={(event) => chooseLocale(event.target.value)}

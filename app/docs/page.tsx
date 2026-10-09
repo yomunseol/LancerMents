@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { listDocs } from "./lib/loader";
 import { CATEGORY_DESCRIPTIONS, CATEGORY_LABELS, CATEGORY_ORDER } from "./docs-nav";
 
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function DocsIndexPage() {
+export default async function DocsIndexPage() {
+  const t = await getTranslations();
   const docs = listDocs();
   const categories = CATEGORY_ORDER.filter((category) =>
     docs.some((doc) => doc.category === category),
@@ -21,10 +23,10 @@ export default function DocsIndexPage() {
   return (
     <>
       <h1 className="text-4xl font-bold tracking-tight text-[#151115] dark:text-[#F8F4F7]">
-        LancerMents Docs
+        {t("docs_title")}
       </h1>
       <p className="mt-3 text-base leading-7 text-[#151115]/70 dark:text-[#F8F4F7]/70">
-        Search the handbook from the sidebar, or start with a section below.
+        {t("docs_sub")}
       </p>
 
       <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">

@@ -57,7 +57,7 @@ function BookOpenIcon() {
 }
 
 const iconButtonClass =
-  "flex h-10 w-10 items-center justify-center rounded-lg border border-[#E2D8E0] text-[#151115] transition-all duration-200 hover:bg-[#85587D]/10 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:text-[#F8F4F7] dark:hover:bg-[#D8A8D3]/10 dark:focus:ring-[#D8A8D3]";
+  "flex h-11 w-11 items-center justify-center rounded-lg border border-[#E2D8E0] text-[#151115] transition-all duration-200 hover:bg-[#85587D]/10 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:text-[#F8F4F7] dark:hover:bg-[#D8A8D3]/10 dark:focus:ring-[#D8A8D3]";
 
 export default function GlobalNav() {
   const t = useTranslations();
@@ -158,9 +158,9 @@ export default function GlobalNav() {
 
   return (
     <>
-    <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-[#E2D8E0] bg-white/80 px-6 backdrop-blur transition-colors duration-200 dark:border-[#4A2E46] dark:bg-[#151115]/80">
+    <header className="sticky top-0 z-50 flex h-20 items-center justify-between border-b border-[#E2D8E0] bg-white/80 px-6 backdrop-blur transition-colors duration-200 dark:border-[#4A2E46] dark:bg-[#151115]/80">
       <Link href="/" className="flex items-center gap-3">
-        <span className="block h-10 w-10 shrink-0 overflow-hidden rounded-xl ring-1 ring-[#E2D8E0] transition-transform duration-200 hover:scale-105 dark:ring-[#4A2E46]">
+        <span className="block h-[50px] w-[50px] shrink-0 overflow-hidden rounded-xl ring-1 ring-[#E2D8E0] transition-transform duration-200 hover:scale-105 dark:ring-[#4A2E46]">
           <img
             src="/LancerMents-Light.png"
             alt="LancerMents"
@@ -172,7 +172,7 @@ export default function GlobalNav() {
             className="hidden h-full w-full object-cover dark:block"
           />
         </span>
-        <span className="text-xl font-extrabold tracking-tight text-[#151115] dark:text-[#F8F4F7]">
+        <span className="text-[25px] font-extrabold tracking-tight text-[#151115] dark:text-[#F8F4F7]">
           LancerMents
         </span>
       </Link>
@@ -183,13 +183,13 @@ export default function GlobalNav() {
             href="/#product"
             className="text-sm font-medium text-[#151115]/80 transition-colors duration-200 hover:text-[#85587D] dark:text-[#F8F4F7]/80 dark:hover:text-[#D8A8D3]"
           >
-            Product
+            {t("product")}
           </Link>
           <Link
             href="/#pricing"
             className="text-sm font-medium text-[#151115]/80 transition-colors duration-200 hover:text-[#85587D] dark:text-[#F8F4F7]/80 dark:hover:text-[#D8A8D3]"
           >
-            Pricing
+            {t("pricing")}
           </Link>
         </nav>
       )}
@@ -198,7 +198,7 @@ export default function GlobalNav() {
         <Link
           href="/docs"
           aria-label={t("docs")}
-          className={`flex h-10 items-center gap-2 rounded-lg px-3 transition-all duration-200 hover:bg-[#85587D]/10 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:hover:bg-[#D8A8D3]/10 dark:focus:ring-[#D8A8D3] ${
+          className={`flex h-11 items-center gap-2 rounded-lg px-3 transition-all duration-200 hover:bg-[#85587D]/10 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:hover:bg-[#D8A8D3]/10 dark:focus:ring-[#D8A8D3] ${
             pathname.startsWith("/docs")
               ? "border border-[#85587D]/20 bg-[#85587D]/5 text-[#85587D] dark:border-[#D8A8D3]/20 dark:bg-[#D8A8D3]/5 dark:text-[#D8A8D3]"
               : "text-[#151115] dark:text-[#F8F4F7]"
@@ -278,7 +278,7 @@ export default function GlobalNav() {
             <Link
               href="/dashboard/profile"
               aria-label={t("profile")}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#85587D] text-sm font-bold text-white transition-all duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#85587D] text-sm font-bold text-white transition-all duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
             >
               {initials || "?"}
             </Link>
@@ -287,7 +287,7 @@ export default function GlobalNav() {
       </div>
     </header>
     {fb && (
-      <div className="sticky top-16 z-40 px-6 py-2">
+      <div className="sticky top-20 z-40 px-6 py-2">
         <FeedbackBanner
           kind={fb.kind}
           label={fb.label}

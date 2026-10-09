@@ -124,15 +124,15 @@ export default function SignupPage() {
       {step === "credentials" ? (
         <>
           <h1 className="text-2xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-            Create your account
+            {t("signup_title")}
           </h1>
           <p className="mt-2 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-            Start free during Beta. No card required.
+            {t("signup_sub")}
           </p>
 
           <form onSubmit={handleSignup} className="mt-6 flex flex-col gap-4">
             <label className="flex flex-col gap-1 text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
-              Email
+              {t("email")}
               <input
                 type="email"
                 required
@@ -144,7 +144,7 @@ export default function SignupPage() {
               />
             </label>
             <label className="flex flex-col gap-1 text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
-              Password
+              {t("password")}
               <input
                 type="password"
                 required
@@ -158,7 +158,7 @@ export default function SignupPage() {
             </label>
             <PasswordStrengthBar password={password} />
             <label className="flex flex-col gap-1 text-sm font-medium text-[#151115] dark:text-[#F8F4F7]">
-              Confirm Password
+              {t("confirm_password")}
               <input
                 type="password"
                 required
@@ -195,7 +195,7 @@ export default function SignupPage() {
               href="/login"
               className="font-medium text-[#85587D] hover:underline dark:text-[#D8A8D3]"
             >
-              Log in
+              {t("login")}
             </Link>
           </p>
         </>
@@ -203,7 +203,7 @@ export default function SignupPage() {
         <>
           <div className="text-center">
             <h1 className="text-2xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-              Check your email
+              {t("verify_title")}
             </h1>
             <p className="mt-2 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
               We sent a 6-digit code to{" "}

@@ -398,7 +398,7 @@ export default function TasksBoard() {
           type="button"
           onClick={handleAdd}
           disabled={capReached || adding}
-          aria-label="Add task"
+          aria-label={t("add_task_aria")}
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#E2D8E0] text-[#151115] transition-all duration-200 hover:border-[#85587D] disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#4A2E46] dark:text-[#F8F4F7] dark:hover:border-[#D8A8D3]"
         >
           <PlusIcon />

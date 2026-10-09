@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 const MONTHS = [
@@ -77,12 +78,14 @@ function Chevron({ dir }: { dir: "left" | "right" }) {
 export default function DatePicker({
   value,
   onChange,
-  placeholder = "Select a date",
+  placeholder,
 }: {
   value: string | null;
   onChange: (value: string | null) => void;
   placeholder?: string;
 }) {
+  const t = useTranslations();
+  const placeholderText = placeholder ?? t("select_date");
   const [open, setOpen] = useState(false);
   const wrapper = useRef<HTMLDivElement>(null);
   const selected = value ? value.slice(0, 10) : null;
@@ -135,7 +138,7 @@ export default function DatePicker({
       >
         <CalendarIcon />
         <span className={selected ? "" : "opacity-60"}>
-          {selected ? formatLabel(selected) : placeholder}
+          {selected ? formatLabel(selected) : placeholderText}
         </span>
       </button>
 
@@ -151,7 +154,7 @@ export default function DatePicker({
                     : { ...current, month: current.month - 1 },
                 )
               }
-              aria-label="Previous month"
+              aria-label={t("prev_month")}
               className="flex h-8 w-8 items-center justify-center rounded-lg text-[#151115] transition-all duration-200 hover:bg-[#85587D]/10 dark:text-[#F8F4F7] dark:hover:bg-[#D8A8D3]/10"
             >
               <Chevron dir="left" />
@@ -168,7 +171,7 @@ export default function DatePicker({
                     : { ...current, month: current.month + 1 },
                 )
               }
-              aria-label="Next month"
+              aria-label={t("next_month")}
               className="flex h-8 w-8 items-center justify-center rounded-lg text-[#151115] transition-all duration-200 hover:bg-[#85587D]/10 dark:text-[#F8F4F7] dark:hover:bg-[#D8A8D3]/10"
             >
               <Chevron dir="right" />
@@ -217,7 +220,7 @@ export default function DatePicker({
               }}
               className="rounded-lg px-3 py-1.5 text-sm font-medium text-[#151115]/70 transition-all duration-200 hover:bg-[#85587D]/10 dark:text-[#F8F4F7]/70 dark:hover:bg-[#D8A8D3]/10"
             >
-              Clear
+              {t("clear")}
             </button>
             <button
               type="button"
@@ -227,7 +230,7 @@ export default function DatePicker({
               }}
               className="rounded-lg px-3 py-1.5 text-sm font-semibold text-[#85587D] transition-all duration-200 hover:bg-[#85587D]/10 dark:text-[#D8A8D3] dark:hover:bg-[#D8A8D3]/10"
             >
-              Today
+              {t("today")}
             </button>
           </div>
         </div>

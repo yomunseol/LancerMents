@@ -163,7 +163,7 @@ export default function CalendarPage() {
         <div className="flex items-center justify-between">
           <button
             type="button"
-            aria-label="Previous month"
+            aria-label={t("prev_month")}
             onClick={() =>
               setCursor((current) =>
                 current.month === 0
@@ -180,7 +180,7 @@ export default function CalendarPage() {
           </span>
           <button
             type="button"
-            aria-label="Next month"
+            aria-label={t("next_month")}
             onClick={() =>
               setCursor((current) =>
                 current.month === 11

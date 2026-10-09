@@ -194,7 +194,7 @@ export default function OnboardingPage() {
       {step === 1 ? (
         <section className="mt-12">
           <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
-            What best describes your work?
+            {t("work_title")}
           </h1>
           <p className="mt-2 opacity-70">
             {"We'll tailor your workspace to fit your workflow."}
@@ -229,7 +229,7 @@ export default function OnboardingPage() {
               onClick={() => setStep(2)}
               className="w-full rounded-lg bg-[#85587D] px-6 py-2.5 text-base font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]"
             >
-              Continue
+              {t("continue")}
             </button>
           </div>
         </section>
