@@ -198,5 +198,7 @@
   "signup_sub": "Commencez gratuitement pendant la Bêta. Sans carte bancaire.",
   "unknown_location": "Lieu inconnu",
   "geocoding": "Recherche de l'adresse...",
-  "address_not_found": "Adresse introuvable — enregistré sans carte."
+  "address_not_found": "Adresse introuvable — enregistré sans carte.",
+  "err_name_required": "Le nom est requis.",
+  "err_email_invalid": "Saisissez une adresse e-mail valide."
 }

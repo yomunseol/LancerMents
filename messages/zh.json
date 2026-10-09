@@ -198,5 +198,7 @@
   "signup_sub": "Beta 期间免费开始，无需银行卡。",
   "unknown_location": "未知位置",
   "geocoding": "正在查找地址...",
-  "address_not_found": "未找到地址——已保存但无地图。"
+  "address_not_found": "未找到地址——已保存但无地图。",
+  "err_name_required": "名称为必填项。",
+  "err_email_invalid": "请输入有效的邮箱地址。"
 }

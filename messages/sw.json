@@ -198,5 +198,7 @@
   "signup_sub": "Anza bure wakati wa Beta. Hakuna kadi inayohitajika.",
   "unknown_location": "Eneo lisilojulikana",
   "geocoding": "Inatafuta anwani...",
-  "address_not_found": "Anwani haikupatikana — imehifadhiwa bila ramani."
+  "address_not_found": "Anwani haikupatikana — imehifadhiwa bila ramani.",
+  "err_name_required": "Jina linahitajika.",
+  "err_email_invalid": "Weka barua pepe sahihi."
 }

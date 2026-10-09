@@ -198,5 +198,7 @@
   "signup_sub": "Begin gratis tydens die Beta. Geen kaart nodig nie.",
   "unknown_location": "Onbekende ligging",
   "geocoding": "Soek tans adres...",
-  "address_not_found": "Adres nie gevind nie — gestoor sonder kaart."
+  "address_not_found": "Adres nie gevind nie — gestoor sonder kaart.",
+  "err_name_required": "Naam is verpligtend.",
+  "err_email_invalid": "Voer 'n geldige e-posadres in."
 }

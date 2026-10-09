@@ -198,5 +198,7 @@
   "signup_sub": "התחל בחינם במהלך הבטא. ללא כרטיס.",
   "unknown_location": "מיקום לא ידוע",
   "geocoding": "מחפש כתובת...",
-  "address_not_found": "כתובת לא נמצאה — נשמר ללא מפה."
+  "address_not_found": "כתובת לא נמצאה — נשמר ללא מפה.",
+  "err_name_required": "יש להזין שם.",
+  "err_email_invalid": "הזן כתובת דוא״ל תקפה."
 }

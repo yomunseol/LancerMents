@@ -198,5 +198,7 @@
   "signup_sub": "In der Beta kostenlos starten. Keine Karte nötig.",
   "unknown_location": "Unbekannter Ort",
   "geocoding": "Adresse wird gesucht...",
-  "address_not_found": "Adresse nicht gefunden — ohne Karte gespeichert."
+  "address_not_found": "Adresse nicht gefunden — ohne Karte gespeichert.",
+  "err_name_required": "Name ist erforderlich.",
+  "err_email_invalid": "Geben Sie eine gültige E-Mail-Adresse ein."
 }

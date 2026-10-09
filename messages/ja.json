@@ -198,5 +198,7 @@
   "signup_sub": "ベータ期間中は無料で開始。カード不要。",
   "unknown_location": "不明な場所",
   "geocoding": "住所を検索中...",
-  "address_not_found": "住所が見つかりません—マップなしで保存。"
+  "address_not_found": "住所が見つかりません—マップなしで保存。",
+  "err_name_required": "名前は必須です。",
+  "err_email_invalid": "有効なメールアドレスを入力してください。"
 }

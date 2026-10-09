@@ -330,8 +330,8 @@ function ClientsInner() {
     // 1. Validate FIRST — inline field errors, never a banner.
     const nameInvalid = !name;
     const emailInvalid = Boolean(email) && !EMAIL_RE.test(email);
-    setNameError(nameInvalid ? "Name is required." : null);
-    setEmailError(emailInvalid ? "Enter a valid email address." : null);
+    setNameError(nameInvalid ? t("err_name_required") : null);
+    setEmailError(emailInvalid ? t("err_email_invalid") : null);
     if (nameInvalid || emailInvalid) return;
     if (!workspaceId) return;
 

@@ -198,5 +198,7 @@
   "signup_sub": "Empieza gratis durante la Beta. Sin tarjeta.",
   "unknown_location": "Ubicación desconocida",
   "geocoding": "Buscando dirección...",
-  "address_not_found": "Dirección no encontrada: guardado sin mapa."
+  "address_not_found": "Dirección no encontrada: guardado sin mapa.",
+  "err_name_required": "El nombre es obligatorio.",
+  "err_email_invalid": "Introduce una dirección de correo válida."
 }
