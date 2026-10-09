@@ -57,6 +57,8 @@ const FILTER_KEY: Record<StatusFilter, "all" | "active" | "blocked"> = {
 
 const BORDER = "border-[#E2D8E0] dark:border-[#4A2E46]";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const fieldClass =
   "w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]";
 
@@ -91,6 +93,20 @@ function MagnifierIcon() {
     >
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-3.6-3.6" />
+    </svg>
+  );
+}
+
+function Spinner() {
+  return (
+    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
+      <path
+        d="M22 12a10 10 0 0 0-10-10"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -180,9 +196,14 @@ function ClientsInner() {
   const [filter, setFilter] = useState<StatusFilter>("all");
 
   const [addOpen, setAddOpen] = useState(false);
+  const [addShown, setAddShown] = useState(false);
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newAddress, setNewAddress] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [addressWarning, setAddressWarning] = useState(false);
+  const [geocoding, setGeocoding] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const [confirmBlockId, setConfirmBlockId] = useState<string | null>(null);
@@ -228,7 +249,17 @@ function ClientsInner() {
 
   function openAdd() {
     setFb(null);
+    setNameError(null);
+    setEmailError(null);
+    setAddressWarning(false);
     setAddOpen(true);
+  }
+
+  function closeAdd() {
+    setAddOpen(false);
+    setNameError(null);
+    setEmailError(null);
+    setAddressWarning(false);
   }
 
   useEffect(() => {
@@ -247,6 +278,27 @@ function ClientsInner() {
     if (!ws?.id) return;
     await load(ws.id);
   }, [ws?.id, load]);
+
+  // Add-modal shell (OMEGA-07): drive the entrance transition from a mount flag
+  // and close on Escape. Outside-click close lives on the overlay below.
+  useEffect(() => {
+    if (!addOpen) {
+      setAddShown(false);
+      return;
+    }
+    const frame = requestAnimationFrame(() => setAddShown(true));
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setAddOpen(false);
+      setAddressWarning(false);
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [addOpen]);
 
   // Client-side only: search (name OR email, case-insensitive) + status filter
   // compose in memory. Typing never triggers a server round-trip.
@@ -275,46 +327,53 @@ function ClientsInner() {
     const email = newEmail.trim();
     const address = newAddress.trim();
 
-    if (!name) {
-      setFb({ kind: "error", label: "Name is required." });
-      return;
-    }
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setFb({ kind: "error", label: "Enter a valid email address." });
-      return;
-    }
+    // 1. Validate FIRST — inline field errors, never a banner.
+    const nameInvalid = !name;
+    const emailInvalid = Boolean(email) && !EMAIL_RE.test(email);
+    setNameError(nameInvalid ? "Name is required." : null);
+    setEmailError(emailInvalid ? "Enter a valid email address." : null);
+    if (nameInvalid || emailInvalid) return;
     if (!workspaceId) return;
 
+    setAddressWarning(false);
     setSaving(true);
     try {
       let lat: number | null = null;
       let lng: number | null = null;
-      let warning: string | null = null;
 
+      // 2. Geocode the address when one was supplied (loading: geocoding).
       if (address) {
+        setGeocoding(true);
         try {
           const response = await fetch(
             `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`,
           );
           const results = (await response.json()) as { lat: string; lon: string }[];
-          if (results?.[0]) {
-            lat = Number(results[0].lat);
-            lng = Number(results[0].lon);
+          const hit = results?.[0];
+          if (hit) {
+            lat = Number(hit.lat);
+            lng = Number(hit.lon);
           } else {
-            warning = "Address not found — client saved without map.";
+            // Non-blocking: amber inline warning, save without coordinates.
+            setAddressWarning(true);
           }
         } catch {
-          warning = "Address lookup failed — client saved without map.";
+          // Non-blocking: amber inline warning, save without coordinates.
+          setAddressWarning(true);
+        } finally {
+          setGeocoding(false);
         }
       }
 
+      // 3. Build the payload.
       const payload: Record<string, unknown> = {
         workspace_id: workspaceId,
         name,
         email: email || null,
+        address: address || null,
       };
 
-      // Only send coordinates when the geocode produced real numbers — never
+      // 4. Only send coordinates when the geocode produced real numbers — never
       // "", NaN, or a null-string.
       if (Number.isFinite(lat) && Number.isFinite(lng)) {
         payload.address_lat = lat;
@@ -333,13 +392,13 @@ function ClientsInner() {
         return;
       }
 
+      // 5. Success: close + clear, refresh the page rows, surface the banner.
       await refresh();
-      setAddOpen(false);
+      closeAdd();
       setNewName("");
       setNewEmail("");
       setNewAddress("");
-      // The geocode warning, when present, rides along as the secondary detail line.
-      setFb({ kind: "success", label: t("saved"), raw: warning ?? undefined });
+      setFb({ kind: "success", label: t("saved") });
     } catch (insertError) {
       setFb({
         kind: "error",
@@ -450,6 +509,7 @@ function ClientsInner() {
   }, [drawerClient]);
 
   const state: ViewState = loading ? "loading" : clients.length === 0 ? "empty" : "data";
+  const busy = saving || geocoding;
 
   if (loadFailed) {
     // OMEGA-05: a failed load renders the FeedbackBanner and nothing else.
@@ -680,38 +740,80 @@ function ClientsInner() {
 
       {addOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-          onClick={() => setAddOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]"
+          onClick={closeAdd}
         >
           <form
             onSubmit={handleAdd}
             onClick={(event) => event.stopPropagation()}
-            className="w-full max-w-md rounded-2xl border border-[#E2D8E0] bg-white p-6 dark:border-[#4A2E46] dark:bg-[#221C21]"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("add_client")}
+            className={`w-full max-w-lg rounded-2xl border p-6 shadow-2xl transition-all duration-200 ease-out motion-reduce:transition-none ${BORDER} bg-white dark:bg-[#221C21] ${
+              addShown ? "scale-100 opacity-100" : "scale-95 opacity-0"
+            }`}
           >
-            <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
-              {t("add_client")}
-            </h2>
-            <div className="mt-4 flex flex-col gap-3">
-              <input
-                value={newName}
-                onChange={(event) => setNewName(event.target.value)}
-                placeholder={t("client_name")}
-                className={fieldClass}
-              />
-              <input
-                type="email"
-                value={newEmail}
-                onChange={(event) => setNewEmail(event.target.value)}
-                placeholder={t("client_email_optional")}
-                className={fieldClass}
-              />
-              <input
-                value={newAddress}
-                onChange={(event) => setNewAddress(event.target.value)}
-                placeholder={t("address_optional")}
-                className={fieldClass}
-              />
+            <div className="flex items-start justify-between gap-3">
+              <h2 className="text-xl font-bold text-[#151115] dark:text-[#F8F4F7]">
+                {t("add_client")}
+              </h2>
+              <button
+                type="button"
+                onClick={closeAdd}
+                aria-label={t("cancel")}
+                className={`shrink-0 rounded-lg border p-2 text-[#151115] transition-all duration-200 hover:bg-[#85587D]/10 dark:text-[#F8F4F7] dark:hover:bg-[#D8A8D3]/10 ${BORDER}`}
+              >
+                <CloseIcon />
+              </button>
             </div>
+
+            <div className="mt-5 flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <input
+                  value={newName}
+                  onChange={(event) => {
+                    setNewName(event.target.value);
+                    if (nameError) setNameError(null);
+                  }}
+                  placeholder={t("client_name")}
+                  className={fieldClass}
+                />
+                {nameError && <p className="text-xs text-red-500">{nameError}</p>}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <input
+                  type="email"
+                  value={newEmail}
+                  onChange={(event) => {
+                    setNewEmail(event.target.value);
+                    if (emailError) setEmailError(null);
+                  }}
+                  placeholder={t("client_email_optional")}
+                  className={fieldClass}
+                />
+                {emailError && <p className="text-xs text-red-500">{emailError}</p>}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <input
+                  value={newAddress}
+                  onChange={(event) => {
+                    setNewAddress(event.target.value);
+                    if (addressWarning) setAddressWarning(false);
+                  }}
+                  placeholder={t("address_optional")}
+                  className={fieldClass}
+                />
+                {geocoding && <p className="text-xs opacity-60">{t("geocoding")}</p>}
+                {addressWarning && (
+                  <div className="rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-600 dark:text-amber-400">
+                    {t("address_not_found")}
+                  </div>
+                )}
+              </div>
+            </div>
+
             {fb && (
               <div className="mt-3">
                 <FeedbackBanner
@@ -722,20 +824,22 @@ function ClientsInner() {
                 />
               </div>
             )}
+
             <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setAddOpen(false)}
-                className="rounded-lg border border-[#E2D8E0] px-4 py-2 text-sm font-semibold text-[#151115] transition-all duration-200 dark:border-[#4A2E46] dark:text-[#F8F4F7]"
+                onClick={closeAdd}
+                className={`rounded-lg border px-4 py-2 text-sm font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg dark:text-[#F8F4F7] ${BORDER}`}
               >
                 {t("cancel")}
               </button>
               <button
                 type="submit"
-                disabled={saving}
-                className="rounded-lg bg-[#85587D] px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:opacity-50 dark:bg-[#D8A8D3] dark:text-[#151115]"
+                disabled={busy}
+                className={`${accentButtonClass} disabled:cursor-not-allowed disabled:opacity-50`}
               >
-                {saving ? t("loading") : t("create")}
+                {busy && <Spinner />}
+                {t("create")}
               </button>
             </div>
           </form>

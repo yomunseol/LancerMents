@@ -196,5 +196,7 @@
   "landing_alt_3": "Team prüft gemeinsam eine Kunden-Pipeline an einem Laptop",
   "signup_title": "Konto erstellen",
   "signup_sub": "In der Beta kostenlos starten. Keine Karte nötig.",
-  "unknown_location": "Unbekannter Ort"
+  "unknown_location": "Unbekannter Ort",
+  "geocoding": "Adresse wird gesucht...",
+  "address_not_found": "Adresse nicht gefunden — ohne Karte gespeichert."
 }

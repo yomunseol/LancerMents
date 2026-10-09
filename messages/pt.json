@@ -196,5 +196,7 @@
   "landing_alt_3": "Equipe revisando junta o pipeline de clientes num laptop",
   "signup_title": "Crie sua conta",
   "signup_sub": "Comece grátis durante o Beta. Sem cartão.",
-  "unknown_location": "Local desconhecido"
+  "unknown_location": "Local desconhecido",
+  "geocoding": "Buscando endereço...",
+  "address_not_found": "Endereço não encontrado — salvo sem mapa."
 }

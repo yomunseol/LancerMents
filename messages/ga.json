@@ -196,5 +196,7 @@
   "landing_alt_3": "Foireann ag scrúdú píblíne cliant le chéile ar ríomhaire glúine",
   "signup_title": "Cruthaigh do chuntas",
   "signup_sub": "Tosaigh saor in aisce le linn na Béite. Níl cárta de dhíth.",
-  "unknown_location": "Suíomh anaithnid"
+  "unknown_location": "Suíomh anaithnid",
+  "geocoding": "Ag lorg seoladh...",
+  "address_not_found": "Seoladh gan aimsiú — sábháilte gan léarscáil."
 }

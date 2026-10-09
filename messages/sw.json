@@ -196,5 +196,7 @@
   "landing_alt_3": "Timu ikikagua mchakato wa wateja pamoja kwenye kompyuta mpakato",
   "signup_title": "Fungua akaunti yako",
   "signup_sub": "Anza bure wakati wa Beta. Hakuna kadi inayohitajika.",
-  "unknown_location": "Eneo lisilojulikana"
+  "unknown_location": "Eneo lisilojulikana",
+  "geocoding": "Inatafuta anwani...",
+  "address_not_found": "Anwani haikupatikana — imehifadhiwa bila ramani."
 }

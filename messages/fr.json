@@ -196,5 +196,7 @@
   "landing_alt_3": "Équipe examinant ensemble un pipeline client sur un ordinateur portable",
   "signup_title": "Créez votre compte",
   "signup_sub": "Commencez gratuitement pendant la Bêta. Sans carte bancaire.",
-  "unknown_location": "Lieu inconnu"
+  "unknown_location": "Lieu inconnu",
+  "geocoding": "Recherche de l'adresse...",
+  "address_not_found": "Adresse introuvable — enregistré sans carte."
 }

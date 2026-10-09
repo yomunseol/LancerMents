@@ -196,5 +196,7 @@
   "landing_alt_3": "ノートPCで顧客パイプラインを一緒に確認するチーム",
   "signup_title": "アカウントを作成",
   "signup_sub": "ベータ期間中は無料で開始。カード不要。",
-  "unknown_location": "不明な場所"
+  "unknown_location": "不明な場所",
+  "geocoding": "住所を検索中...",
+  "address_not_found": "住所が見つかりません—マップなしで保存。"
 }

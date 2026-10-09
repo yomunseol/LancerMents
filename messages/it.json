@@ -196,5 +196,7 @@
   "landing_alt_3": "Team che rivede insieme la pipeline clienti su un portatile",
   "signup_title": "Crea il tuo account",
   "signup_sub": "Inizia gratis durante la Beta. Nessuna carta richiesta.",
-  "unknown_location": "Posizione sconosciuta"
+  "unknown_location": "Posizione sconosciuta",
+  "geocoding": "Ricerca indirizzo...",
+  "address_not_found": "Indirizzo non trovato — salvato senza mappa."
 }

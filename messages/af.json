@@ -196,5 +196,7 @@
   "landing_alt_3": "Span wat saam 'n kliëntpyplyn op 'n skootrekenaar hersien",
   "signup_title": "Skep jou rekening",
   "signup_sub": "Begin gratis tydens die Beta. Geen kaart nodig nie.",
-  "unknown_location": "Onbekende ligging"
+  "unknown_location": "Onbekende ligging",
+  "geocoding": "Soek tans adres...",
+  "address_not_found": "Adres nie gevind nie — gestoor sonder kaart."
 }
