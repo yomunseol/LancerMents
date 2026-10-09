@@ -4,6 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { TIER_LIMITS } from "@/lib/tiers";
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 import DatePicker from "@/app/components/DatePicker";
 import { useWorkspaceGate } from "./useWorkspaceData";
 
@@ -37,10 +41,6 @@ function formatDue(due: string | null): string {
   const parsed = new Date(`${day}T00:00:00`);
   if (Number.isNaN(parsed.getTime())) return day;
   return parsed.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
-function messageOf(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
 }
 
 function PlusIcon() {
@@ -127,7 +127,8 @@ export default function TasksBoard() {
   const ws = useWorkspaceGate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [fb, setFb] = useState<FeedbackState>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [showCompleted, setShowCompleted] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDue, setNewDue] = useState<string | null>(null);
@@ -135,30 +136,46 @@ export default function TasksBoard() {
 
   const workspaceId = ws?.id ?? "";
 
-  const loadTasks = useCallback(async (activeWorkspaceId: string) => {
-    try {
-      const { data, error: loadError } = await supabase
-        .from("tasks")
-        .select(TASK_COLUMNS)
-        .eq("workspace_id", activeWorkspaceId)
-        .order("created_at", { ascending: true });
+  const loadTasks = useCallback(
+    async (activeWorkspaceId: string) => {
+      setFb(null);
+      try {
+        const { data, error: loadError } = await supabase
+          .from("tasks")
+          .select(TASK_COLUMNS)
+          .eq("workspace_id", activeWorkspaceId)
+          .order("created_at", { ascending: true });
 
-      if (loadError) throw loadError;
-      setTasks((data ?? []) as Task[]);
-    } catch (loadError) {
-      setError(messageOf(loadError, "Could not load tasks."));
-    }
-  }, []);
+        if (loadError) throw loadError;
+        setTasks((data ?? []) as Task[]);
+        setLoadFailed(false);
+      } catch (loadError) {
+        setLoadFailed(true);
+        setFb({
+          kind: "error",
+          label: t("err_load"),
+          raw: rawReason(loadError),
+          onRetry: () => retryLoad(activeWorkspaceId),
+        });
+      }
+    },
+    [t],
+  );
+
+  function retryLoad(activeWorkspaceId: string) {
+    setLoading(true);
+    loadTasks(activeWorkspaceId).finally(() => setLoading(false));
+  }
 
   useEffect(() => {
     if (!ws?.id) return; // WS-GATE
     setLoading(true);
-    setError(null);
+    setFb(null);
     loadTasks(ws.id).finally(() => setLoading(false));
   }, [ws?.id, loadTasks]);
 
   async function handleToggle(task: Task) {
-    setError(null);
+    setFb(null);
     const next = !task.is_completed;
     setTasks((current) =>
       current.map((item) =>
@@ -179,7 +196,11 @@ export default function TasksBoard() {
           item.id === task.id ? { ...item, is_completed: task.is_completed } : item,
         ),
       );
-      setError(messageOf(updateError, "Could not update that task."));
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(updateError),
+      });
     }
   }
 
@@ -187,7 +208,7 @@ export default function TasksBoard() {
     const title = newTitle.trim();
     if (!title || !workspaceId || capReached) return;
 
-    setError(null);
+    setFb(null);
     setAdding(true);
 
     try {
@@ -201,15 +222,20 @@ export default function TasksBoard() {
       setTasks((current) => [...current, data as Task]);
       setNewTitle("");
       setNewDue(null);
+      setFb({ kind: "success", label: t("saved") });
     } catch (insertError) {
-      setError(messageOf(insertError, "Could not add that task."));
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(insertError),
+      });
     } finally {
       setAdding(false);
     }
   }
 
   async function handleDelete(task: Task) {
-    setError(null);
+    setFb(null);
     const previous = tasks;
     setTasks((current) => current.filter((item) => item.id !== task.id));
 
@@ -222,7 +248,11 @@ export default function TasksBoard() {
       if (deleteError) throw deleteError;
     } catch (deleteError) {
       setTasks(previous);
-      setError(messageOf(deleteError, "Could not delete that task."));
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(deleteError),
+      });
     }
   }
 
@@ -245,6 +275,44 @@ export default function TasksBoard() {
   const rowFor = (task: Task) => (
     <TaskRow key={task.id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
   );
+
+  if (loadFailed && fb) {
+    return (
+      <section className="mt-8">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
+            {t("daily_tasks")}
+          </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-xs uppercase tracking-widest opacity-60">
+              {t("daily_grid")}
+            </span>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: TASK_LIMIT }).map((_, index) => (
+                <span
+                  key={index}
+                  className={`h-1.5 w-6 rounded-full transition-colors duration-200 ${
+                    index < uncompleted.length
+                      ? "bg-[#85587D] dark:bg-[#D8A8D3]"
+                      : "bg-[#E2D8E0] dark:bg-[#4A2E46]"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <FeedbackBanner
+            kind={fb.kind}
+            label={fb.label}
+            raw={fb.raw}
+            onRetry={fb.onRetry}
+          />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="mt-8">
@@ -270,6 +338,17 @@ export default function TasksBoard() {
           </div>
         </div>
       </div>
+
+      {fb && (
+        <div className="mt-6">
+          <FeedbackBanner
+            kind={fb.kind}
+            label={fb.label}
+            raw={fb.raw}
+            onRetry={fb.onRetry}
+          />
+        </div>
+      )}
 
       {busy ? (
         <p className="py-6 text-sm opacity-50">Loading tasks…</p>
@@ -342,12 +421,6 @@ export default function TasksBoard() {
       {capReached && (
         <p className="mt-3 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
           {t("limit_reached")}
-        </p>
-      )}
-
-      {error && (
-        <p className="mt-3 text-sm font-medium text-red-600 dark:text-red-400">
-          {error}
         </p>
       )}
     </section>

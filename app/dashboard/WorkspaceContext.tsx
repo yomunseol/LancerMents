@@ -10,6 +10,7 @@ import {
 } from "react";
 import { supabase } from "@/lib/supabase";
 import { normalizeTier, type Tier } from "@/lib/tiers";
+import { rawReason } from "@/app/components/FeedbackBanner";
 
 export type Workspace = {
   id: string;
@@ -113,11 +114,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         window.localStorage.setItem(STORAGE_KEY, next);
       }
     } catch (loadError) {
-      setError(
-        loadError instanceof Error
-          ? loadError.message
-          : "Could not load your workspaces.",
-      );
+      setError(rawReason(loadError));
     } finally {
       setLoading(false);
     }

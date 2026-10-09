@@ -3,10 +3,15 @@
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import PasswordStrengthBar, {
   getPasswordStrength,
 } from "../components/PasswordStrengthBar";
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 
 const fieldClass =
   "w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/70 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#151115] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/70 dark:focus:ring-[#D8A8D3]";
@@ -14,16 +19,16 @@ const primaryButtonClass =
   "w-full rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#D8A8D3] dark:text-[#151115]";
 const otpInputClass =
   "w-full max-w-[280px] mx-auto rounded-xl border border-[#E2D8E0] bg-[#F8F4F7] px-4 py-4 text-center font-mono text-2xl tracking-[0.5em] text-[#151115] outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#151115] dark:text-[#F8F4F7] dark:focus:ring-[#D8A8D3]";
-const errorClass = "text-sm font-medium text-red-600 dark:text-red-400";
 
 export default function SignupPage() {
   const router = useRouter();
+  const t = useTranslations();
   const [step, setStep] = useState<"credentials" | "otp">("credentials");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otpCode, setOtpCode] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [fb, setFb] = useState<FeedbackState>(null);
   const [loading, setLoading] = useState(false);
   const [resendIn, setResendIn] = useState(0);
 
@@ -35,15 +40,23 @@ export default function SignupPage() {
 
   async function handleSignup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError(null);
+    setFb(null);
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: "Passwords do not match.",
+      });
       return;
     }
 
     if (getPasswordStrength(password) < 3) {
-      setError("Please choose a stronger password (at least Moderate).");
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: "Please choose a stronger password (at least Moderate).",
+      });
       return;
     }
 
@@ -60,7 +73,7 @@ export default function SignupPage() {
     setLoading(false);
 
     if (signUpError) {
-      setError(signUpError.message);
+      setFb({ kind: "error", label: t("err_save"), raw: rawReason(signUpError) });
       return;
     }
 
@@ -69,7 +82,7 @@ export default function SignupPage() {
 
   async function handleVerify(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError(null);
+    setFb(null);
     setLoading(true);
 
     const { error: verifyError } = await supabase.auth.verifyOtp({
@@ -81,7 +94,7 @@ export default function SignupPage() {
     setLoading(false);
 
     if (verifyError) {
-      setError(verifyError.message);
+      setFb({ kind: "error", label: t("err_save"), raw: rawReason(verifyError) });
       return;
     }
 
@@ -90,7 +103,7 @@ export default function SignupPage() {
 
   async function handleResend() {
     if (resendIn > 0) return;
-    setError(null);
+    setFb(null);
 
     const { error: resendError } = await supabase.auth.resend({
       type: "signup",
@@ -98,11 +111,12 @@ export default function SignupPage() {
     });
 
     if (resendError) {
-      setError(resendError.message);
+      setFb({ kind: "error", label: t("err_save"), raw: rawReason(resendError) });
       return;
     }
 
     setResendIn(30);
+    setFb({ kind: "success", label: t("saved") });
   }
 
   return (
@@ -165,7 +179,14 @@ export default function SignupPage() {
               {loading ? "Creating account…" : "Sign Up"}
             </button>
 
-            {error && <p className={errorClass}>{error}</p>}
+            {fb && (
+              <FeedbackBanner
+                kind={fb.kind}
+                label={fb.label}
+                raw={fb.raw}
+                onRetry={fb.onRetry}
+              />
+            )}
           </form>
 
           <p className="mt-6 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
@@ -215,7 +236,14 @@ export default function SignupPage() {
               {loading ? "Verifying…" : "Verify"}
             </button>
 
-            {error && <p className={errorClass}>{error}</p>}
+            {fb && (
+              <FeedbackBanner
+                kind={fb.kind}
+                label={fb.label}
+                raw={fb.raw}
+                onRetry={fb.onRetry}
+              />
+            )}
           </form>
 
           <div className="mt-6 text-center">

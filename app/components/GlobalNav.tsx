@@ -8,6 +8,10 @@ import { supabase } from "@/lib/supabase";
 import { saveProfile } from "@/lib/profile";
 import { getStoredTheme, resolveDark, setTheme, type ThemeMode } from "@/lib/theme";
 import { LOCALE_LABELS, LOCALE_ORDER } from "@/lib/i18n/vocab";
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 
 function GlobeIcon() {
   return (
@@ -65,6 +69,7 @@ export default function GlobalNav() {
   const [initials, setInitials] = useState("");
   const [dark, setDark] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [fb, setFb] = useState<FeedbackState>(null);
   const langRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -135,9 +140,12 @@ export default function GlobalNav() {
         if (!data.user) return;
         const result = await saveProfile(data.user.id, { locale: code });
         if (!result.ok) throw new Error(result.error);
+        setFb({ kind: "success", label: t("saved") });
         return result;
       })
-      .catch(() => undefined);
+      .catch((err: unknown) => {
+        setFb({ kind: "error", label: t("err_save"), raw: rawReason(err) });
+      });
 
     router.refresh();
   }
@@ -149,6 +157,7 @@ export default function GlobalNav() {
   }
 
   return (
+    <>
     <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-[#E2D8E0] bg-white/80 px-6 backdrop-blur transition-colors duration-200 dark:border-[#4A2E46] dark:bg-[#151115]/80">
       <Link href="/" className="flex items-center gap-3">
         <span className="block h-10 w-10 shrink-0 overflow-hidden rounded-xl ring-1 ring-[#E2D8E0] transition-transform duration-200 hover:scale-105 dark:ring-[#4A2E46]">
@@ -277,5 +286,16 @@ export default function GlobalNav() {
         )}
       </div>
     </header>
+    {fb && (
+      <div className="sticky top-16 z-40 px-6 py-2">
+        <FeedbackBanner
+          kind={fb.kind}
+          label={fb.label}
+          raw={fb.raw}
+          onRetry={fb.onRetry}
+        />
+      </div>
+    )}
+    </>
   );
 }

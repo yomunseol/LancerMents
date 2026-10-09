@@ -3,7 +3,12 @@
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 
 const fieldClass =
   "w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/70 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#151115] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/70 dark:focus:ring-[#D8A8D3]";
@@ -12,20 +17,29 @@ const primaryButtonClass =
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useTranslations();
   const [step, setStep] = useState<"credentials" | "mfa">("credentials");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [factorId, setFactorId] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [fb, setFb] = useState<FeedbackState>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const authError = new URLSearchParams(window.location.search).get("error");
     if (authError === "auth-code-error") {
-      setError("We couldn't verify that sign-in link. Please log in again.");
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: "We couldn't verify that sign-in link. Please log in again.",
+      });
     } else if (authError === "missing-code") {
-      setError("That link is missing its verification code. Please try again.");
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: "That link is missing its verification code. Please try again.",
+      });
     }
   }, []);
 
@@ -59,7 +73,7 @@ export default function LoginPage() {
     const client = supabase;
 
     setLoading(true);
-    setError(null);
+    setFb(null);
 
     const { error: signInError } = await client.auth.signInWithPassword({
       email,
@@ -68,7 +82,7 @@ export default function LoginPage() {
 
     if (signInError) {
       setLoading(false);
-      setError(signInError.message);
+      setFb({ kind: "error", label: t("err_save"), raw: rawReason(signInError) });
       return;
     }
 
@@ -99,14 +113,14 @@ export default function LoginPage() {
     const client = supabase;
 
     setLoading(true);
-    setError(null);
+    setFb(null);
 
     const { data: challenge, error: challengeError } =
       await client.auth.mfa.challenge({ factorId });
 
     if (challengeError) {
       setLoading(false);
-      setError(challengeError.message);
+      setFb({ kind: "error", label: t("err_save"), raw: rawReason(challengeError) });
       return;
     }
 
@@ -119,7 +133,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (verifyError) {
-      setError(verifyError.message);
+      setFb({ kind: "error", label: t("err_save"), raw: rawReason(verifyError) });
       return;
     }
 
@@ -168,10 +182,15 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {error && (
-            <p className="mt-4 text-sm text-[#85587D] dark:text-[#D8A8D3]">
-              {error}
-            </p>
+          {fb && (
+            <div className="mt-4">
+              <FeedbackBanner
+                kind={fb.kind}
+                label={fb.label}
+                raw={fb.raw}
+                onRetry={fb.onRetry}
+              />
+            </div>
           )}
 
           <p className="mt-6 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
@@ -211,10 +230,15 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {error && (
-            <p className="mt-4 text-sm text-[#85587D] dark:text-[#D8A8D3]">
-              {error}
-            </p>
+          {fb && (
+            <div className="mt-4">
+              <FeedbackBanner
+                kind={fb.kind}
+                label={fb.label}
+                raw={fb.raw}
+                onRetry={fb.onRetry}
+              />
+            </div>
           )}
 
           <button

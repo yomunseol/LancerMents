@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
-import { ErrorBanner } from "@/app/components/SaveFeedback";
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 import { useWorkspaceGate } from "../useWorkspaceData";
 
 type Note = {
@@ -35,7 +38,7 @@ export default function NotesPage() {
   const ws = useWorkspaceGate();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [fb, setFb] = useState<FeedbackState>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const titleRef = useRef<HTMLInputElement | null>(null);
@@ -53,10 +56,11 @@ export default function NotesPage() {
   useEffect(() => {
     let active = true;
     if (!ws?.id) return; // WS-GATE
+    const workspaceId = ws.id;
 
     setLoading(true);
-    setError(null);
-    load(ws.id)
+    setFb(null);
+    load(workspaceId)
       .then((rows) => {
         if (!active) return;
         setNotes(rows);
@@ -64,7 +68,12 @@ export default function NotesPage() {
       })
       .catch((loadError) => {
         if (active) {
-          setError(loadError instanceof Error ? loadError.message : String(loadError));
+          setFb({
+            kind: "error",
+            label: t("err_load"),
+            raw: rawReason(loadError),
+            onRetry: () => load(workspaceId),
+          });
         }
       })
       .finally(() => {
@@ -74,7 +83,7 @@ export default function NotesPage() {
     return () => {
       active = false;
     };
-  }, [ws?.id, load]);
+  }, [ws?.id, load, t]);
 
   const selected = notes.find((note) => note.id === selectedId) ?? null;
   const pinned = notes.filter((note) => note.pinned);
@@ -82,7 +91,7 @@ export default function NotesPage() {
   async function createNote() {
     if (!ws?.id || creating) return;
     setCreating(true);
-    setError(null);
+    setFb(null);
 
     try {
       const { data, error: insertError } = await supabase
@@ -96,9 +105,14 @@ export default function NotesPage() {
       const rows = await load(ws.id);
       setNotes(rows);
       setSelectedId((data as { id: string }).id);
+      setFb({ kind: "success", label: t("saved") });
       requestAnimationFrame(() => titleRef.current?.focus());
     } catch (createError) {
-      setError(createError instanceof Error ? createError.message : String(createError));
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(createError),
+      });
     } finally {
       setCreating(false);
     }
@@ -107,7 +121,7 @@ export default function NotesPage() {
   async function persist(note: Note, patch: Partial<Note>) {
     const previous = notes;
     setNotes((rows) => rows.map((row) => (row.id === note.id ? { ...row, ...patch } : row)));
-    setError(null);
+    setFb(null);
 
     const { error: writeError } = await supabase
       .from("notes")
@@ -116,7 +130,13 @@ export default function NotesPage() {
 
     if (writeError) {
       setNotes(previous);
-      setError(writeError.message);
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(writeError),
+      });
+    } else {
+      setFb({ kind: "success", label: t("saved") });
     }
   }
 
@@ -125,6 +145,26 @@ export default function NotesPage() {
       <div className="flex flex-col gap-3">
         <div className="h-10 w-48 animate-pulse rounded-lg bg-[#E2D8E0] dark:bg-[#4A2E46]" />
         <div className="h-64 animate-pulse rounded-2xl bg-[#E2D8E0] dark:bg-[#4A2E46]" />
+      </div>
+    );
+  }
+
+  // Load failures render only the banner (never the rail/list alongside it).
+  // Load errors carry onRetry; mutation errors omit it.
+  if (fb?.kind === "error" && fb.onRetry) {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-[#151115] dark:text-[#F8F4F7]">
+          {t("notes")}
+        </h1>
+        <div className="mt-6">
+          <FeedbackBanner
+            kind={fb.kind}
+            label={fb.label}
+            raw={fb.raw}
+            onRetry={fb.onRetry}
+          />
+        </div>
       </div>
     );
   }
@@ -207,7 +247,9 @@ export default function NotesPage() {
         </button>
       </div>
 
-      {error && <ErrorBanner label={t("err_save")} detail={error} onRetry={createNote} />}
+      {fb && (
+        <FeedbackBanner kind={fb.kind} label={fb.label} raw={fb.raw} onRetry={fb.onRetry} />
+      )}
 
       <div className="mt-6 flex flex-col gap-6 md:flex-row">
         {rail}

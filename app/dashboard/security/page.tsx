@@ -9,16 +9,16 @@ import { isSessionRevoked, relativeTime, trackSession, touchSession } from "@/li
 import PasswordStrengthBar, {
   getPasswordStrength,
 } from "@/app/components/PasswordStrengthBar";
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 
 type Method = "none" | "email" | "totp";
 type Stage = "idle" | "confirm" | "verify";
 
 const fieldClass =
   "w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]";
-
-function messageOf(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
-}
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -37,8 +37,7 @@ export default function SecurityPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [pwStatus, setPwStatus] = useState<string | null>(null);
-  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwFb, setPwFb] = useState<FeedbackState>(null);
 
   const [userId, setUserId] = useState("");
   const [sessionId, setSessionId] = useState("");
@@ -51,13 +50,12 @@ export default function SecurityPage() {
   const [secret, setSecret] = useState("");
   const [factorId, setFactorId] = useState("");
   const [confirmNone, setConfirmNone] = useState(false);
-  const [status, setStatus] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [fb, setFb] = useState<FeedbackState>(null);
 
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [revoking, setRevoking] = useState<string | null>(null);
 
-  const loadSessions = useCallback(async () => {
+  const loadSessions = useCallback<() => Promise<void>>(async () => {
     try {
       const {
         data: { session },
@@ -71,43 +69,55 @@ export default function SecurityPage() {
       if (loadError) throw loadError;
       setSessions((data ?? []) as SessionRow[]);
     } catch (loadError) {
-      setError(messageOf(loadError, "Could not load your sessions."));
+      setFb({
+        kind: "error",
+        label: t("err_load"),
+        raw: rawReason(loadError),
+        onRetry: loadSessions,
+      });
     }
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (!session) return;
+  const loadSecurity = useCallback<() => Promise<void>>(async () => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) return;
 
-        setSessionId(session.access_token);
-        setUserId(session.user.id);
+      setSessionId(session.access_token);
+      setUserId(session.user.id);
 
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("mfa_method")
-          .eq("id", session.user.id)
-          .maybeSingle();
-        const method = ((profile as { mfa_method?: string | null } | null)?.mfa_method ??
-          "none") as Method;
-        setMode(method);
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("mfa_method")
+        .eq("id", session.user.id)
+        .maybeSingle();
+      const method = ((profile as { mfa_method?: string | null } | null)?.mfa_method ??
+        "none") as Method;
+      setMode(method);
 
-        if (method === "totp") {
-          const { data: factors } = await supabase.auth.mfa.listFactors();
-          const totp = factors?.totp?.find((factor) => factor.status === "verified");
-          setFactorId(totp?.id ?? "");
-        }
-
-        await trackSession(session.access_token, session.user.id);
-        await loadSessions();
-      } catch (loadError) {
-        setError(messageOf(loadError, "Could not load your security settings."));
+      if (method === "totp") {
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        const totp = factors?.totp?.find((factor) => factor.status === "verified");
+        setFactorId(totp?.id ?? "");
       }
-    })();
+
+      await trackSession(session.access_token, session.user.id);
+      await loadSessions();
+    } catch (loadError) {
+      setFb({
+        kind: "error",
+        label: t("err_load"),
+        raw: rawReason(loadError),
+        onRetry: loadSecurity,
+      });
+    }
   }, [loadSessions]);
+
+  useEffect(() => {
+    void loadSecurity();
+  }, [loadSecurity]);
 
   // Heartbeat: refresh last_active on load, every 5 minutes, and on route change.
   useEffect(() => {
@@ -137,15 +147,17 @@ export default function SecurityPage() {
 
   async function handleChangePassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setPwError(null);
-    setPwStatus(null);
+    setPwFb(null);
 
     if (newPassword !== confirmPassword) {
-      setPwError(t("passwords_mismatch"));
+      setPwFb({ kind: "error", label: t("passwords_mismatch") });
       return;
     }
     if (getPasswordStrength(newPassword) < 3) {
-      setPwError("Please choose a stronger password (at least Moderate).");
+      setPwFb({
+        kind: "error",
+        label: "Please choose a stronger password (at least Moderate).",
+      });
       return;
     }
 
@@ -169,16 +181,19 @@ export default function SecurityPage() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setPwStatus("Password updated.");
+      setPwFb({ kind: "success", label: t("saved") });
     } catch (changeError) {
-      setPwError(messageOf(changeError, "Could not update your password."));
+      setPwFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(changeError),
+      });
     }
   }
 
   function chooseMethod(next: Method) {
     if (next === mode) return;
-    setError(null);
-    setStatus(null);
+    setFb(null);
     setCode("");
     setQr("");
     setSecret("");
@@ -190,7 +205,7 @@ export default function SecurityPage() {
 
   async function handleConfirmPassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError(null);
+    setFb(null);
     if (!selected) return;
 
     try {
@@ -220,7 +235,7 @@ export default function SecurityPage() {
         setMode("none");
         setFactorId("");
         setStage("idle");
-        setStatus("Password-only sign-in enabled.");
+        setFb({ kind: "success", label: t("saved") });
         return;
       }
 
@@ -242,13 +257,17 @@ export default function SecurityPage() {
       setSecret(enrolled.totp?.secret ?? "");
       setStage("verify");
     } catch (confirmError) {
-      setError(messageOf(confirmError, "Could not verify your password."));
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(confirmError),
+      });
     }
   }
 
   async function submitCode(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError(null);
+    setFb(null);
 
     try {
       if (selected === "email") {
@@ -258,7 +277,7 @@ export default function SecurityPage() {
         });
         if (rpcError) throw rpcError;
         if (data !== true) {
-          setError(t("invalid_code"));
+          setFb({ kind: "error", label: t("invalid_code") });
           return;
         }
       } else {
@@ -271,7 +290,7 @@ export default function SecurityPage() {
           code,
         });
         if (verifyError) {
-          setError(t("invalid_code"));
+          setFb({ kind: "error", label: t("invalid_code") });
           return;
         }
       }
@@ -287,18 +306,18 @@ export default function SecurityPage() {
       setCode("");
       setQr("");
       setSecret("");
-      setStatus(
-        selected === "totp"
-          ? "Authenticator 2FA enabled."
-          : "Email 2FA enabled.",
-      );
+      setFb({ kind: "success", label: t("saved") });
     } catch (codeError) {
-      setError(messageOf(codeError, t("invalid_code")));
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(codeError),
+      });
     }
   }
 
   async function revoke(id: string) {
-    setError(null);
+    setFb(null);
     setRevoking(id);
     try {
       const { error: revokeError } = await supabase
@@ -312,12 +331,16 @@ export default function SecurityPage() {
       }, 200);
     } catch (revokeError) {
       setRevoking(null);
-      setError(messageOf(revokeError, "Could not revoke that session."));
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(revokeError),
+      });
     }
   }
 
   async function signOutAll() {
-    setError(null);
+    setFb(null);
     try {
       await supabase.auth.signOut({ scope: "others" });
       if (userId) {
@@ -329,7 +352,11 @@ export default function SecurityPage() {
       }
       await loadSessions();
     } catch (signOutError) {
-      setError(messageOf(signOutError, "Could not sign out the other sessions."));
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(signOutError),
+      });
     }
   }
 
@@ -353,15 +380,29 @@ export default function SecurityPage() {
             <input type="password" required autoComplete="new-password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={`${t("password")} (new)`} className={fieldClass} />
             <PasswordStrengthBar password={newPassword} />
             <input type="password" required autoComplete="new-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder={t("confirm_password")} className={fieldClass} />
+            {pwFb && (
+              <FeedbackBanner
+                kind={pwFb.kind}
+                label={pwFb.label}
+                raw={pwFb.raw}
+                onRetry={pwFb.onRetry}
+              />
+            )}
             <button type="submit" className="w-full rounded-lg bg-[#85587D] px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 sm:w-auto dark:bg-[#D8A8D3] dark:text-[#151115]">
               {t("save")}
             </button>
-            {pwStatus && <p className="text-sm font-medium text-green-600 dark:text-green-400">{pwStatus}</p>}
-            {pwError && <p className="text-sm text-red-400">{pwError}</p>}
           </form>
         </SectionCard>
 
         <SectionCard title={t("two_factor")}>
+          {fb && (
+            <FeedbackBanner
+              kind={fb.kind}
+              label={fb.label}
+              raw={fb.raw}
+              onRetry={fb.onRetry}
+            />
+          )}
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             {METHODS.map((option) => {
               const active = mode === option.id;
@@ -441,9 +482,6 @@ export default function SecurityPage() {
               </button>
             </form>
           )}
-
-          {status && <p className="mt-3 text-sm font-medium text-green-600 dark:text-green-400">{status}</p>}
-          {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
         </SectionCard>
 
         <SectionCard title={t("sessions")}>

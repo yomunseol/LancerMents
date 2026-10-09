@@ -7,6 +7,10 @@ import { supabase } from "@/lib/supabase";
 import { canonicalPlan, saveProfile, type CanonicalPlan } from "@/lib/profile";
 import { PLAN_TIERS } from "@/lib/plans";
 import PlanCard from "@/app/components/PlanCard";
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 import { useProfile } from "@/app/dashboard/ProfileContext";
 
 type BusinessType = {
@@ -47,10 +51,6 @@ function businessCardClass(selected: boolean): string {
     : "border border-[#E2D8E0] bg-white dark:border-[#4A2E46] dark:bg-[#221C21]";
 }
 
-function messageOf(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
-}
-
 function Spinner() {
   return (
     <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -77,7 +77,7 @@ export default function OnboardingPage() {
   const [planType, setPlanType] = useState("");
   const [currentPlan, setCurrentPlan] = useState<CanonicalPlan | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [fb, setFb] = useState<FeedbackState>(null);
 
   useEffect(() => {
     let active = true;
@@ -134,7 +134,7 @@ export default function OnboardingPage() {
   }, [router]);
 
   async function finishOnboarding() {
-    setError(null);
+    setFb(null);
     setLoading(true);
 
     try {
@@ -166,7 +166,7 @@ export default function OnboardingPage() {
       router.push(returnTo || "/dashboard");
     } catch (saveError) {
       setLoading(false);
-      setError(messageOf(saveError, "Could not save your setup. Please try again."));
+      setFb({ kind: "error", label: t("err_save"), raw: rawReason(saveError) });
     }
   }
 
@@ -282,10 +282,13 @@ export default function OnboardingPage() {
             </button>
           </div>
 
-          {error && (
-            <p className="mt-4 text-sm font-medium text-red-600 dark:text-red-400">
-              {error}
-            </p>
+          {fb && (
+            <FeedbackBanner
+              kind={fb.kind}
+              label={fb.label}
+              raw={fb.raw}
+              onRetry={fb.onRetry}
+            />
           )}
         </section>
       )}

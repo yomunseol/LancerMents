@@ -2,8 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { getStoredTheme, setTheme, type ThemeMode } from "@/lib/theme";
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 import { useWorkspace } from "../WorkspaceContext";
 
 const MODES: { id: ThemeMode; label: string; swatch: string[] }[] = [
@@ -16,10 +21,6 @@ const DEFAULT_WS_KEY = "lancermonts.defaultWorkspaceId";
 
 const fieldClass =
   "w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]";
-
-function messageOf(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
-}
 
 function SectionCard({
   title,
@@ -40,13 +41,13 @@ function SectionCard({
 
 export default function SettingsPage() {
   const router = useRouter();
+  const t = useTranslations();
   const { workspaces, activeWorkspace, refreshWorkspaces } = useWorkspace();
 
   const [mode, setMode] = useState<ThemeMode>("dark");
   const [defaultWorkspace, setDefaultWorkspace] = useState("");
   const [renameValue, setRenameValue] = useState("");
-  const [renameStatus, setRenameStatus] = useState<string | null>(null);
-  const [renameError, setRenameError] = useState<string | null>(null);
+  const [fb, setFb] = useState<FeedbackState>(null);
   const [dangerBusy, setDangerBusy] = useState(false);
 
   useEffect(() => {
@@ -69,12 +70,15 @@ export default function SettingsPage() {
   }
 
   async function handleRename() {
-    setRenameStatus(null);
-    setRenameError(null);
+    setFb(null);
     if (!activeWorkspace) return;
     const name = renameValue.trim();
     if (!name) {
-      setRenameError("Workspace name cannot be empty.");
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: "Workspace name cannot be empty.",
+      });
       return;
     }
 
@@ -85,9 +89,9 @@ export default function SettingsPage() {
         .eq("id", activeWorkspace.id);
       if (error) throw error;
       await refreshWorkspaces();
-      setRenameStatus("Workspace renamed.");
+      setFb({ kind: "success", label: t("saved") });
     } catch (error) {
-      setRenameError(messageOf(error, "Could not rename the workspace."));
+      setFb({ kind: "error", label: t("err_save"), raw: rawReason(error) });
     }
   }
 
@@ -181,15 +185,13 @@ export default function SettingsPage() {
             >
               Save name
             </button>
-            {renameStatus && (
-              <p className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
-                {renameStatus}
-              </p>
-            )}
-            {renameError && (
-              <p className="mt-2 text-sm font-medium text-red-600 dark:text-red-400">
-                {renameError}
-              </p>
+            {fb && (
+              <FeedbackBanner
+                kind={fb.kind}
+                label={fb.label}
+                raw={fb.raw}
+                onRetry={fb.onRetry}
+              />
             )}
           </div>
         </SectionCard>

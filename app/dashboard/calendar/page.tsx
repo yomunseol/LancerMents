@@ -3,6 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 import { useWorkspaceGate } from "../useWorkspaceData";
 
 type Task = {
@@ -63,28 +67,36 @@ export default function CalendarPage() {
   const t = useTranslations();
   const ws = useWorkspaceGate();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [fb, setFb] = useState<FeedbackState>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [cursor, setCursor] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
   });
 
-  const load = useCallback(async (id: string) => {
-    setError(null);
-    try {
-      const { data, error: loadError } = await supabase
-        .from("tasks")
-        .select("id,title,due_date,is_completed")
-        .eq("workspace_id", id)
-        .order("due_date", { ascending: true });
+  const load = useCallback(
+    async (id: string) => {
+      setFb(null);
+      try {
+        const { data, error: loadError } = await supabase
+          .from("tasks")
+          .select("id,title,due_date,is_completed")
+          .eq("workspace_id", id)
+          .order("due_date", { ascending: true });
 
-      if (loadError) throw loadError;
-      setTasks((data ?? []) as Task[]);
-    } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Could not load tasks.");
-    }
-  }, []);
+        if (loadError) throw loadError;
+        setTasks((data ?? []) as Task[]);
+      } catch (err) {
+        setFb({
+          kind: "error",
+          label: t("err_load"),
+          raw: rawReason(err),
+          onRetry: () => load(id),
+        });
+      }
+    },
+    [t],
+  );
 
   useEffect(() => {
     if (!ws?.id) return; // WS-GATE
@@ -116,6 +128,27 @@ export default function CalendarPage() {
   const dayTasks = selected
     ? tasks.filter((task) => dayOf(task.due_date) === selected)
     : [];
+
+  if (fb?.kind === "error") {
+    return (
+      <>
+        <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
+          {t("calendar")}
+        </h1>
+        <p className="mt-1 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
+          {t("cal_sub")}
+        </p>
+        <div className="mt-8">
+          <FeedbackBanner
+            kind={fb.kind}
+            label={fb.label}
+            raw={fb.raw}
+            onRetry={fb.onRetry}
+          />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -199,12 +232,6 @@ export default function CalendarPage() {
           })}
         </div>
       </section>
-
-      {error && (
-        <p className="mt-3 text-sm font-medium text-red-600 dark:text-red-400">
-          {error}
-        </p>
-      )}
 
       {selected && (
         <section className="mt-6">

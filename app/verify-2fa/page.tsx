@@ -4,10 +4,10 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
-
-function messageOf(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
-}
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 
 export default function Verify2faPage() {
   const t = useTranslations();
@@ -21,7 +21,7 @@ export default function Verify2faPage() {
   const [sent, setSent] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [nextPath, setNextPath] = useState("/dashboard");
-  const [error, setError] = useState<string | null>(null);
+  const [fb, setFb] = useState<FeedbackState>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -62,7 +62,11 @@ export default function Verify2faPage() {
           setFactorId(totp?.id ?? "");
         }
       } catch (loadError) {
-        setError(messageOf(loadError, "Could not load your security settings."));
+        setFb({
+          kind: "error",
+          label: t("err_load"),
+          raw: rawReason(loadError),
+        });
       } finally {
         setLoading(false);
       }
@@ -76,7 +80,7 @@ export default function Verify2faPage() {
   }, [cooldown]);
 
   async function sendCode() {
-    setError(null);
+    setFb(null);
     try {
       const { error: rpcError } = await supabase.rpc("request_2fa_code", {
         p_locale: locale,
@@ -85,13 +89,17 @@ export default function Verify2faPage() {
       setSent(true);
       setCooldown(30);
     } catch (sendError) {
-      setError(messageOf(sendError, "Could not send the code."));
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(sendError),
+      });
     }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError(null);
+    setFb(null);
     setLoading(true);
 
     try {
@@ -105,7 +113,7 @@ export default function Verify2faPage() {
           router.replace(nextPath);
           return;
         }
-        setError(t("invalid_code"));
+        setFb({ kind: "error", label: t("invalid_code") });
       } else if (method === "totp") {
         const { data: challenge, error: challengeError } =
           await supabase.auth.mfa.challenge({ factorId });
@@ -117,7 +125,7 @@ export default function Verify2faPage() {
           code,
         });
         if (verifyError) {
-          setError(t("invalid_code"));
+          setFb({ kind: "error", label: t("invalid_code") });
           return;
         }
         router.replace(nextPath);
@@ -125,7 +133,11 @@ export default function Verify2faPage() {
         router.replace(nextPath);
       }
     } catch (submitError) {
-      setError(messageOf(submitError, t("invalid_code")));
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(submitError),
+      });
     } finally {
       setLoading(false);
     }
@@ -191,8 +203,13 @@ export default function Verify2faPage() {
             </button>
           )}
 
-          {error && (
-            <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
+          {fb && (
+            <FeedbackBanner
+              kind={fb.kind}
+              label={fb.label}
+              raw={fb.raw}
+              onRetry={fb.onRetry}
+            />
           )}
         </form>
       )}

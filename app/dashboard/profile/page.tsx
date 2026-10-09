@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { LOCALE_LABELS, LOCALE_ORDER } from "@/lib/i18n/vocab";
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 import { useProfile } from "../ProfileContext";
 
 const BUSINESS_TYPES = [
@@ -24,10 +28,6 @@ const PLAN_LABELS: Record<string, { name: string; price: string }> = {
 const fieldClass =
   "w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:focus:ring-[#D8A8D3]";
 
-function messageOf(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
-}
-
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="border-b border-[#E2D8E0] py-6 first:pt-0 last:border-b-0 last:pb-0 dark:border-[#4A2E46]">
@@ -44,8 +44,7 @@ export default function ProfilePage() {
   const [displayName, setDisplayName] = useState("");
   const [locale, setLocale] = useState("en");
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [fb, setFb] = useState<FeedbackState>(null);
 
   useEffect(() => {
     setDisplayName(profile?.display_name ?? "");
@@ -55,8 +54,7 @@ export default function ProfilePage() {
 
   const save = useCallback(
     async (patch: Record<string, string>) => {
-      setStatus(null);
-      setError(null);
+      setFb(null);
       try {
         const {
           data: { user },
@@ -68,12 +66,12 @@ export default function ProfilePage() {
           .eq("id", user.id);
         if (updateError) throw updateError;
         await refresh();
-        setStatus("Saved.");
+        setFb({ kind: "success", label: t("saved") });
       } catch (saveError) {
-        setError(messageOf(saveError, "Could not save your profile."));
+        setFb({ kind: "error", label: t("err_save"), raw: rawReason(saveError) });
       }
     },
-    [refresh],
+    [refresh, t],
   );
 
   function chooseLocale(code: string) {
@@ -182,10 +180,14 @@ export default function ProfilePage() {
           </select>
         </SectionCard>
 
-        {status && (
-          <p className="mt-4 text-sm font-medium text-green-600 dark:text-green-400">{status}</p>
+        {fb && (
+          <FeedbackBanner
+            kind={fb.kind}
+            label={fb.label}
+            raw={fb.raw}
+            onRetry={fb.onRetry}
+          />
         )}
-        {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
       </div>
     </>
   );

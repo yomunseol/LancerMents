@@ -1,15 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 
 export default function Feedback({ page }: { page: string }) {
+  const t = useTranslations();
   const [done, setDone] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [fb, setFb] = useState<FeedbackState>(null);
   const [busy, setBusy] = useState(false);
 
   async function send(helpful: boolean) {
-    setError(null);
+    setFb(null);
     setBusy(true);
     try {
       const {
@@ -23,9 +29,11 @@ export default function Feedback({ page }: { page: string }) {
       if (insertError) throw insertError;
       setDone(true);
     } catch (sendError) {
-      setError(
-        sendError instanceof Error ? sendError.message : "Could not record that.",
-      );
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(sendError),
+      });
     } finally {
       setBusy(false);
     }
@@ -62,7 +70,11 @@ export default function Feedback({ page }: { page: string }) {
           </div>
         </>
       )}
-      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+      {fb?.kind === "error" && (
+        <div className="mt-2">
+          <FeedbackBanner kind={fb.kind} label={fb.label} raw={fb.raw} />
+        </div>
+      )}
     </section>
   );
 }

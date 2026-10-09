@@ -11,6 +11,7 @@ import {
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { canonicalPlan, type CanonicalPlan } from "@/lib/profile";
+import { rawReason } from "@/app/components/FeedbackBanner";
 
 export type Profile = {
   id: string;
@@ -72,9 +73,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         },
       );
     } catch (loadError) {
-      setError(
-        loadError instanceof Error ? loadError.message : "Could not load your profile.",
-      );
+      setError(rawReason(loadError));
     } finally {
       setLoading(false);
     }

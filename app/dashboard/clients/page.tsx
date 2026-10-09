@@ -7,6 +7,10 @@ import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import { formatCurrency, formatDate } from "@/lib/format";
 import EmptyState from "@/app/components/EmptyState";
+import FeedbackBanner, {
+  rawReason,
+  type FeedbackState,
+} from "@/app/components/FeedbackBanner";
 import TierGate from "@/app/components/TierGate";
 import { useWorkspaceGate } from "../useWorkspaceData";
 import { useProfile } from "../ProfileContext";
@@ -36,10 +40,6 @@ type StatusFilter = "all" | "active" | "blocked";
 const fieldClass =
   "w-full rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]";
 
-function messageOf(error: unknown, fallback: string): string {
-  return error instanceof Error ? error.message : fallback;
-}
-
 function StatusPill({ status }: { status: string | null }) {
   const blocked = status === "blocked";
   return (
@@ -61,7 +61,8 @@ function ClientsInner() {
   const { planCanonical } = useProfile();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [fb, setFb] = useState<FeedbackState>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<StatusFilter>("all");
 
@@ -69,7 +70,6 @@ function ClientsInner() {
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newAddress, setNewAddress] = useState("");
-  const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const [confirmBlockId, setConfirmBlockId] = useState<string | null>(null);
@@ -80,20 +80,40 @@ function ClientsInner() {
 
   const workspaceId = ws?.id ?? "";
 
-  const load = useCallback(async (id: string) => {
-    setError(null);
-    try {
-      const { data, error: loadError } = await supabase
-        .from("clients")
-        .select("id,name,email,status,address,address_lat,address_lng,created_at")
-        .eq("workspace_id", id)
-        .order("created_at", { ascending: false });
-      if (loadError) throw loadError;
-      setClients((data ?? []) as Client[]);
-    } catch (loadError) {
-      setError(messageOf(loadError, "Could not load clients."));
-    }
-  }, []);
+  const load = useCallback(
+    async (id: string) => {
+      setFb(null);
+      try {
+        const { data, error: loadError } = await supabase
+          .from("clients")
+          .select("id,name,email,status,address,address_lat,address_lng,created_at")
+          .eq("workspace_id", id)
+          .order("created_at", { ascending: false });
+        if (loadError) throw loadError;
+        setClients((data ?? []) as Client[]);
+        setLoadFailed(false);
+      } catch (loadError) {
+        setLoadFailed(true);
+        setFb({
+          kind: "error",
+          label: t("err_load"),
+          raw: rawReason(loadError),
+          onRetry: () => retryLoad(id),
+        });
+      }
+    },
+    [t],
+  );
+
+  function retryLoad(id: string) {
+    setLoading(true);
+    load(id).finally(() => setLoading(false));
+  }
+
+  function openAdd() {
+    setFb(null);
+    setAddOpen(true);
+  }
 
   useEffect(() => {
     if (!ws?.id) return; // WS-GATE
@@ -117,17 +137,21 @@ function ClientsInner() {
 
   async function handleAdd(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setFormError(null);
+    await submitNewClient();
+  }
+
+  async function submitNewClient() {
+    setFb(null);
     const name = newName.trim();
     const email = newEmail.trim();
     const address = newAddress.trim();
 
     if (!name) {
-      setFormError("Name is required.");
+      setFb({ kind: "error", label: "Name is required." });
       return;
     }
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setFormError("Enter a valid email address.");
+      setFb({ kind: "error", label: "Enter a valid email address." });
       return;
     }
     if (!workspaceId) return;
@@ -171,7 +195,12 @@ function ClientsInner() {
       const { error: insertError } = await supabase.from("clients").insert(payload);
 
       if (insertError) {
-        setFormError(insertError.message);
+        setFb({
+          kind: "error",
+          label: t("err_add_client"),
+          raw: rawReason(insertError),
+          onRetry: () => void submitNewClient(),
+        });
         return;
       }
 
@@ -180,16 +209,22 @@ function ClientsInner() {
       setNewName("");
       setNewEmail("");
       setNewAddress("");
-      if (warning) setError(warning);
+      // The geocode warning, when present, rides along as the secondary detail line.
+      setFb({ kind: "success", label: t("saved"), raw: warning ?? undefined });
     } catch (insertError) {
-      setFormError(messageOf(insertError, "Could not add the client."));
+      setFb({
+        kind: "error",
+        label: t("err_add_client"),
+        raw: rawReason(insertError),
+        onRetry: () => void submitNewClient(),
+      });
     } finally {
       setSaving(false);
     }
   }
 
   async function toggleBlock(client: Client) {
-    setError(null);
+    setFb(null);
     setConfirmBlockId(null);
     const next = client.status === "blocked" ? "active" : "blocked";
     setClients((current) =>
@@ -207,7 +242,11 @@ function ClientsInner() {
           item.id === client.id ? { ...item, status: client.status } : item,
         ),
       );
-      setError(messageOf(updateError, "Could not update the client."));
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(updateError),
+      });
     }
   }
 
@@ -230,13 +269,41 @@ function ClientsInner() {
     }
   }
 
+  if (loadFailed && fb) {
+    return (
+      <>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">
+            {t("clients")}
+          </h1>
+          <button
+            type="button"
+            onClick={openAdd}
+            className="rounded-lg bg-[#85587D] px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
+          >
+            {t("add_client")}
+          </button>
+        </div>
+
+        <div className="mt-8">
+          <FeedbackBanner
+            kind={fb.kind}
+            label={fb.label}
+            raw={fb.raw}
+            onRetry={fb.onRetry}
+          />
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl font-bold text-[#151115] dark:text-[#F8F4F7]">{t("clients")}</h1>
         <button
           type="button"
-          onClick={() => setAddOpen(true)}
+          onClick={openAdd}
           className="rounded-lg bg-[#85587D] px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
         >
           {t("add_client")}
@@ -268,6 +335,17 @@ function ClientsInner() {
         </div>
       </div>
 
+      {!addOpen && fb && (
+        <div className="mt-6">
+          <FeedbackBanner
+            kind={fb.kind}
+            label={fb.label}
+            raw={fb.raw}
+            onRetry={fb.onRetry}
+          />
+        </div>
+      )}
+
       <div className="mt-6">
         {loading ? (
           <div className="flex flex-col gap-3">
@@ -278,25 +356,6 @@ function ClientsInner() {
               />
             ))}
           </div>
-        ) : error ? (
-          <div className="rounded-2xl border border-red-500/40 bg-red-500/5 p-6">
-            <p className="text-sm font-medium text-red-600 dark:text-red-400">
-              {t("err_load")}
-            </p>
-            <p className="mt-1 font-mono text-xs text-red-500/80">{error}</p>
-            <button
-              type="button"
-              onClick={() => {
-                if (ws?.id) {
-                  setLoading(true);
-                  load(ws.id).finally(() => setLoading(false));
-                }
-              }}
-              className="mt-4 rounded-lg border border-[#E2D8E0] px-4 py-2 text-sm font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
-            >
-              {t("retry")}
-            </button>
-          </div>
         ) : visible.length === 0 ? (
           <EmptyState
             title={clients.length === 0 ? t("empty_clients") : "No matches."}
@@ -304,7 +363,7 @@ function ClientsInner() {
               clients.length === 0 ? t("empty_clients_sub") : "Try a different search or filter."
             }
             actionLabel={clients.length === 0 ? t("add_first_client") : undefined}
-            onAction={clients.length === 0 ? () => setAddOpen(true) : undefined}
+            onAction={clients.length === 0 ? openAdd : undefined}
           />
         ) : (
           <>
@@ -453,7 +512,16 @@ function ClientsInner() {
                 className={fieldClass}
               />
             </div>
-            {formError && <p className="mt-3 text-sm text-red-400">{formError}</p>}
+            {fb && (
+              <div className="mt-3">
+                <FeedbackBanner
+                  kind={fb.kind}
+                  label={fb.label}
+                  raw={fb.raw}
+                  onRetry={fb.onRetry}
+                />
+              </div>
+            )}
             <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
