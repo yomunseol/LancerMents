@@ -202,8 +202,6 @@ function ClientsInner() {
   const [newAddress, setNewAddress] = useState("");
   const [nameError, setNameError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
-  const [geocodeWarning, setGeocodeWarning] = useState<string | null>(null);
-  const [geocoding, setGeocoding] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const [confirmBlockId, setConfirmBlockId] = useState<string | null>(null);
@@ -251,7 +249,6 @@ function ClientsInner() {
     setFb(null);
     setNameError(null);
     setEmailError(null);
-    setGeocodeWarning(null);
     setAddOpen(true);
   }
 
@@ -259,7 +256,6 @@ function ClientsInner() {
     setAddOpen(false);
     setNameError(null);
     setEmailError(null);
-    setGeocodeWarning(null);
   }
 
   useEffect(() => {
@@ -291,7 +287,6 @@ function ClientsInner() {
       if (event.key !== "Escape") return;
       event.preventDefault();
       setAddOpen(false);
-      setGeocodeWarning(null);
     }
     document.addEventListener("keydown", onKeyDown);
     return () => {
@@ -321,44 +316,6 @@ function ClientsInner() {
     await submitNewClient();
   }
 
-  const geocode = useCallback(
-    async (
-      address: string,
-    ): Promise<{ lat: number | null; lng: number | null; warned: boolean; raw?: string }> => {
-      if (!address?.trim()) return { lat: null, lng: null, warned: false };
-      setGeocoding(true);
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 8000);
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address.trim())}`,
-          { headers: { "Accept-Language": locale }, signal: controller.signal },
-        );
-        clearTimeout(timer);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = (await res.json()) as { lat?: string; lon?: string; lng?: string }[];
-        const hit = Array.isArray(data) ? data[0] : null;
-        if (!hit) return { lat: null, lng: null, warned: true };
-        const lat = parseFloat(hit.lat ?? "");
-        const lng = parseFloat(hit.lon ?? hit.lng ?? "");
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-          return { lat: null, lng: null, warned: true };
-        }
-        return { lat, lng, warned: false };
-      } catch (e) {
-        return {
-          lat: null,
-          lng: null,
-          warned: true,
-          raw: e instanceof Error ? e.message : undefined,
-        };
-      } finally {
-        setGeocoding(false);
-      }
-    },
-    [locale],
-  );
-
   async function submitNewClient() {
     setFb(null);
     const name = newName.trim();
@@ -373,7 +330,6 @@ function ClientsInner() {
     if (nameInvalid || emailInvalid) return;
     if (!workspaceId) return;
 
-    setGeocodeWarning(null);
     setSaving(true);
     try {
       const {
@@ -384,29 +340,20 @@ function ClientsInner() {
         return;
       }
 
-      // 2. Geocode the address when one was supplied. This NEVER blocks the
-      // insert — any failure resolves to { warned: true } and we proceed
-      // without coordinates.
-      const { lat, lng, warned, raw } = await geocode(address);
-      if (warned) {
-        setGeocodeWarning(t("address_not_found") + (raw ? ` (${raw})` : ""));
-      }
-
-      // 3. Build the payload.
-      const payload: Record<string, unknown> = {
+      // 2. Insert IMMEDIATELY, with NO coordinates — client creation is never
+      // blocked by the map/geocode.
+      const payload = {
         workspace_id: workspaceId,
         name,
         email: email || null,
         address: address || null,
         created_by: user.id,
       };
-
-      // 4. Only send each coordinate when it is a real finite number — never
-      // "", NaN, or a null-string.
-      if (Number.isFinite(lat)) payload.address_lat = lat;
-      if (Number.isFinite(lng)) payload.address_lng = lng;
-
-      const { error: insertError } = await supabase.from("clients").insert(payload);
+      const { data: inserted, error: insertError } = await supabase
+        .from("clients")
+        .insert(payload)
+        .select("id")
+        .single();
 
       if (insertError) {
         setFb({
@@ -418,13 +365,43 @@ function ClientsInner() {
         return;
       }
 
-      // 5. Success: close + clear, refresh the page rows, surface the banner.
-      await refresh();
+      // 3. Success: close + clear, refresh the page rows, surface the banner.
+      const insertedId = (inserted as { id?: string } | null)?.id;
       closeAdd();
       setNewName("");
       setNewEmail("");
       setNewAddress("");
       setFb({ kind: "success", label: t("saved") });
+      await refresh();
+
+      // 4. Geocode in the BACKGROUND (fire-and-forget) — the map is best-effort,
+      // never blocks the insert, and never surfaces a failure.
+      const addressToGeocode = address;
+      if (addressToGeocode && insertedId) {
+        (async () => {
+          try {
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressToGeocode)}`,
+              { headers: { "Accept-Language": locale } },
+            );
+            if (!res.ok) return;
+            const data = (await res.json()) as { lat?: string; lon?: string; lng?: string }[];
+            const hit = data?.[0];
+            if (!hit) return;
+            const lat = parseFloat(hit.lat ?? "");
+            const lng = parseFloat(hit.lon ?? hit.lng ?? "");
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+            await supabase
+              .from("clients")
+              .update({ address_lat: lat, address_lng: lng })
+              .eq("id", insertedId)
+              .eq("workspace_id", workspaceId);
+            await refresh();
+          } catch {
+            /* map is best-effort; never surface */
+          }
+        })();
+      }
     } catch (insertError) {
       setFb({
         kind: "error",
@@ -535,7 +512,7 @@ function ClientsInner() {
   }, [drawerClient]);
 
   const state: ViewState = loading ? "loading" : clients.length === 0 ? "empty" : "data";
-  const busy = saving || geocoding;
+  const busy = saving;
 
   if (loadFailed) {
     // OMEGA-05: a failed load renders the FeedbackBanner and nothing else.
@@ -824,19 +801,10 @@ function ClientsInner() {
               <div className="flex flex-col gap-1.5">
                 <input
                   value={newAddress}
-                  onChange={(event) => {
-                    setNewAddress(event.target.value);
-                    if (geocodeWarning) setGeocodeWarning(null);
-                  }}
+                  onChange={(event) => setNewAddress(event.target.value)}
                   placeholder={t("address_optional")}
                   className={fieldClass}
                 />
-                {geocoding && <p className="text-xs opacity-60">{t("geocoding")}</p>}
-                {geocodeWarning && (
-                  <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-2 text-xs text-amber-700 dark:text-amber-400">
-                    {geocodeWarning}
-                  </div>
-                )}
               </div>
             </div>
 
@@ -916,8 +884,13 @@ function ClientsInner() {
               </div>
               <div className={`flex items-center justify-between gap-4 rounded-lg border px-3 py-2 ${BORDER}`}>
                 <dt className={sectionLabelClass}>{t("location")}</dt>
-                <dd className="min-w-0 truncate text-sm text-[#151115] dark:text-[#F8F4F7]">
-                  {drawerClient.address ?? "—"}
+                <dd className="min-w-0 text-sm text-[#151115] dark:text-[#F8F4F7]">
+                  <span className="block truncate">{drawerClient.address ?? "—"}</span>
+                  {drawerClient.address && drawerClient.address_lat == null && (
+                    <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                      {t("address_not_found")}
+                    </p>
+                  )}
                 </dd>
               </div>
               <div className={`flex items-center justify-between gap-4 rounded-lg border px-3 py-2 ${BORDER}`}>
