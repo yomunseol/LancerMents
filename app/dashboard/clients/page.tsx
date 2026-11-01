@@ -642,8 +642,15 @@ function ClientsInner() {
                           client.status === "blocked" ? "opacity-70" : ""
                         }`}
                       >
-                        <td className="px-5 py-3 font-medium text-[#151115] dark:text-[#F8F4F7]">
-                          {client.name}
+                        <td className="px-5 py-3 font-medium">
+                          <Link
+                            href={`/dashboard/clients/${client.id}`}
+                            onClick={(event) => event.stopPropagation()}
+                            onKeyDown={(event) => event.stopPropagation()}
+                            className="text-[#85587D] transition-colors duration-200 hover:underline dark:text-[#D8A8D3]"
+                          >
+                            {client.name}
+                          </Link>
                         </td>
                         <td className="px-5 py-3 text-[#151115]/70 dark:text-[#F8F4F7]/70">
                           {client.email ?? "—"}
@@ -716,6 +723,12 @@ function ClientsInner() {
                     <div
                       className={`flex items-center gap-2 border-t px-4 py-2 ${BORDER}`}
                     >
+                      <Link
+                        href={`/dashboard/clients/${client.id}`}
+                        className="rounded-lg px-3 py-1.5 text-xs font-semibold text-[#85587D] transition-all duration-200 hover:bg-[#85587D]/10 dark:text-[#D8A8D3] dark:hover:bg-[#D8A8D3]/10"
+                      >
+                        {t("view")}
+                      </Link>
                       <button
                         type="button"
                         onClick={() => setConfirmBlockId(client.id)}

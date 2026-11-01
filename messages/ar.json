@@ -200,5 +200,8 @@
   "geocoding": "جارٍ البحث عن العنوان...",
   "address_not_found": "لم يتم العثور على العنوان — تم الحفظ بدون خريطة.",
   "err_name_required": "الاسم مطلوب.",
-  "err_email_invalid": "أدخل بريداً إلكترونياً صالحاً."
+  "err_email_invalid": "أدخل بريداً إلكترونياً صالحاً.",
+  "client_detail_title": "تفاصيل العميل",
+  "client_detail_locating": "جارٍ تحديد العنوان...",
+  "client_detail_no_location": "لا توجد بيانات موقع"
 }

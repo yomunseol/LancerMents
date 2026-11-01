@@ -200,5 +200,8 @@
   "geocoding": "住所を検索中...",
   "address_not_found": "住所が見つかりません—マップなしで保存。",
   "err_name_required": "名前は必須です。",
-  "err_email_invalid": "有効なメールアドレスを入力してください。"
+  "err_email_invalid": "有効なメールアドレスを入力してください。",
+  "client_detail_title": "クライアントの詳細",
+  "client_detail_locating": "住所を特定中...",
+  "client_detail_no_location": "位置情報なし"
 }

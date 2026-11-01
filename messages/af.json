@@ -200,5 +200,8 @@
   "geocoding": "Soek tans adres...",
   "address_not_found": "Adres nie gevind nie — gestoor sonder kaart.",
   "err_name_required": "Naam is verpligtend.",
-  "err_email_invalid": "Voer 'n geldige e-posadres in."
+  "err_email_invalid": "Voer 'n geldige e-posadres in.",
+  "client_detail_title": "Kliëntbesonderhede",
+  "client_detail_locating": "Soek tans adres...",
+  "client_detail_no_location": "Geen liggingsdata nie"
 }

@@ -9,7 +9,6 @@ import {
   useState,
 } from "react";
 import { supabase } from "@/lib/supabase";
-import { normalizeTier, type Tier } from "@/lib/tiers";
 import { rawReason } from "@/app/components/FeedbackBanner";
 
 export type Workspace = {
@@ -23,7 +22,6 @@ type WorkspaceContextValue = {
   activeWorkspace: Workspace | null;
   switchWorkspace: (id: string) => void;
   refreshWorkspaces: () => Promise<void>;
-  tier: Tier;
   loading: boolean;
   ready: boolean;
   error: string | null;
@@ -36,7 +34,6 @@ const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [tier, setTier] = useState<Tier>("basic");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,20 +56,11 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const [workspaceResult, subscriptionResult] = await Promise.all([
-        supabase
-          .from("workspaces")
-          .select("id,name,owner_id")
-          .eq("owner_id", user.id)
-          .order("created_at", { ascending: true }),
-        supabase
-          .from("subscriptions")
-          .select("tier")
-          .eq("user_id", user.id)
-          .order("updated_at", { ascending: false })
-          .limit(1)
-          .maybeSingle(),
-      ]);
+      const workspaceResult = await supabase
+        .from("workspaces")
+        .select("id,name,owner_id")
+        .eq("owner_id", user.id)
+        .order("created_at", { ascending: true });
 
       if (workspaceResult.error) throw workspaceResult.error;
 
@@ -90,9 +78,6 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       }
 
       setWorkspaces(rows);
-      setTier(
-        normalizeTier((subscriptionResult.data as { tier?: string | null } | null)?.tier),
-      );
 
       const stored =
         typeof window === "undefined"
@@ -142,12 +127,11 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       activeWorkspace,
       switchWorkspace,
       refreshWorkspaces: load,
-      tier,
       loading,
       ready: !loading,
       error,
     }),
-    [workspaces, activeWorkspace, switchWorkspace, load, tier, loading, error],
+    [workspaces, activeWorkspace, switchWorkspace, load, loading, error],
   );
 
   return (

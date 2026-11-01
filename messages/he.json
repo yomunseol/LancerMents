@@ -200,5 +200,8 @@
   "geocoding": "מחפש כתובת...",
   "address_not_found": "כתובת לא נמצאה — נשמר ללא מפה.",
   "err_name_required": "יש להזין שם.",
-  "err_email_invalid": "הזן כתובת דוא״ל תקפה."
+  "err_email_invalid": "הזן כתובת דוא״ל תקפה.",
+  "client_detail_title": "פרטי הלקוח",
+  "client_detail_locating": "מאתר כתובת...",
+  "client_detail_no_location": "אין נתוני מיקום"
 }

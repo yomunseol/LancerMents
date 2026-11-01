@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
-import { TIER_LIMITS } from "@/lib/tiers";
+import { taskLimitFor } from "@/lib/profile";
 import FeedbackBanner, {
   rawReason,
   type FeedbackState,
 } from "@/app/components/FeedbackBanner";
 import DatePicker from "@/app/components/DatePicker";
 import { useWorkspaceGate } from "./useWorkspaceData";
+import { useProfile } from "./ProfileContext";
 
 export type Task = {
   id: string;
@@ -20,7 +21,6 @@ export type Task = {
   is_completed: boolean;
 };
 
-const TASK_LIMIT = TIER_LIMITS.basic.maxTasks;
 const TASK_COLUMNS = "id,workspace_id,title,due_date,created_at,is_completed";
 
 function todayIso(): string {
@@ -125,6 +125,9 @@ function TaskRow({
 export default function TasksBoard() {
   const t = useTranslations();
   const ws = useWorkspaceGate();
+  const { planCanonical } = useProfile();
+  const taskLimit = taskLimitFor(planCanonical);
+  const meterVisible = Number.isFinite(taskLimit);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [fb, setFb] = useState<FeedbackState>(null);
@@ -269,7 +272,7 @@ export default function TasksBoard() {
     })
     .sort((a, b) => (dueDay(a.due_date) ?? "").localeCompare(dueDay(b.due_date) ?? ""));
   const completed = tasks.filter((task) => task.is_completed);
-  const capReached = uncompleted.length >= TASK_LIMIT;
+  const capReached = meterVisible && uncompleted.length >= taskLimit;
   const busy = loading || !ws;
 
   const rowFor = (task: Task) => (
@@ -283,23 +286,25 @@ export default function TasksBoard() {
           <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
             {t("daily_tasks")}
           </h2>
-          <div className="flex items-center gap-2">
-            <span className="text-xs uppercase tracking-widest opacity-60">
-              {t("daily_grid")}
-            </span>
-            <div className="flex items-center gap-1">
-              {Array.from({ length: TASK_LIMIT }).map((_, index) => (
-                <span
-                  key={index}
-                  className={`h-1.5 w-6 rounded-full transition-colors duration-200 ${
-                    index < uncompleted.length
-                      ? "bg-[#85587D] dark:bg-[#D8A8D3]"
-                      : "bg-[#E2D8E0] dark:bg-[#4A2E46]"
-                  }`}
-                />
-              ))}
+          {meterVisible && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs uppercase tracking-widest opacity-60">
+                {t("daily_grid")}
+              </span>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: taskLimit }).map((_, index) => (
+                  <span
+                    key={index}
+                    className={`h-1.5 w-6 rounded-full transition-colors duration-200 ${
+                      index < uncompleted.length
+                        ? "bg-[#85587D] dark:bg-[#D8A8D3]"
+                        : "bg-[#E2D8E0] dark:bg-[#4A2E46]"
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="mt-8">
@@ -320,23 +325,25 @@ export default function TasksBoard() {
         <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
           {t("daily_tasks")}
         </h2>
-        <div className="flex items-center gap-2">
-          <span className="text-xs uppercase tracking-widest opacity-60">
-            {t("daily_grid")}
-          </span>
-          <div className="flex items-center gap-1">
-            {Array.from({ length: TASK_LIMIT }).map((_, index) => (
-              <span
-                key={index}
-                className={`h-1.5 w-6 rounded-full transition-colors duration-200 ${
-                  index < uncompleted.length
-                    ? "bg-[#85587D] dark:bg-[#D8A8D3]"
-                    : "bg-[#E2D8E0] dark:bg-[#4A2E46]"
-                }`}
-              />
-            ))}
+        {meterVisible && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs uppercase tracking-widest opacity-60">
+              {t("daily_grid")}
+            </span>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: taskLimit }).map((_, index) => (
+                <span
+                  key={index}
+                  className={`h-1.5 w-6 rounded-full transition-colors duration-200 ${
+                    index < uncompleted.length
+                      ? "bg-[#85587D] dark:bg-[#D8A8D3]"
+                      : "bg-[#E2D8E0] dark:bg-[#4A2E46]"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {fb && (

@@ -200,5 +200,8 @@
   "geocoding": "Ag lorg seoladh...",
   "address_not_found": "Seoladh gan aimsiú — sábháilte gan léarscáil.",
   "err_name_required": "Tá ainm ag teastáil.",
-  "err_email_invalid": "Cuir isteach seoladh ríomhphoist bailí."
+  "err_email_invalid": "Cuir isteach seoladh ríomhphoist bailí.",
+  "client_detail_title": "Sonraí an chliaint",
+  "client_detail_locating": "Ag aimsiú an tseoladh...",
+  "client_detail_no_location": "Níl aon sonraí suímh"
 }

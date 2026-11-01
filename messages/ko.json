@@ -200,5 +200,8 @@
   "geocoding": "주소 찾는 중...",
   "address_not_found": "주소를 찾을 수 없습니다 — 지도 없이 저장됨.",
   "err_name_required": "이름은 필수입니다.",
-  "err_email_invalid": "유효한 이메일 주소를 입력하세요."
+  "err_email_invalid": "유효한 이메일 주소를 입력하세요.",
+  "client_detail_title": "클라이언트 세부 정보",
+  "client_detail_locating": "주소 찾는 중...",
+  "client_detail_no_location": "위치 데이터 없음"
 }

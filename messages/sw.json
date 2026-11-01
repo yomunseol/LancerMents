@@ -200,5 +200,8 @@
   "geocoding": "Inatafuta anwani...",
   "address_not_found": "Anwani haikupatikana — imehifadhiwa bila ramani.",
   "err_name_required": "Jina linahitajika.",
-  "err_email_invalid": "Weka barua pepe sahihi."
+  "err_email_invalid": "Weka barua pepe sahihi.",
+  "client_detail_title": "Maelezo ya mteja",
+  "client_detail_locating": "Inatafuta anwani...",
+  "client_detail_no_location": "Hakuna data ya mahali"
 }

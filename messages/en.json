@@ -200,5 +200,8 @@
   "geocoding": "Finding address...",
   "address_not_found": "Address not found — saved without map.",
   "err_name_required": "Name is required.",
-  "err_email_invalid": "Enter a valid email address."
+  "err_email_invalid": "Enter a valid email address.",
+  "client_detail_title": "Client Details",
+  "client_detail_locating": "Locating address...",
+  "client_detail_no_location": "No location data"
 }

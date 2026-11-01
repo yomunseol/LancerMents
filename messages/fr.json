@@ -200,5 +200,8 @@
   "geocoding": "Recherche de l'adresse...",
   "address_not_found": "Adresse introuvable — enregistré sans carte.",
   "err_name_required": "Le nom est requis.",
-  "err_email_invalid": "Saisissez une adresse e-mail valide."
+  "err_email_invalid": "Saisissez une adresse e-mail valide.",
+  "client_detail_title": "Détails du client",
+  "client_detail_locating": "Localisation de l'adresse...",
+  "client_detail_no_location": "Aucune donnée de localisation"
 }

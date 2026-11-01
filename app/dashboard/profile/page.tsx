@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
+import { canonicalPlan, type CanonicalPlan } from "@/lib/profile";
 import { LOCALE_LABELS, LOCALE_ORDER } from "@/lib/i18n/vocab";
 import FeedbackBanner, {
   rawReason,
@@ -19,10 +20,11 @@ const BUSINESS_TYPES = [
   { id: "team-company", label: "Team Company" },
 ];
 
-const PLAN_LABELS: Record<string, { name: string; price: string }> = {
-  "engine-room": { name: "The Engine Room", price: "$9/mo" },
-  pipeline: { name: "The Pipeline", price: "$19/mo" },
-  studio: { name: "The Studio", price: "$49/mo" },
+const PLAN_LABELS: Record<CanonicalPlan, { name: string; price: string }> = {
+  engine: { name: "Starter", price: "$9/mo" },
+  pipeline: { name: "Pro", price: "$19/mo" },
+  studio: { name: "Expert", price: "$49/mo" },
+  business: { name: "Business", price: "$99/mo" },
 };
 
 const fieldClass =
@@ -90,7 +92,8 @@ export default function ProfilePage() {
     .map((part) => part[0]?.toUpperCase())
     .join("");
 
-  const plan = profile?.plan_type ? PLAN_LABELS[profile.plan_type] : undefined;
+  const canonical = canonicalPlan(profile?.plan_type ?? null);
+  const plan = canonical ? PLAN_LABELS[canonical] : undefined;
 
   return (
     <>
