@@ -77,22 +77,27 @@ export default async function Home() {
         <PricingGrid />
 
         <section className="border-t border-[#E2D8E0] py-16 dark:border-[#4A2E46]">
-          <div className="mx-auto max-w-2xl">
-            <h2 className="text-2xl font-bold tracking-tight text-[#151115] sm:text-3xl dark:text-[#F8F4F7]">
-              {FOUNDER_NOTE.heading}
-            </h2>
-            {FOUNDER_NOTE.paragraphs.map((paragraph) => (
-              <p
-                key={paragraph}
-                className="mt-4 text-base leading-relaxed text-[#151115]/80 dark:text-[#F8F4F7]/80"
-              >
-                {paragraph}
+          <div className="mx-auto max-w-3xl">
+            <div className="rounded-2xl border border-white/10 bg-white p-8 sm:p-10 dark:bg-[#221C21]">
+              <p className="text-xs font-semibold tracking-widest text-[#85587D] dark:text-[#D8A8D3]">
+                {FOUNDER_NOTE.eyebrow}
               </p>
-            ))}
-            <p className="mt-6 text-sm font-semibold text-[#85587D] dark:text-[#D8A8D3]">
-              {FOUNDER_NOTE.signature}
-            </p>
-            <FounderCta />
+              <h2 className="mt-3 text-2xl font-bold tracking-tight text-[#151115] sm:text-3xl dark:text-[#F8F4F7]">
+                {FOUNDER_NOTE.heading}
+              </h2>
+              {FOUNDER_NOTE.paragraphs.map((paragraph) => (
+                <p
+                  key={paragraph}
+                  className="mt-4 text-base leading-relaxed text-[#151115]/80 dark:text-[#F8F4F7]/80"
+                >
+                  {paragraph}
+                </p>
+              ))}
+              <p className="mt-6 text-sm font-semibold text-[#85587D] dark:text-[#D8A8D3]">
+                {FOUNDER_NOTE.signature}
+              </p>
+              <FounderCta />
+            </div>
           </div>
         </section>
       </main>

@@ -228,5 +228,8 @@
   "feedback_recorded": "ありがとうございます。フィードバックを記録しました。",
   "best_for_solo": "ひとりフリーランスに最適",
   "start_free_beta": "ベータで無料開始",
-  "cta_my_workspace": "マイワークスペース →"
+  "cta_my_workspace": "マイワークスペースへ →",
+  "cta_try_free": "LancerMentsを無料で試す",
+  "cta_login_your_account": "アカウントにログイン",
+  "cta_no_card_beta": "カード不要 · 公開ベータ期間中は無料"
 }

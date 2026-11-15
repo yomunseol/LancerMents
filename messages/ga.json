@@ -228,5 +228,8 @@
   "feedback_recorded": "Go raibh maith agat. Taifeadadh an aiseolas.",
   "best_for_solo": "Is fearr do shaoririseoirí aonair",
   "start_free_beta": "Tosaigh saor sa bhéite",
-  "cta_my_workspace": "Mo spás →"
+  "cta_my_workspace": "Téigh go dtí Mo spás →",
+  "cta_try_free": "Bain triail as LancerMents saor in aisce",
+  "cta_login_your_account": "Logáil isteach i do chuntas",
+  "cta_no_card_beta": "Níl cárta ag teastáil · Saor le linn na béite poiblí"
 }

@@ -228,5 +228,8 @@
   "feedback_recorded": "Спасибо. Отзыв сохранён.",
   "best_for_solo": "Лучший выбор для соло-фрилансеров",
   "start_free_beta": "Начать бесплатно в бете",
-  "cta_my_workspace": "Моё пространство →"
+  "cta_my_workspace": "Перейти в моё пространство →",
+  "cta_try_free": "Попробуйте LancerMents бесплатно",
+  "cta_login_your_account": "Войдите в аккаунт",
+  "cta_no_card_beta": "Без карты · Бесплатно в открытой бете"
 }

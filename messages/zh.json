@@ -228,5 +228,8 @@
   "feedback_recorded": "谢谢，已记录你的反馈。",
   "best_for_solo": "最适合独立自由职业者",
   "start_free_beta": "免费开始公测",
-  "cta_my_workspace": "我的工作区 →"
+  "cta_my_workspace": "前往我的工作区 →",
+  "cta_try_free": "免费试用 LancerMents",
+  "cta_login_your_account": "登录你的账户",
+  "cta_no_card_beta": "无需银行卡 · 公测期间免费"
 }

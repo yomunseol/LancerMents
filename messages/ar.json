@@ -228,5 +228,8 @@
   "feedback_recorded": "شكراً. تم تسجيل ملاحظاتك.",
   "best_for_solo": "الأنسب للمستقلين الأفراد",
   "start_free_beta": "ابدأ مجاناً في البيتا",
-  "cta_my_workspace": "مساحة عملي →"
+  "cta_my_workspace": "الانتقال إلى مساحة عملي →",
+  "cta_try_free": "جرّب LancerMents مجاناً",
+  "cta_login_your_account": "سجّل الدخول إلى حسابك",
+  "cta_no_card_beta": "بدون بطاقة · مجاناً خلال البيتا العامة"
 }

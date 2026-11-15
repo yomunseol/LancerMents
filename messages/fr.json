@@ -228,5 +228,8 @@
   "feedback_recorded": "Merci. Avis enregistré.",
   "best_for_solo": "Idéal pour les freelances solo",
   "start_free_beta": "Commencer gratuitement en bêta",
-  "cta_my_workspace": "Mon espace →"
+  "cta_my_workspace": "Aller à Mon espace →",
+  "cta_try_free": "Essayez LancerMents gratuitement",
+  "cta_login_your_account": "Connectez-vous à votre compte",
+  "cta_no_card_beta": "Sans carte bancaire · Gratuit pendant la bêta publique"
 }

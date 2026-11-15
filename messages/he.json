@@ -228,5 +228,8 @@
   "feedback_recorded": "תודה. המשוב נרשם.",
   "best_for_solo": "המתאים לפרילנסרים עצמאיים",
   "start_free_beta": "מתחילים בחינם בבטא",
-  "cta_my_workspace": "סביבת העבודה שלי →"
+  "cta_my_workspace": "עברו לסביבת העבודה שלי →",
+  "cta_try_free": "נסו את LancerMents בחינם",
+  "cta_login_your_account": "התחברו לחשבון שלכם",
+  "cta_no_card_beta": "ללא כרטיס אשראי · חינם במהלך הבטא הציבורית"
 }
