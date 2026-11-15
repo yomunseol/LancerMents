@@ -12,6 +12,7 @@ import FeedbackBanner, {
   rawReason,
   type FeedbackState,
 } from "@/app/components/FeedbackBanner";
+import { useAuthState } from "./useAuthState";
 
 function GlobeIcon() {
   return (
@@ -65,7 +66,7 @@ export default function GlobalNav() {
   const pathname = usePathname();
   const activeLocale = useLocale();
 
-  const [plan, setPlan] = useState<"guest" | "authed">("guest");
+  const plan = useAuthState();
   const [initials, setInitials] = useState("");
   const [dark, setDark] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
@@ -82,10 +83,8 @@ export default function GlobalNav() {
           data: { user },
         } = await supabase.auth.getUser();
         if (!user) {
-          setPlan("guest");
           return;
         }
-        setPlan("authed");
 
         const { data } = await supabase
           .from("profiles")
@@ -106,7 +105,7 @@ export default function GlobalNav() {
             .join("") || "?",
         );
       } catch {
-        setPlan("guest");
+        /* stay guest */
       }
     })();
   }, []);

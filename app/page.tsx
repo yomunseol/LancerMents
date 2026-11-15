@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import PricingGrid from "./components/PricingGrid";
 import TrustStrip from "./components/TrustStrip";
 import SiteFooter from "./components/SiteFooter";
+import FounderCta from "./components/FounderCta";
 import {
   DailyGridMockup,
   InvoiceMockup,
@@ -91,6 +92,7 @@ export default async function Home() {
             <p className="mt-6 text-sm font-semibold text-[#85587D] dark:text-[#D8A8D3]">
               {FOUNDER_NOTE.signature}
             </p>
+            <FounderCta />
           </div>
         </section>
       </main>

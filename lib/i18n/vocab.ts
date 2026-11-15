@@ -243,3 +243,7 @@ export const VOCAB13 = {
   best_for_solo: { en:"Best for solo freelancers", zh:"最适合独立自由职业者", es:"Ideal para freelancers independientes", fr:"Idéal pour les freelances solo", ar:"الأنسب للمستقلين الأفراد", pt:"Ideal para freelancers solo", ru:"Лучший выбор для соло-фрилансеров", de:"Ideal für Solo-Freelancer", ja:"ひとりフリーランスに最適", ko:"1인 프리랜서에게 최적", sw:"Bora kwa wafanyakazi huru", it:"Ideale per freelance singoli", he:"המתאים לפרילנסרים עצמאיים", af:"Beste vir solo-vryskutters", ga:"Is fearr do shaoririseoirí aonair" },
   start_free_beta: { en:"Start free in beta", zh:"免费开始公测", es:"Empieza gratis en la beta", fr:"Commencer gratuitement en bêta", ar:"ابدأ مجاناً في البيتا", pt:"Comece grátis no beta", ru:"Начать бесплатно в бете", de:"Kostenlos in der Beta starten", ja:"ベータで無料開始", ko:"베타에서 무료로 시작", sw:"Anza bure kwenye beta", it:"Inizia gratis in beta", he:"מתחילים בחינם בבטא", af:"Begin gratis in die beta", ga:"Tosaigh saor sa bhéite" },
 }
+
+export const VOCAB14 = {
+  cta_my_workspace: { en:"My Workspace →", zh:"我的工作区 →", es:"Mi espacio →", fr:"Mon espace →", ar:"مساحة عملي →", pt:"Meu espaço →", ru:"Моё пространство →", de:"Mein Workspace →", ja:"マイワークスペース →", ko:"내 워크스페이스 →", sw:"Nafasi yangu →", it:"Il mio spazio →", he:"סביבת העבודה שלי →", af:"My werkspas →", ga:"Mo spás →" },
+}
