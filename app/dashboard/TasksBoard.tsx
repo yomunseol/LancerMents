@@ -17,6 +17,7 @@ export type Task = {
   due_date: string | null;
   created_at: string;
   is_completed: boolean;
+  client_name?: string | null;
 };
 
 const TASK_COLUMNS = "id,workspace_id,title,due_date,created_at,is_completed";
@@ -35,7 +36,6 @@ function dueDay(due: string | null): string | null {
 function formatDue(due: string | null): string {
   const day = dueDay(due);
   if (!day) return "";
-  if (day === todayIso()) return "Today";
   const parsed = new Date(`${day}T00:00:00`);
   if (Number.isNaN(parsed.getTime())) return day;
   return parsed.toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -85,34 +85,45 @@ function TaskRow({
   onToggle: (task: Task) => void;
   onDelete: (task: Task) => void;
 }) {
+  const t = useTranslations();
   const completed = task.is_completed;
+  const isToday = dueDay(task.due_date) === todayIso();
+
   return (
-    <li className="group flex items-center rounded-xl border border-[#E2D8E0] bg-white px-5 py-4 transition-all duration-200 hover:-translate-y-px hover:border-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:hover:border-[#D8A8D3]">
+    <li className="group flex items-start gap-3 rounded-xl border border-[#27272a] bg-[#121214] px-4 py-3.5 transition-colors duration-200 hover:border-[#3f3f46]">
       <input
         id={`task-${task.id}`}
         type="checkbox"
         checked={completed}
         onChange={() => onToggle(task)}
-        className="mr-4 h-5 w-5 shrink-0 accent-[#85587D] focus:ring-2 focus:ring-[#85587D] dark:accent-[#D8A8D3] dark:focus:ring-[#D8A8D3]"
-      />
-      <label
-        htmlFor={`task-${task.id}`}
-        className={`flex-1 text-base leading-relaxed text-[#151115] dark:text-[#F8F4F7] ${
-          completed ? "line-through opacity-60" : ""
+        className={`mt-0.5 h-5 w-5 shrink-0 cursor-pointer appearance-none rounded border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500/30 ${
+          completed
+            ? "border-purple-500 bg-purple-500"
+            : "border-zinc-600 bg-transparent hover:border-zinc-500"
         }`}
-      >
-        {task.title}
+      />
+      <label htmlFor={`task-${task.id}`} className="min-w-0 flex-1 cursor-pointer">
+        <span
+          className={`block text-base leading-relaxed ${
+            completed ? "text-zinc-500 line-through" : "text-zinc-200"
+          }`}
+        >
+          {task.title}
+        </span>
+        {task.client_name && (
+          <span className="mt-0.5 block text-xs text-zinc-500">{task.client_name}</span>
+        )}
       </label>
       {task.due_date && (
-        <span className="ml-3 whitespace-nowrap rounded-full border border-[#E2D8E0] px-2.5 py-1 text-xs opacity-70 dark:border-[#4A2E46]">
-          {formatDue(task.due_date)}
+        <span className="ml-3 mt-0.5 whitespace-nowrap rounded-full border border-[#3f3f46] px-2.5 py-1 text-xs text-zinc-400">
+          {isToday ? t("dashboard.today") : formatDue(task.due_date)}
         </span>
       )}
       <button
         type="button"
         onClick={() => onDelete(task)}
         aria-label={`Delete ${task.title}`}
-        className="ml-3 shrink-0 text-[#151115]/60 opacity-0 transition-all duration-200 hover:text-red-400 focus:opacity-100 group-hover:opacity-100 dark:text-[#F8F4F7]/60"
+        className="ml-3 mt-0.5 shrink-0 text-zinc-500 opacity-0 transition-colors duration-200 hover:text-red-400 focus:opacity-100 group-hover:opacity-100"
       >
         <XIcon />
       </button>
@@ -131,7 +142,6 @@ export default function TasksBoard() {
   const [showCompleted, setShowCompleted] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDue, setNewDue] = useState<string | null>(null);
-  const [adding, setAdding] = useState(false);
 
   const workspaceId = ws?.id ?? "";
 
@@ -203,34 +213,57 @@ export default function TasksBoard() {
     }
   }
 
-  async function handleAdd() {
-    const title = newTitle.trim();
-    if (!title || !workspaceId) return;
+  async function createTask(title: string, due: string | null) {
+    if (!workspaceId) return;
+
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const optimistic: Task = {
+      id: tempId,
+      workspace_id: workspaceId,
+      title,
+      due_date: due,
+      created_at: new Date().toISOString(),
+      is_completed: false,
+    };
 
     setFb(null);
-    setAdding(true);
+    setTasks((current) => [...current, optimistic]);
 
     try {
       const { data, error: insertError } = await supabase
         .from("tasks")
-        .insert({ workspace_id: workspaceId, title, due_date: newDue })
+        .insert({ workspace_id: workspaceId, title, due_date: due })
         .select(TASK_COLUMNS)
         .single();
 
       if (insertError) throw insertError;
-      setTasks((current) => [...current, data as Task]);
-      setNewTitle("");
-      setNewDue(null);
+
+      setTasks((current) =>
+        current.map((item) => (item.id === tempId ? (data as Task) : item)),
+      );
       setFb({ kind: "success", label: t("saved") });
     } catch (insertError) {
+      setTasks((current) => current.filter((item) => item.id !== tempId));
       setFb({
         kind: "error",
         label: t("err_save"),
         raw: rawReason(insertError),
+        onRetry: () => {
+          void createTask(title, due);
+        },
       });
-    } finally {
-      setAdding(false);
     }
+  }
+
+  function handleAdd() {
+    const title = newTitle.trim();
+    if (!title || !workspaceId) return;
+
+    const due = newDue;
+    setNewTitle("");
+    setNewDue(null);
+    titleInputRef.current?.focus();
+    void createTask(title, due);
   }
 
   async function handleDelete(task: Task) {
@@ -276,13 +309,10 @@ export default function TasksBoard() {
 
   if (loadFailed && fb) {
     return (
-      <section className="mt-8">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
-            {t("daily_tasks")}
-          </h2>
-        </div>
-
+      <section className="mt-8 rounded-2xl border border-[#27272a] bg-[#09090b] p-4 text-zinc-100 sm:p-6">
+        <h2 className="text-lg font-semibold text-zinc-100">
+          {t("dashboard.daily_tasks")}
+        </h2>
         <div className="mt-8">
           <FeedbackBanner
             kind={fb.kind}
@@ -296,15 +326,15 @@ export default function TasksBoard() {
   }
 
   return (
-    <section className="mt-8">
+    <section className="mt-8 rounded-2xl border border-[#27272a] bg-[#09090b] p-4 text-zinc-100 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
-          {t("daily_tasks")}
+        <h2 className="text-lg font-semibold text-zinc-100">
+          {t("dashboard.daily_tasks")}
         </h2>
       </div>
 
       {fb && (
-        <div className="mt-6">
+        <div className="fixed bottom-4 right-4 z-50 w-[min(22rem,calc(100vw-2rem))]">
           <FeedbackBanner
             kind={fb.kind}
             label={fb.label}
@@ -315,23 +345,25 @@ export default function TasksBoard() {
       )}
 
       {busy ? (
-        <p className="py-6 text-sm opacity-50">Loading tasks…</p>
+        <p className="py-6 text-sm text-zinc-500">{t("loading")}</p>
       ) : (
         <div className="mt-6 space-y-8">
           <section>
-            <h3 className="text-xs uppercase tracking-widest opacity-60">{t("today")}</h3>
+            <h3 className="text-xs uppercase tracking-widest text-zinc-500">
+              {t("dashboard.today")}
+            </h3>
             {todayTasks.length > 0 ? (
               <ul className="mt-3 space-y-3">{todayTasks.map(rowFor)}</ul>
             ) : (
-              <p className="py-6 text-sm opacity-50">
-                {t("empty_today")}
+              <p className="py-6 text-sm text-zinc-500">
+                {t("dashboard.empty_today")}
               </p>
             )}
           </section>
 
           {scheduled.length > 0 && (
             <section>
-              <h3 className="text-xs uppercase tracking-widest opacity-60">
+              <h3 className="text-xs uppercase tracking-widest text-zinc-500">
                 {t("scheduled")}
               </h3>
               <ul className="mt-3 space-y-3">{scheduled.map(rowFor)}</ul>
@@ -344,9 +376,9 @@ export default function TasksBoard() {
                 type="button"
                 onClick={() => setShowCompleted((open) => !open)}
                 aria-expanded={showCompleted}
-                className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-60 transition-all duration-200"
+                className="flex items-center gap-2 text-xs uppercase tracking-widest text-zinc-500 transition-colors duration-200 hover:text-zinc-300"
               >
-                {t("completed")} ({completed.length})
+                {t("dashboard.completed")} ({completed.length})
                 <ChevronIcon open={showCompleted} />
               </button>
               {showCompleted && (
@@ -361,9 +393,8 @@ export default function TasksBoard() {
         <button
           type="button"
           onClick={handleAdd}
-          disabled={adding}
           aria-label={t("add_task_aria")}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#E2D8E0] text-[#151115] transition-all duration-200 hover:border-[#85587D] disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#4A2E46] dark:text-[#F8F4F7] dark:hover:border-[#D8A8D3]"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-500 text-white transition-colors duration-200 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
         >
           <PlusIcon />
         </button>
@@ -374,19 +405,18 @@ export default function TasksBoard() {
           onKeyDown={(event) => {
             if (event.key === "Enter") handleAdd();
           }}
-          placeholder={t("add_task")}
-          className="min-w-0 flex-1 rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] disabled:opacity-50 dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]"
+          placeholder={t("dashboard.add_task_placeholder")}
+          className="min-w-0 flex-1 rounded-lg border border-[#27272a] bg-[#18181b] px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 transition-colors duration-200 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/20"
         />
         <div className="w-full sm:w-44">
           <DatePicker
             value={newDue}
             onChange={setNewDue}
-            placeholder={t("due_date")}
+            placeholder={t("dashboard.due_date")}
             onPick={() => titleInputRef.current?.focus()}
           />
         </div>
       </div>
-
     </section>
   );
 }

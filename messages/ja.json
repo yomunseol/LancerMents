@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "ダッシュボード",
+  "dashboard": {
+    "daily_tasks": "本日のタスク",
+    "today": "今日",
+    "completed": "完了",
+    "add_task_placeholder": "タスクを追加…",
+    "due_date": "締切日",
+    "empty_today": "本日の締切なし。グリッドは空です。"
+  },
   "tasks": "タスク",
   "calendar": "カレンダー",
   "tier": {

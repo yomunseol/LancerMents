@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "Dashboard",
+  "dashboard": {
+    "daily_tasks": "Attività di oggi",
+    "today": "Oggi",
+    "completed": "Completate",
+    "add_task_placeholder": "Aggiungi un'attività…",
+    "due_date": "Scadenza",
+    "empty_today": "Niente per oggi. Il grid è libero."
+  },
   "tasks": "Attività",
   "calendar": "Calendario",
   "tier": {

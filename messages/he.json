@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "לוח בקרה",
+  "dashboard": {
+    "daily_tasks": "משימות יומיות",
+    "today": "היום",
+    "completed": "הושלם",
+    "add_task_placeholder": "הוסף משימה…",
+    "due_date": "תאריך יעד",
+    "empty_today": "שום דבר להיום. הרשת פנויה."
+  },
   "tasks": "משימות",
   "calendar": "לוח שנה",
   "tier": {

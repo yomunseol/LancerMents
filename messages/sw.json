@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "Dashibodi",
+  "dashboard": {
+    "daily_tasks": "Kazi za leo",
+    "today": "Leo",
+    "completed": "Imekamilika",
+    "add_task_placeholder": "Ongeza kazi…",
+    "due_date": "Tarehe ya mwisho",
+    "empty_today": "Hakuna kazi leo. Gridi iko wazi."
+  },
   "tasks": "Kazi",
   "calendar": "Kalenda",
   "tier": {

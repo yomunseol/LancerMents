@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "Panel",
+  "dashboard": {
+    "daily_tasks": "Tareas diarias",
+    "today": "Hoy",
+    "completed": "Completadas",
+    "add_task_placeholder": "Añadir tarea…",
+    "due_date": "Fecha límite",
+    "empty_today": "Nada para hoy. El grid está libre."
+  },
   "tasks": "Tareas",
   "calendar": "Calendario",
   "tier": {

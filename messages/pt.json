@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "Painel",
+  "dashboard": {
+    "daily_tasks": "Tarefas diárias",
+    "today": "Hoje",
+    "completed": "Concluídas",
+    "add_task_placeholder": "Adicionar tarefa…",
+    "due_date": "Data de vencimento",
+    "empty_today": "Nada para hoje. A grade está livre."
+  },
   "tasks": "Tarefas",
   "calendar": "Calendário",
   "tier": {

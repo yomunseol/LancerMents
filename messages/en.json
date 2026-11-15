@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "Dashboard",
+  "dashboard": {
+    "daily_tasks": "Daily tasks",
+    "today": "Today",
+    "completed": "Completed",
+    "add_task_placeholder": "Add a task…",
+    "due_date": "Due date",
+    "empty_today": "Nothing due today. The grid is clear."
+  },
   "tasks": "Tasks",
   "calendar": "Calendar",
   "tier": {

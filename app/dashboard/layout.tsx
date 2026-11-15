@@ -97,7 +97,7 @@ function Sidebar() {
               }`}
             >
               <NavIconSvg icon={item.icon} />
-              <span className="flex-1 truncate">{t(item.key)}</span>
+              <span className="flex-1 truncate">{t(`nav.${item.key}`)}</span>
               {locked && <LockIcon />}
             </Link>
           );

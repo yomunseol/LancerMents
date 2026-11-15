@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "Übersicht",
+  "dashboard": {
+    "daily_tasks": "Tagesaufgaben",
+    "today": "Heute",
+    "completed": "Erledigt",
+    "add_task_placeholder": "Aufgabe hinzufügen…",
+    "due_date": "Fällig am",
+    "empty_today": "Nichts für heute. Das Raster ist frei."
+  },
   "tasks": "Aufgaben",
   "calendar": "Kalender",
   "tier": {

@@ -273,7 +273,7 @@ export default function GlobalNav() {
               href="/dashboard"
               className="hidden rounded-lg border border-[#E2D8E0] px-4 py-2 text-sm font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg sm:inline-block dark:border-[#4A2E46] dark:text-[#F8F4F7]"
             >
-              {t("dashboard")}
+              {t("nav.dashboard")}
             </Link>
             <Link
               href="/dashboard/profile"

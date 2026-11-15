@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "Панель",
+  "dashboard": {
+    "daily_tasks": "Задачи на день",
+    "today": "Сегодня",
+    "completed": "Выполнено",
+    "add_task_placeholder": "Добавить задачу…",
+    "due_date": "Срок",
+    "empty_today": "На сегодня ничего. Сетка свободна."
+  },
   "tasks": "Задачи",
   "calendar": "Календарь",
   "tier": {

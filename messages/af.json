@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "Kontrolepaneel",
+  "dashboard": {
+    "daily_tasks": "Daaglikse take",
+    "today": "Vandag",
+    "completed": "Voltooi",
+    "add_task_placeholder": "Voeg 'n taak by…",
+    "due_date": "Verskyningsdatum",
+    "empty_today": "Niks vir vandag nie. Die rooster is oop."
+  },
   "tasks": "Take",
   "calendar": "Kalender",
   "tier": {

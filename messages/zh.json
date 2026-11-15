@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "仪表盘",
+  "dashboard": {
+    "daily_tasks": "每日任务",
+    "today": "今天",
+    "completed": "已完成",
+    "add_task_placeholder": "添加任务…",
+    "due_date": "截止日期",
+    "empty_today": "今天没有截止任务。网格是清的。"
+  },
   "tasks": "任务",
   "calendar": "日历",
   "tier": {

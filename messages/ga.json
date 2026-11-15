@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "Painéal",
+  "dashboard": {
+    "daily_tasks": "Tascanna laethúla",
+    "today": "Inniu",
+    "completed": "Críochnaithe",
+    "add_task_placeholder": "Cuir tasc leis…",
+    "due_date": "Spriocdháta",
+    "empty_today": "Faic inniu. Tá an ghreille glan."
+  },
   "tasks": "Tascanna",
   "calendar": "Féilire",
   "tier": {

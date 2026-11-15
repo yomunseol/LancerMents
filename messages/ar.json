@@ -23,7 +23,14 @@
     "security": "Security",
     "settings": "Settings"
   },
-  "dashboard": "لوحة التحكم",
+  "dashboard": {
+    "daily_tasks": "مهام اليوم",
+    "today": "اليوم",
+    "completed": "مكتملة",
+    "add_task_placeholder": "أضف مهمة…",
+    "due_date": "تاريخ الاستحقاق",
+    "empty_today": "لا مهام اليوم. الشبكة فارغة."
+  },
   "tasks": "المهام",
   "calendar": "التقويم",
   "tier": {
