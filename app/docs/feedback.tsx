@@ -43,7 +43,7 @@ export default function Feedback({ page }: { page: string }) {
     <section className="mt-12 rounded-xl border border-[#E2D8E0] bg-white p-5 dark:border-[#4A2E46] dark:bg-[#221C21]">
       {done ? (
         <p className="text-sm font-medium text-green-600 dark:text-green-400">
-          Thanks — feedback recorded.
+          {t("feedback_recorded")}
         </p>
       ) : (
         <>

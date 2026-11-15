@@ -28,7 +28,7 @@
   "calendar": "Calendrier",
   "tier": {
     "headline": "This lives in {tier}",
-    "cta": "Switch plan — free during Beta"
+    "cta": "Switch plan (free during Beta)"
   },
   "notes": "Notes",
   "clients": "Clients",
@@ -130,11 +130,11 @@
   "sure": "Sûr ?",
   "docs": "Documentation",
   "create": "Créer",
-  "address_optional": "Adresse (optionnel — active la carte Studio)",
+  "address_optional": "Adresse (optionnel, active la carte Studio)",
   "err_add_client": "Impossible d'ajouter le client.",
   "err_load": "Impossible de charger les données.",
   "err_save": "Impossible d'enregistrer les modifications.",
-  "gate_body": "Cette partie de l'espace est incluse dans un plan supérieur. Tout est gratuit pendant la Beta — choisissez un plan pour débloquer.",
+  "gate_body": "Cette partie de l'espace est incluse dans un plan supérieur. Tout est gratuit pendant la Beta. Choisissez un plan pour débloquer.",
   "retry": "Réessayer",
   "saved": "Enregistré",
   "coming_soon": "Bientôt disponible",
@@ -190,7 +190,7 @@
   "hero_badge": "Pensé pour les freelances",
   "hero_line1": "Vos factures, plus vite.",
   "hero_line2": "Vos projets, sous contrôle.",
-  "hero_cta": "Commencer gratuitement — sans carte",
+  "hero_cta": "Commencer gratuitement (sans carte)",
   "landing_alt_1": "Grille de tâches LancerMents avec le travail du jour, les échéances planifiées et les tâches terminées",
   "landing_alt_2": "Liste de factures LancerMents avec les statuts brouillon, envoyée, payée et en retard",
   "landing_alt_3": "Liste de clients LancerMents avec filtres de statut, coordonnées et panneau des projets liés",
@@ -198,7 +198,7 @@
   "signup_sub": "Commencez gratuitement pendant la Bêta. Sans carte bancaire.",
   "unknown_location": "Lieu inconnu",
   "geocoding": "Recherche de l'adresse...",
-  "address_not_found": "Adresse introuvable — enregistré sans carte.",
+  "address_not_found": "Adresse introuvable. Enregistré sans carte.",
   "err_name_required": "Le nom est requis.",
   "err_email_invalid": "Saisissez une adresse e-mail valide.",
   "client_detail_title": "Détails du client",
@@ -224,5 +224,6 @@
   "trust_stripe": "Stripe traitera les paiements par carte. Nous ne stockons jamais les données de carte.",
   "trust_founder": "Support direct du fondateur et développement transparent.",
   "footer_privacy": "Politique de confidentialité",
-  "footer_terms": "Conditions d'utilisation"
+  "footer_terms": "Conditions d'utilisation",
+  "feedback_recorded": "Merci. Avis enregistré."
 }

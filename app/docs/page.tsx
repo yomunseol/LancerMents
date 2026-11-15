@@ -60,7 +60,7 @@ export default async function DocsIndexPage() {
             <h2 className="text-2xl font-bold tracking-tight text-[#151115] dark:text-[#F8F4F7]">
               {section.title}
             </h2>
-            <p className="mt-1 text-xs font-semibold uppercase tracking-widest opacity-50">
+            <p className="mt-1 text-xs font-semibold tracking-widest opacity-50">
               {section.updated}
             </p>
             {section.paragraphs.map((paragraph) => (

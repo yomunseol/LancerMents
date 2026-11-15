@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 const BORDER = "border-[#E2D8E0] dark:border-[#4A2E46]";
 const CARD = `rounded-2xl border bg-white shadow-xl dark:bg-[#221C21] ${BORDER}`;
-const LABEL = "text-[11px] uppercase tracking-widest opacity-60";
+const LABEL = "text-[11px] tracking-widest opacity-60";
 
 const TEXT = {
   gridAria:
@@ -221,7 +221,7 @@ export function InvoiceMockup() {
           <p className="text-xs opacity-60">{TEXT.invoiceNumber}</p>
         </div>
         <div className="text-right">
-          <span className="inline-block rounded-full border border-[#85587D]/40 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-widest text-[#85587D] dark:border-[#D8A8D3]/40 dark:text-[#D8A8D3]">
+          <span className="inline-block rounded-full border border-[#85587D]/40 px-2.5 py-1 text-[11px] font-semibold tracking-widest text-[#85587D] dark:border-[#D8A8D3]/40 dark:text-[#D8A8D3]">
             {TEXT.invoiceStatus}
           </span>
           <p className="mt-1 text-xs opacity-60">{TEXT.invoiceDue}</p>
@@ -266,7 +266,7 @@ export function ClientCardMockup() {
             </h3>
           </div>
         </div>
-        <span className="rounded-full border border-[#85587D]/40 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-widest text-[#85587D] dark:border-[#D8A8D3]/40 dark:text-[#D8A8D3]">
+        <span className="rounded-full border border-[#85587D]/40 px-2.5 py-1 text-[11px] font-semibold tracking-widest text-[#85587D] dark:border-[#D8A8D3]/40 dark:text-[#D8A8D3]">
           {TEXT.clientStatus}
         </span>
       </div>
@@ -304,7 +304,7 @@ export function ClientCardMockup() {
               <span className="min-w-0 flex-1 truncate text-sm text-[#151115] dark:text-[#F8F4F7]">
                 {step.label}
               </span>
-              <span className="text-[11px] uppercase tracking-widest opacity-50">
+              <span className="text-[11px] tracking-widest opacity-50">
                 {step.state}
               </span>
             </li>

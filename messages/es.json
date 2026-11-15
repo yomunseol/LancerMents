@@ -28,7 +28,7 @@
   "calendar": "Calendario",
   "tier": {
     "headline": "This lives in {tier}",
-    "cta": "Switch plan — free during Beta"
+    "cta": "Switch plan (free during Beta)"
   },
   "notes": "Notas",
   "clients": "Clientes",
@@ -190,7 +190,7 @@
   "hero_badge": "Hecho para freelancers",
   "hero_line1": "Factura más rápido.",
   "hero_line2": "Controla cada proyecto.",
-  "hero_cta": "Empieza gratis — sin tarjeta",
+  "hero_cta": "Empieza gratis (sin tarjeta)",
   "landing_alt_1": "Cuadrícula de tareas de LancerMents con lo de hoy, los vencimientos programados y lo completado",
   "landing_alt_2": "Lista de facturas de LancerMents con estados de borrador, enviada, pagada y vencida",
   "landing_alt_3": "Lista de clientes de LancerMents con filtros de estado, datos de contacto y panel de proyectos vinculados",
@@ -224,5 +224,6 @@
   "trust_stripe": "Stripe gestionará los pagos con tarjeta. Nunca guardamos datos de tarjeta.",
   "trust_founder": "Soporte directo del fundador y desarrollo transparente.",
   "footer_privacy": "Política de privacidad",
-  "footer_terms": "Términos de uso"
+  "footer_terms": "Términos de uso",
+  "feedback_recorded": "Gracias. Comentario registrado."
 }

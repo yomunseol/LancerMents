@@ -28,7 +28,7 @@
   "calendar": "日历",
   "tier": {
     "headline": "This lives in {tier}",
-    "cta": "Switch plan — free during Beta"
+    "cta": "Switch plan (free during Beta)"
   },
   "notes": "笔记",
   "clients": "客户",
@@ -130,11 +130,11 @@
   "sure": "确定？",
   "docs": "文档",
   "create": "创建",
-  "address_optional": "地址(可选——用于 Studio 地图)",
+  "address_optional": "地址(可选、用于 Studio 地图)",
   "err_add_client": "无法添加客户。",
   "err_load": "无法加载数据。",
   "err_save": "无法保存更改。",
-  "gate_body": "此功能包含在更高级的计划中。Beta 期间一切免费——选择计划即可解锁。",
+  "gate_body": "此功能包含在更高级的计划中。Beta 期间一切免费。选择计划即可解锁。",
   "retry": "重试",
   "saved": "已保存",
   "coming_soon": "即将推出",
@@ -190,7 +190,7 @@
   "hero_badge": "为独立自由职业者打造",
   "hero_line1": "发票开得快，",
   "hero_line2": "项目不落下。",
-  "hero_cta": "免费开始 — 无需银行卡",
+  "hero_cta": "免费开始（无需银行卡）",
   "landing_alt_1": "LancerMents 任务网格，显示今日任务、已安排截止日期和已完成工作",
   "landing_alt_2": "LancerMents 发票列表，显示草稿、已发送、已付款和逾期状态",
   "landing_alt_3": "LancerMents 客户列表，带状态筛选、联系方式与关联项目面板",
@@ -198,7 +198,7 @@
   "signup_sub": "Beta 期间免费开始，无需银行卡。",
   "unknown_location": "未知位置",
   "geocoding": "正在查找地址...",
-  "address_not_found": "未找到地址——已保存但无地图。",
+  "address_not_found": "未找到地址。已保存但无地图。",
   "err_name_required": "名称为必填项。",
   "err_email_invalid": "请输入有效的邮箱地址。",
   "client_detail_title": "客户详情",
@@ -224,5 +224,6 @@
   "trust_stripe": "付费后由 Stripe 处理银行卡支付，我们不保存原始卡号。",
   "trust_founder": "创始人直接支持，开发过程透明。",
   "footer_privacy": "隐私政策",
-  "footer_terms": "使用条款"
+  "footer_terms": "使用条款",
+  "feedback_recorded": "谢谢，已记录你的反馈。"
 }

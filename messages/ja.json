@@ -28,7 +28,7 @@
   "calendar": "カレンダー",
   "tier": {
     "headline": "This lives in {tier}",
-    "cta": "Switch plan — free during Beta"
+    "cta": "Switch plan (free during Beta)"
   },
   "notes": "メモ",
   "clients": "クライアント",
@@ -130,11 +130,11 @@
   "sure": "よろしいですか？",
   "docs": "ドキュメント",
   "create": "作成",
-  "address_optional": "住所(任意—Studioマップ用)",
+  "address_optional": "住所(任意、Studioマップ用)",
   "err_add_client": "クライアントを追加できませんでした。",
   "err_load": "データを読み込めませんでした。",
   "err_save": "変更を保存できませんでした。",
-  "gate_body": "この機能は上位プランに含まれます。ベータ中はすべて無料——プランを選択で解放。",
+  "gate_body": "この機能は上位プランに含まれます。ベータ中はすべて無料。プランを選択で解放。",
   "retry": "再試行",
   "saved": "保存しました",
   "coming_soon": "近日公開",
@@ -190,7 +190,7 @@
   "hero_badge": "ひとりフリーランスのための",
   "hero_line1": "請求書はすばやく、",
   "hero_line2": "案件はひと目で。",
-  "hero_cta": "無料で始める — カード不要",
+  "hero_cta": "無料で始める（カード不要）",
   "landing_alt_1": "今日のタスク、予定された締切、完了した作業が並ぶLancerMentsのタスクグリッド",
   "landing_alt_2": "下書き・送信済み・支払済み・期限超過の状態が並ぶLancerMentsの請求書一覧",
   "landing_alt_3": "ステータス絞り込み、連絡先、関連プロジェクトが並ぶLancerMentsのクライアント一覧",
@@ -198,7 +198,7 @@
   "signup_sub": "ベータ期間中は無料で開始。カード不要。",
   "unknown_location": "不明な場所",
   "geocoding": "住所を検索中...",
-  "address_not_found": "住所が見つかりません—マップなしで保存。",
+  "address_not_found": "住所が見つかりません。マップなしで保存。",
   "err_name_required": "名前は必須です。",
   "err_email_invalid": "有効なメールアドレスを入力してください。",
   "client_detail_title": "クライアントの詳細",
@@ -224,5 +224,6 @@
   "trust_stripe": "カード決済はStripeが処理します。カード情報そのものは保存しません。",
   "trust_founder": "創業者による直接サポートと透明な開発。",
   "footer_privacy": "プライバシーポリシー",
-  "footer_terms": "利用規約"
+  "footer_terms": "利用規約",
+  "feedback_recorded": "ありがとうございます。フィードバックを記録しました。"
 }

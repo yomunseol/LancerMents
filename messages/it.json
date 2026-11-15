@@ -28,7 +28,7 @@
   "calendar": "Calendario",
   "tier": {
     "headline": "This lives in {tier}",
-    "cta": "Switch plan — free during Beta"
+    "cta": "Switch plan (free during Beta)"
   },
   "notes": "Note",
   "clients": "Clienti",
@@ -130,11 +130,11 @@
   "sure": "Sicuro?",
   "docs": "Documentazione",
   "create": "Crea",
-  "address_optional": "Indirizzo (opzionale — attiva la mappa Studio)",
+  "address_optional": "Indirizzo (opzionale, attiva la mappa Studio)",
   "err_add_client": "Impossibile aggiungere il cliente.",
   "err_load": "Impossibile caricare i dati.",
   "err_save": "Impossibile salvare le modifiche.",
-  "gate_body": "Questa parte dello spazio è inclusa in un piano superiore. Tutto è gratis durante la Beta — scegli un piano per sbloccarla.",
+  "gate_body": "Questa parte dello spazio è inclusa in un piano superiore. Tutto è gratis durante la Beta. Scegli un piano per sbloccarla.",
   "retry": "Riprova",
   "saved": "Salvato",
   "coming_soon": "Prossimamente",
@@ -190,7 +190,7 @@
   "hero_badge": "Pensato per i freelance",
   "hero_line1": "Fatture più veloci.",
   "hero_line2": "Progetti sotto controllo.",
-  "hero_cta": "Inizia gratis — senza carta",
+  "hero_cta": "Inizia gratis (senza carta)",
   "landing_alt_1": "Griglia attività di LancerMents con lavoro di oggi, scadenze pianificate e attività completate",
   "landing_alt_2": "Elenco fatture di LancerMents con stati bozza, inviata, pagata e scaduta",
   "landing_alt_3": "Elenco clienti di LancerMents con filtri di stato, recapiti e pannello progetti collegati",
@@ -198,7 +198,7 @@
   "signup_sub": "Inizia gratis durante la Beta. Nessuna carta richiesta.",
   "unknown_location": "Posizione sconosciuta",
   "geocoding": "Ricerca indirizzo...",
-  "address_not_found": "Indirizzo non trovato — salvato senza mappa.",
+  "address_not_found": "Indirizzo non trovato. Salvato senza mappa.",
   "err_name_required": "Il nome è obbligatorio.",
   "err_email_invalid": "Inserisci un indirizzo email valido.",
   "client_detail_title": "Dettagli cliente",
@@ -224,5 +224,6 @@
   "trust_stripe": "Stripe gestirà i pagamenti con carta. Non conserviamo i dati grezzi della carta.",
   "trust_founder": "Supporto diretto del fondatore e sviluppo trasparente.",
   "footer_privacy": "Informativa sulla privacy",
-  "footer_terms": "Termini di utilizzo"
+  "footer_terms": "Termini di utilizzo",
+  "feedback_recorded": "Grazie. Feedback registrato."
 }

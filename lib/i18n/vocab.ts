@@ -234,3 +234,7 @@ export const VOCAB11 = {
   footer_privacy: { en:"Privacy Policy", zh:"隐私政策", es:"Política de privacidad", fr:"Politique de confidentialité", ar:"سياسة الخصوصية", pt:"Política de privacidade", ru:"Политика конфиденциальности", de:"Datenschutz", ja:"プライバシーポリシー", ko:"개인정보 처리방침", sw:"Sera ya faragha", it:"Informativa sulla privacy", he:"מדיניות פרטיות", af:"Privaatheidsbeleid", ga:"Polasaí Príobháideachta" },
   footer_terms: { en:"Terms of Use", zh:"使用条款", es:"Términos de uso", fr:"Conditions d'utilisation", ar:"شروط الاستخدام", pt:"Termos de uso", ru:"Условия использования", de:"Nutzungsbedingungen", ja:"利用規約", ko:"이용약관", sw:"Masharti ya matumizi", it:"Termini di utilizzo", he:"תנאי שימוש", af:"Gebruiksvoorwaardes", ga:"Téarmaí Úsáide" },
 }
+
+export const VOCAB12 = {
+  feedback_recorded: { en:"Thanks. Feedback recorded.", zh:"谢谢，已记录你的反馈。", es:"Gracias. Comentario registrado.", fr:"Merci. Avis enregistré.", ar:"شكراً. تم تسجيل ملاحظاتك.", pt:"Obrigado. Feedback registrado.", ru:"Спасибо. Отзыв сохранён.", de:"Danke. Feedback gespeichert.", ja:"ありがとうございます。フィードバックを記録しました。", ko:"감사합니다. 피드백이 기록되었습니다.", sw:"Asante. Maoni yamehifadhiwa.", it:"Grazie. Feedback registrato.", he:"תודה. המשוב נרשם.", af:"Dankie. Terugvoer gestoor.", ga:"Go raibh maith agat. Taifeadadh an aiseolas." },
+}

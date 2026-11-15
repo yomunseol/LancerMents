@@ -15,9 +15,9 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-[#F8F4F7] text-[#151115] transition-colors duration-300 dark:bg-[#151115] dark:text-[#F8F4F7]">
       <main className="mx-auto max-w-6xl px-4 md:px-8 lg:px-12">
-        <section className="flex flex-col items-center gap-12 py-24 lg:flex-row">
+        <section className="flex flex-col items-center gap-12 pb-24 pt-32 lg:flex-row">
           <div className="w-full lg:w-1/2">
-            <span className="inline-block rounded-full border border-[#E2D8E0] px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#85587D] dark:border-[#4A2E46] dark:text-[#D8A8D3]">
+            <span className="inline-block rounded-full border border-[#E2D8E0] px-3 py-1 text-xs font-bold tracking-widest text-[#85587D] dark:border-[#4A2E46] dark:text-[#D8A8D3]">
               {t("hero_badge")}
             </span>
             <h1 className="mt-6 break-words text-4xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl">

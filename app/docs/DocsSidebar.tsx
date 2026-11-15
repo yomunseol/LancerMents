@@ -124,7 +124,7 @@ export default function DocsSidebar({ docs }: { docs: DocMeta[] }) {
                   onClick={() =>
                     setOpenCategory(collapsed ? category : openCategory === category ? null : category)
                   }
-                  className="w-full text-left text-xs font-semibold uppercase tracking-widest opacity-60 transition-opacity duration-200 hover:opacity-100"
+                  className="w-full text-left text-xs font-semibold tracking-widest opacity-60 transition-opacity duration-200 hover:opacity-100"
                 >
                   {CATEGORY_LABELS[category] ?? category}
                 </button>

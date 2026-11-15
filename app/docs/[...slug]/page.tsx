@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!doc) return {};
 
   return {
-    title: `${doc.meta.title} — LancerMents Docs`,
+    title: `${doc.meta.title} | LancerMents Docs`,
     description: doc.meta.description,
     openGraph: { title: doc.meta.title, description: doc.meta.description },
   };

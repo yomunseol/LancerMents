@@ -28,7 +28,7 @@
   "calendar": "Calendário",
   "tier": {
     "headline": "This lives in {tier}",
-    "cta": "Switch plan — free during Beta"
+    "cta": "Switch plan (free during Beta)"
   },
   "notes": "Notas",
   "clients": "Clientes",
@@ -130,11 +130,11 @@
   "sure": "Tem certeza?",
   "docs": "Documentação",
   "create": "Criar",
-  "address_optional": "Endereço (opcional — ativa o mapa do Studio)",
+  "address_optional": "Endereço (opcional, ativa o mapa do Studio)",
   "err_add_client": "Não foi possível adicionar o cliente.",
   "err_load": "Não foi possível carregar os dados.",
   "err_save": "Não foi possível salvar as alterações.",
-  "gate_body": "Esta parte do espaço está incluída em um plano superior. Tudo é grátis durante o Beta — escolha um plano para desbloquear.",
+  "gate_body": "Esta parte do espaço está incluída em um plano superior. Tudo é grátis durante o Beta. Escolha um plano para desbloquear.",
   "retry": "Tentar novamente",
   "saved": "Salvo",
   "coming_soon": "Em breve",
@@ -190,7 +190,7 @@
   "hero_badge": "Feito para freelancers",
   "hero_line1": "Fature mais rápido.",
   "hero_line2": "Acompanhe cada projeto.",
-  "hero_cta": "Comece grátis — sem cartão",
+  "hero_cta": "Comece grátis (sem cartão)",
   "landing_alt_1": "Grade de tarefas do LancerMents com as tarefas de hoje, prazos agendados e trabalho concluído",
   "landing_alt_2": "Lista de faturas do LancerMents com status de rascunho, enviada, paga e atrasada",
   "landing_alt_3": "Lista de clientes do LancerMents com filtros de status, contatos e painel de projetos vinculados",
@@ -198,13 +198,13 @@
   "signup_sub": "Comece grátis durante o Beta. Sem cartão.",
   "unknown_location": "Local desconhecido",
   "geocoding": "Buscando endereço...",
-  "address_not_found": "Endereço não encontrado — salvo sem mapa.",
+  "address_not_found": "Endereço não encontrado. Salvo sem mapa.",
   "err_name_required": "O nome é obrigatório.",
   "err_email_invalid": "Insira um endereço de e-mail válido.",
   "client_detail_title": "Detalhes do cliente",
   "client_detail_locating": "Localizando o endereço...",
   "client_detail_no_location": "Sem dados de localização",
-  "hero_sub": "Um espaço para suas tarefas, clientes e faturas — sem refazer planilhas nem correr atrás de pagamentos atrasados.",
+  "hero_sub": "Um espaço para suas tarefas, clientes e faturas, sem refazer planilhas nem correr atrás de pagamentos atrasados.",
   "feature_invoicing_title": "Fature sem planilhas",
   "feature_invoicing_body": "Defina um valor por hora ou um preço fixo, envie a fatura e veja numa só lista o que está pago, enviado ou atrasado. O vencimento deixa o atraso visível antes de virar constrangimento.",
   "feature_tasks_title": "Saiba o que vem e para quem",
@@ -224,5 +224,6 @@
   "trust_stripe": "A Stripe processará os pagamentos com cartão. Nunca guardamos dados brutos do cartão.",
   "trust_founder": "Suporte direto do fundador e desenvolvimento transparente.",
   "footer_privacy": "Política de privacidade",
-  "footer_terms": "Termos de uso"
+  "footer_terms": "Termos de uso",
+  "feedback_recorded": "Obrigado. Feedback registrado."
 }
