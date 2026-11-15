@@ -104,10 +104,22 @@ function Sidebar() {
         })}
       </nav>
 
+      <Link
+        href="/onboarding"
+        className="mt-4 block rounded-lg border border-[#E2D8E0] bg-[#F8F4F7] p-3 transition-all duration-200 hover:border-[#85587D] dark:border-[#4A2E46] dark:bg-[#151115] dark:hover:border-[#D8A8D3]"
+      >
+        <span className="block text-xs font-semibold text-[#151115] dark:text-[#F8F4F7]">
+          {t("upgrade")}
+        </span>
+        <span className="mt-1 block text-[11px] leading-4 text-[#151115]/60 dark:text-[#F8F4F7]/60">
+          {t("plan_sub")}
+        </span>
+      </Link>
+
       <button
         type="button"
         onClick={handleLogout}
-        className="mt-4 w-full rounded-lg border border-[#E2D8E0] px-4 py-2.5 text-sm font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
+        className="mt-2 w-full rounded-lg border border-[#E2D8E0] px-4 py-2.5 text-sm font-semibold text-[#151115] transition-all duration-200 hover:shadow-lg dark:border-[#4A2E46] dark:text-[#F8F4F7]"
       >
         {t("logout")}
       </button>

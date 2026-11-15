@@ -79,10 +79,12 @@ export default function DatePicker({
   value,
   onChange,
   placeholder,
+  onPick,
 }: {
   value: string | null;
   onChange: (value: string | null) => void;
   placeholder?: string;
+  onPick?: () => void;
 }) {
   const t = useTranslations();
   const placeholderText = placeholder ?? t("select_date");
@@ -198,6 +200,7 @@ export default function DatePicker({
                   onClick={() => {
                     onChange(cell);
                     setOpen(false);
+                    onPick?.();
                   }}
                   className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm transition-all duration-200 ${
                     isSelected
@@ -217,6 +220,7 @@ export default function DatePicker({
               onClick={() => {
                 onChange(null);
                 setOpen(false);
+                onPick?.();
               }}
               className="rounded-lg px-3 py-1.5 text-sm font-medium text-[#151115]/70 transition-all duration-200 hover:bg-[#85587D]/10 dark:text-[#F8F4F7]/70 dark:hover:bg-[#D8A8D3]/10"
             >
@@ -227,6 +231,7 @@ export default function DatePicker({
               onClick={() => {
                 onChange(today);
                 setOpen(false);
+                onPick?.();
               }}
               className="rounded-lg px-3 py-1.5 text-sm font-semibold text-[#85587D] transition-all duration-200 hover:bg-[#85587D]/10 dark:text-[#D8A8D3] dark:hover:bg-[#D8A8D3]/10"
             >

@@ -274,7 +274,7 @@ export function ClientCardMockup() {
       <dl className="flex flex-col gap-2 px-5 py-4 text-sm">
         <div className="flex items-center justify-between gap-3">
           <dt className={LABEL}>{TEXT.clientEmailLabel}</dt>
-          <dd className="truncate text-[#151115] dark:text-[#F8F4F7]">{TEXT.clientEmail}</dd>
+          <dd className="break-all text-right text-[#151115] dark:text-[#F8F4F7]">{TEXT.clientEmail}</dd>
         </div>
         <div className="flex items-center justify-between gap-3">
           <dt className={LABEL}>{TEXT.clientAddressLabel}</dt>

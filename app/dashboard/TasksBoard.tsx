@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import FeedbackBanner, {
@@ -123,6 +123,7 @@ function TaskRow({
 export default function TasksBoard() {
   const t = useTranslations();
   const ws = useWorkspaceGate();
+  const titleInputRef = useRef<HTMLInputElement>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [fb, setFb] = useState<FeedbackState>(null);
@@ -367,6 +368,7 @@ export default function TasksBoard() {
           <PlusIcon />
         </button>
         <input
+          ref={titleInputRef}
           value={newTitle}
           onChange={(event) => setNewTitle(event.target.value)}
           onKeyDown={(event) => {
@@ -376,7 +378,12 @@ export default function TasksBoard() {
           className="min-w-0 flex-1 rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] disabled:opacity-50 dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]"
         />
         <div className="w-full sm:w-44">
-          <DatePicker value={newDue} onChange={setNewDue} placeholder={t("due_date")} />
+          <DatePicker
+            value={newDue}
+            onChange={setNewDue}
+            placeholder={t("due_date")}
+            onPick={() => titleInputRef.current?.focus()}
+          />
         </div>
       </div>
 
