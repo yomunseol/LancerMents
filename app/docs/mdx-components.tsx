@@ -1,4 +1,12 @@
-import type { ComponentType } from "react";
+import { isValidElement, type ComponentType, type ReactNode } from "react";
+import { slugifyHeading } from "./lib/headings";
+
+function textOf(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(textOf).join("");
+  if (isValidElement<{ children?: ReactNode }>(node)) return textOf(node.props.children);
+  return "";
+}
 
 const Callout = ({ children }: { children?: React.ReactNode }) => (
   <aside className="my-6 rounded-xl border-l-4 border-[#85587D] bg-[#85587D]/10 p-4 text-sm leading-6 text-[#151115] dark:border-[#D8A8D3] dark:bg-[#D8A8D3]/10 dark:text-[#F8F4F7]">
@@ -7,17 +15,23 @@ const Callout = ({ children }: { children?: React.ReactNode }) => (
 );
 
 export const mdxComponents: Record<string, ComponentType<Record<string, unknown>>> = {
-  h2: (props) => (
+  h2: ({ children, ...props }) => (
     <h2
+      {...props}
+      id={slugifyHeading(textOf(children as ReactNode))}
       className="mt-10 scroll-mt-24 text-2xl font-bold text-[#151115] dark:text-[#F8F4F7]"
-      {...props}
-    />
+    >
+      {children as ReactNode}
+    </h2>
   ),
-  h3: (props) => (
+  h3: ({ children, ...props }) => (
     <h3
-      className="mt-8 scroll-mt-24 text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]"
       {...props}
-    />
+      id={slugifyHeading(textOf(children as ReactNode))}
+      className="mt-8 scroll-mt-24 text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]"
+    >
+      {children as ReactNode}
+    </h3>
   ),
   p: (props) => (
     <p className="mt-4 leading-7 text-[#151115]/85 dark:text-[#F8F4F7]/85" {...props} />

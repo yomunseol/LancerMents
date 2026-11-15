@@ -170,6 +170,11 @@ export default function GlobalNav() {
         <span className="text-[25px] font-extrabold tracking-tight text-[#151115] dark:text-[#F8F4F7]">
           LancerMents
         </span>
+        {pathname.startsWith("/docs") && (
+          <span className="rounded-full border border-[#E2D8E0] px-2 py-0.5 text-[11px] font-semibold tracking-wide text-[#151115]/70 dark:border-[#4A2E46] dark:text-[#F8F4F7]/70">
+            {t("docs")}
+          </span>
+        )}
       </Link>
 
       {plan === "guest" && (

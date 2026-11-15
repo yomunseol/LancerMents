@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -13,6 +13,19 @@ type IndexEntry = {
   title: string;
   headings: string[];
 };
+
+const SEARCH_SHORTCUT = "⌘K";
+
+function isTypingTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  const tag = target.tagName;
+  return (
+    tag === "INPUT" ||
+    tag === "TEXTAREA" ||
+    tag === "SELECT" ||
+    target.isContentEditable
+  );
+}
 
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query) return <>{text}</>;
@@ -35,6 +48,7 @@ export default function DocsSidebar({ docs }: { docs: DocMeta[] }) {
   const [index, setIndex] = useState<IndexEntry[]>([]);
   const [query, setQuery] = useState("");
   const [openCategory, setOpenCategory] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch("/api/docs-index")
@@ -50,6 +64,20 @@ export default function DocsSidebar({ docs }: { docs: DocMeta[] }) {
     const last = from.split("/").filter(Boolean).pop() ?? "";
     const category = HELP_MAP[last];
     if (category) setOpenCategory(category);
+  }, []);
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      const commandK =
+        (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
+      const slash = event.key === "/" && !isTypingTarget(event.target);
+      if (!commandK && !slash) return;
+      event.preventDefault();
+      inputRef.current?.focus();
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
   const categories = CATEGORY_ORDER.filter((category) =>
@@ -75,21 +103,25 @@ export default function DocsSidebar({ docs }: { docs: DocMeta[] }) {
 
   return (
     <aside className="w-full shrink-0 md:w-64">
-      <div className="md:sticky md:top-20">
+      <div className="md:sticky md:top-20 md:h-[calc(100vh-5rem)] md:overflow-y-auto md:pr-2">
         <div className="relative">
           <label htmlFor="docs-search" className="sr-only">
             {t("search_docs")}
           </label>
           <input
             id="docs-search"
+            ref={inputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Escape") setQuery("");
             }}
             placeholder={t("search_docs_hint")}
-            className="w-full rounded-lg border border-[#E2D8E0] bg-white px-3 py-2 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]"
+            className="w-full rounded-lg border border-[#E2D8E0] bg-white py-2 pl-3 pr-12 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]"
           />
+          <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-[#E2D8E0] bg-[#F8F4F7] px-1.5 py-0.5 text-[10px] font-semibold text-[#151115]/60 dark:border-[#4A2E46] dark:bg-[#151115] dark:text-[#F8F4F7]/60">
+            {SEARCH_SHORTCUT}
+          </kbd>
 
           {results.length > 0 && (
             <ul className="absolute left-0 right-0 z-40 mt-2 max-h-80 overflow-auto rounded-xl border border-[#E2D8E0] bg-white p-1 shadow-xl dark:border-[#4A2E46] dark:bg-[#221C21]">

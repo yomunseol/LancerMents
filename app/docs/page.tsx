@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { listDocs } from "./lib/loader";
-import { CATEGORY_DESCRIPTIONS, CATEGORY_LABELS, CATEGORY_ORDER } from "./docs-nav";
+import {
+  CATEGORY_DESCRIPTIONS,
+  CATEGORY_ICON_PATHS,
+  CATEGORY_LABELS,
+  CATEGORY_ORDER,
+} from "./docs-nav";
 import { POLICY_SECTIONS } from "@/lib/site-content";
 
 export const metadata: Metadata = {
@@ -32,24 +37,57 @@ export default async function DocsIndexPage() {
 
       <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
         {categories.map((category) => {
-          const pages = docs.filter((doc) => doc.category === category);
-          const first = pages[0];
+          const pages = docs
+            .filter((doc) => doc.category === category)
+            .sort((a, b) => a.order - b.order);
+
           return (
-            <Link
+            <article
               key={category}
-              href={`/docs/${first.slug}`}
-              className="rounded-2xl border border-[#E2D8E0] bg-white p-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:hover:border-[#D8A8D3]"
+              className="rounded-2xl border border-[#E2D8E0] bg-white p-6 transition-all duration-200 hover:border-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:hover:border-[#D8A8D3]"
             >
-              <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
-                {CATEGORY_LABELS[category] ?? category}
-              </h2>
-              <p className="mt-1 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-                {pages.length} {pages.length === 1 ? "page" : "pages"}
-              </p>
-              <p className="mt-3 text-sm leading-6 text-[#151115]/70 dark:text-[#F8F4F7]/70">
-                {CATEGORY_DESCRIPTIONS[category] ?? ""}
-              </p>
-            </Link>
+              <div className="flex items-start gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#85587D]/10 text-[#85587D] dark:bg-[#D8A8D3]/15 dark:text-[#D8A8D3]">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d={CATEGORY_ICON_PATHS[category] ?? ""} />
+                  </svg>
+                </span>
+                <div className="min-w-0">
+                  <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
+                    {CATEGORY_LABELS[category] ?? category}
+                  </h2>
+                  <p className="mt-1 text-sm leading-6 text-[#151115]/70 dark:text-[#F8F4F7]/70">
+                    {CATEGORY_DESCRIPTIONS[category] ?? ""}
+                  </p>
+                </div>
+              </div>
+
+              <ul className="mt-4 flex flex-col gap-1.5">
+                {pages.map((doc) => (
+                  <li key={doc.slug}>
+                    <Link
+                      href={`/docs/${doc.slug}`}
+                      className="flex items-center justify-between gap-3 rounded-lg px-2 py-1.5 text-sm font-medium text-[#151115] transition-colors duration-200 hover:bg-[#85587D]/10 hover:text-[#85587D] dark:text-[#F8F4F7] dark:hover:bg-[#D8A8D3]/10 dark:hover:text-[#D8A8D3]"
+                    >
+                      <span className="min-w-0 truncate">{doc.title}</span>
+                      <span aria-hidden="true" className="shrink-0 opacity-40">
+                        →
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </article>
           );
         })}
       </div>
