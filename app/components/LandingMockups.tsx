@@ -14,17 +14,17 @@ const TEXT = {
   done: "done",
   notes: "Notes",
   notesBody:
-    "Acme wants the homepage live before their launch on the 28th. Send the invoice after the final review.",
+    "Kite & Co. wants the homepage live before their launch on the 28th. Send the invoice after the final review.",
   timer: "Client timer",
-  timerClient: "Acme Studio",
+  timerClient: "Kite & Co.",
   start: "Start timer",
   pause: "Pause timer",
-  timerAria: "Client timer for Acme Studio",
+  timerAria: "Client timer for Kite & Co.",
   invoiceAria:
     "Preview of a LancerMents invoice summary with line items, total, status, and due date",
   invoiceTitle: "Invoice",
   invoiceNumber: "LM-04A2F1",
-  invoiceClient: "Acme Studio",
+  invoiceClient: "Kite & Co.",
   invoiceStatus: "Sent",
   invoiceDue: "Due Nov 28",
   invoiceItems: [
@@ -38,8 +38,8 @@ const TEXT = {
   clientAria:
     "Preview of a LancerMents client card with contact details, status, and today's work timeline",
   clientTitle: "Client",
-  clientName: "Acme Studio",
-  clientEmail: "billing@acme.studio",
+  clientName: "Kite & Co.",
+  clientEmail: "billing@kiteandco.design",
   clientStatus: "Active",
   clientAddress: "18 Marlow St, London",
   clientSince: "Client since Mar 2026",
@@ -47,12 +47,12 @@ const TEXT = {
   clientAddressLabel: "Address",
   clientSinceLabel: "Since",
   rhythmTitle: "Today",
-  rhythmAria: "Today's schedule for Acme Studio",
+  rhythmAria: "Today's schedule for Kite & Co.",
 };
 
 const INITIAL_TASKS = [
-  { id: "t1", title: "Send Acme Studio invoice", client: "Acme Studio", done: false },
-  { id: "t2", title: "Review homepage copy", client: "Acme Studio", done: true },
+  { id: "t1", title: "Send Kite & Co. invoice", client: "Kite & Co.", done: false },
+  { id: "t2", title: "Review homepage copy", client: "Kite & Co.", done: true },
   { id: "t3", title: "Book launch call", client: "Northwind", done: false },
 ];
 
@@ -257,7 +257,7 @@ export function ClientCardMockup() {
       <div className={`flex items-start justify-between border-b px-5 py-4 ${BORDER}`}>
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#85587D]/15 text-sm font-bold text-[#85587D] dark:bg-[#D8A8D3]/15 dark:text-[#D8A8D3]">
-            AS
+            KC
           </span>
           <div>
             <p className={LABEL}>{TEXT.clientTitle}</p>

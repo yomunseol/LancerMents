@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import type { PlanDef } from "@/lib/plans";
 
@@ -70,8 +71,8 @@ export default function PlanCard({
   const content = (
     <>
       {plan.popular && (
-        <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#85587D] px-3 py-1 text-xs font-bold text-white dark:bg-[#D8A8D3] dark:text-[#151115]">
-          {t("most_popular")}
+        <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-[#85587D] px-3 py-1 text-xs font-bold text-white dark:bg-[#D8A8D3] dark:text-[#151115]">
+          {t("best_for_solo")}
         </span>
       )}
       {plan.comingSoon && (
@@ -130,6 +131,28 @@ export default function PlanCard({
           </li>
         ))}
       </ul>
+
+      {!onSelect && (
+        <div className="mt-auto pt-6">
+          {plan.comingSoon ? (
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              className="w-full cursor-not-allowed rounded-lg border border-[#E2D8E0] px-4 py-2.5 text-sm font-semibold text-[#151115]/50 opacity-60 dark:border-[#4A2E46] dark:text-[#F8F4F7]/50"
+            >
+              {t("coming_soon")}
+            </button>
+          ) : (
+            <Link
+              href="/signup"
+              className="block w-full rounded-lg bg-[#85587D] px-4 py-2.5 text-center text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 dark:bg-[#D8A8D3] dark:text-[#151115]"
+            >
+              {t("start_free_beta")}
+            </Link>
+          )}
+        </div>
+      )}
     </>
   );
 
