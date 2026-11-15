@@ -50,7 +50,7 @@ export default function SiteFooter() {
         </p>
 
         <p className="text-xs text-[#151115]/60 dark:text-[#F8F4F7]/60">
-          © 2026{" "}
+          2026{" "}
           <a
             href="https://github.com"
             target="_blank"
