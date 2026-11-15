@@ -26,7 +26,7 @@ export default function PricingGrid() {
             aria-pressed={!annual}
             className={option(!annual)}
           >
-            Monthly
+            {t("monthly")}
           </button>
           <button
             type="button"

@@ -8,10 +8,10 @@ export type PlanDef = {
   annual: number;
   /** i18n key for the positioning line. */
   positionKey: string;
-  /** Existing i18n feature keys, rendered as check bullets. */
+  /** i18n feature keys, rendered as check bullets. */
   features: string[];
-  /** Plain inline count chip (e.g. "×3"); no i18n key. */
-  limit?: string;
+  /** i18n key for the concrete plan limit. */
+  limitKey?: string;
   popular?: boolean;
   comingSoon?: boolean;
   /** Plain-text locked rows (proper-noun exception). */
@@ -25,8 +25,8 @@ export const PLAN_TIERS: PlanDef[] = [
     monthly: 9,
     annual: 90,
     positionKey: "pos_starter",
-    features: ["tasks"],
-    limit: "×3",
+    features: ["feat_task_grid", "feat_calendar"],
+    limitKey: "limit_starter_tasks",
   },
   {
     slug: "pipeline",
@@ -34,7 +34,13 @@ export const PLAN_TIERS: PlanDef[] = [
     monthly: 19,
     annual: 190,
     positionKey: "pos_pro",
-    features: ["tasks", "clients", "crm", "invoices"],
+    features: [
+      "feat_task_grid",
+      "feat_calendar",
+      "feat_clients",
+      "feat_deals",
+      "feat_invoices",
+    ],
     popular: true,
   },
   {
@@ -43,7 +49,15 @@ export const PLAN_TIERS: PlanDef[] = [
     monthly: 49,
     annual: 490,
     positionKey: "pos_expert",
-    features: ["tasks", "clients", "crm", "invoices", "analytics", "spreadsheet"],
+    features: [
+      "feat_task_grid",
+      "feat_calendar",
+      "feat_clients",
+      "feat_deals",
+      "feat_invoices",
+      "feat_analytics",
+      "feat_spreadsheet",
+    ],
   },
   {
     slug: "business",
@@ -51,7 +65,15 @@ export const PLAN_TIERS: PlanDef[] = [
     monthly: 99,
     annual: 990,
     positionKey: "pos_business",
-    features: ["clients", "crm", "invoices", "analytics", "spreadsheet"],
+    features: [
+      "feat_task_grid",
+      "feat_calendar",
+      "feat_clients",
+      "feat_deals",
+      "feat_invoices",
+      "feat_analytics",
+      "feat_spreadsheet",
+    ],
     comingSoon: true,
     lockedFeatures: ["Multi-seat", "White-label"],
   },

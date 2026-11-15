@@ -98,7 +98,9 @@ export default function PlanCard({
         <span className="text-4xl font-extrabold text-[#151115] dark:text-[#F8F4F7]">
           ${price}
         </span>
-        <span className="text-sm opacity-60">{annual ? "/yr" : "/mo"}</span>
+        <span className="text-sm opacity-60">
+          {annual ? t("per_year") : t("per_month")}
+        </span>
       </p>
 
       <p className="mt-3 text-sm opacity-70">{t(plan.positionKey)}</p>
@@ -113,11 +115,11 @@ export default function PlanCard({
             <span>{t(key)}</span>
           </li>
         ))}
-        {plan.limit && (
+        {plan.limitKey && (
           <li className="flex items-center gap-2 text-[#151115] dark:text-[#F8F4F7]">
             <CheckIcon />
             <span className="rounded-full border border-[#E2D8E0] px-2 py-0.5 text-xs font-semibold dark:border-[#4A2E46]">
-              {plan.limit}
+              {t(plan.limitKey)}
             </span>
           </li>
         )}

@@ -21,9 +21,7 @@ export default async function Home() {
               </span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed sm:text-lg">
-              Automate your invoicing, track your tasks, and manage clients in
-              one place. LancerMents handles the busywork so you can focus on
-              the work.
+              {t("hero_sub")}
             </p>
             <Link
               href="/signup"
@@ -42,12 +40,10 @@ export default async function Home() {
         <section className="flex flex-col items-center gap-12 py-16 lg:flex-row-reverse">
           <div className="w-full lg:w-1/2">
             <h2 className="break-words text-3xl font-bold tracking-tight sm:text-4xl">
-              Automated Invoicing &amp; Payments.
+              {t("feature_invoicing_title")}
             </h2>
             <p className="mt-4 text-base leading-relaxed sm:text-lg">
-              Set your rates, send a secure link, and get paid. Smart retries
-              and automated reminders handle the rest—no awkward follow-ups
-              required.
+              {t("feature_invoicing_body")}
             </p>
           </div>
           <img
@@ -60,11 +56,10 @@ export default async function Home() {
         <section className="flex flex-col items-center gap-12 py-16 lg:flex-row">
           <div className="w-full lg:w-1/2">
             <h2 className="break-words text-3xl font-bold tracking-tight sm:text-4xl">
-              Visual Task Grids &amp; Client CRM.
+              {t("feature_tasks_title")}
             </h2>
             <p className="mt-4 text-base leading-relaxed sm:text-lg">
-              Drag, drop, and done. See your entire client pipeline, daily
-              tasks, and project deadlines in one clean, intuitive view.
+              {t("feature_tasks_body")}
             </p>
           </div>
           <img
