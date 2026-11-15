@@ -219,5 +219,10 @@
   "limit_starter_tasks": "Up to 5 active tasks",
   "monthly": "Monthly",
   "per_month": "/mo",
-  "per_year": "/yr"
+  "per_year": "/yr",
+  "trust_tls": "Encrypted in transit (TLS/HTTPS)",
+  "trust_stripe": "Stripe will handle card payments. We never store raw card data.",
+  "trust_founder": "Direct founder support and transparent development.",
+  "footer_privacy": "Privacy Policy",
+  "footer_terms": "Terms of Use"
 }

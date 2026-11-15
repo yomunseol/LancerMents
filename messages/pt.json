@@ -219,5 +219,10 @@
   "limit_starter_tasks": "Até 5 tarefas ativas",
   "monthly": "Mensal",
   "per_month": "/mês",
-  "per_year": "/ano"
+  "per_year": "/ano",
+  "trust_tls": "Criptografado em trânsito (TLS/HTTPS)",
+  "trust_stripe": "A Stripe processará os pagamentos com cartão. Nunca guardamos dados brutos do cartão.",
+  "trust_founder": "Suporte direto do fundador e desenvolvimento transparente.",
+  "footer_privacy": "Política de privacidade",
+  "footer_terms": "Termos de uso"
 }

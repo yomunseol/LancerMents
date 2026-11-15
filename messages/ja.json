@@ -219,5 +219,10 @@
   "limit_starter_tasks": "アクティブなタスク最大5件",
   "monthly": "月払い",
   "per_month": "/月",
-  "per_year": "/年"
+  "per_year": "/年",
+  "trust_tls": "通信は暗号化(TLS/HTTPS)",
+  "trust_stripe": "カード決済はStripeが処理します。カード情報そのものは保存しません。",
+  "trust_founder": "創業者による直接サポートと透明な開発。",
+  "footer_privacy": "プライバシーポリシー",
+  "footer_terms": "利用規約"
 }

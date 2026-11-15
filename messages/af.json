@@ -219,5 +219,10 @@
   "limit_starter_tasks": "Tot 5 aktiewe take",
   "monthly": "Maandeliks",
   "per_month": "/mnd",
-  "per_year": "/jaar"
+  "per_year": "/jaar",
+  "trust_tls": "Geënkripteer tydens oordrag (TLS/HTTPS)",
+  "trust_stripe": "Stripe sal kaartbetalings hanteer. Ons stoor nooit rou kaartdata nie.",
+  "trust_founder": "Direkte ondersteuning van die stigter en deursigtige ontwikkeling.",
+  "footer_privacy": "Privaatheidsbeleid",
+  "footer_terms": "Gebruiksvoorwaardes"
 }

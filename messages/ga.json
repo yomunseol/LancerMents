@@ -219,5 +219,10 @@
   "limit_starter_tasks": "Suas le 5 thasc ghníomhacha",
   "monthly": "Míosúil",
   "per_month": "/mí",
-  "per_year": "/bliain"
+  "per_year": "/bliain",
+  "trust_tls": "Criptithe agus á tharchur (TLS/HTTPS)",
+  "trust_stripe": "Láimhseálfaidh Stripe íocaíochtaí cárta. Ní stórálaimid sonraí cárta amh.",
+  "trust_founder": "Tacaíocht dhíreach ón mbunaitheoir agus forbairt thrédhearcach.",
+  "footer_privacy": "Polasaí Príobháideachta",
+  "footer_terms": "Téarmaí Úsáide"
 }

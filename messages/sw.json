@@ -219,5 +219,10 @@
   "limit_starter_tasks": "Hadi kazi 5 zinazoendelea",
   "monthly": "Kila mwezi",
   "per_month": "/mwezi",
-  "per_year": "/mwaka"
+  "per_year": "/mwaka",
+  "trust_tls": "Imesimbwa wakati wa kusafiri (TLS/HTTPS)",
+  "trust_stripe": "Stripe itashughulikia malipo ya kadi. Hatuhatadhi data ghafi ya kadi.",
+  "trust_founder": "Msaada wa moja kwa moja kutoka kwa mwanzilishi na maendeleo ya wazi.",
+  "footer_privacy": "Sera ya faragha",
+  "footer_terms": "Masharti ya matumizi"
 }

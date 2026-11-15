@@ -219,5 +219,10 @@
   "limit_starter_tasks": "עד 5 משימות פעילות",
   "monthly": "חודשי",
   "per_month": "/חודש",
-  "per_year": "/שנה"
+  "per_year": "/שנה",
+  "trust_tls": "מוצפן בהעברה (TLS/HTTPS)",
+  "trust_stripe": "Stripe תטפל בתשלומי כרטיס. איננו שומרים נתוני כרטיס גולמיים.",
+  "trust_founder": "תמיכה ישירה מהמייסד ופיתוח שקוף.",
+  "footer_privacy": "מדיניות פרטיות",
+  "footer_terms": "תנאי שימוש"
 }

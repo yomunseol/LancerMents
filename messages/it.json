@@ -219,5 +219,10 @@
   "limit_starter_tasks": "Fino a 5 attività attive",
   "monthly": "Mensile",
   "per_month": "/mese",
-  "per_year": "/anno"
+  "per_year": "/anno",
+  "trust_tls": "Crittografato in transito (TLS/HTTPS)",
+  "trust_stripe": "Stripe gestirà i pagamenti con carta. Non conserviamo i dati grezzi della carta.",
+  "trust_founder": "Supporto diretto del fondatore e sviluppo trasparente.",
+  "footer_privacy": "Informativa sulla privacy",
+  "footer_terms": "Termini di utilizzo"
 }

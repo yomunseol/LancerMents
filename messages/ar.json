@@ -219,5 +219,10 @@
   "limit_starter_tasks": "حتى 5 مهام نشطة",
   "monthly": "شهري",
   "per_month": "/شهر",
-  "per_year": "/سنة"
+  "per_year": "/سنة",
+  "trust_tls": "تشفير أثناء النقل (TLS/HTTPS)",
+  "trust_stripe": "ستتولى Stripe مدفوعات البطاقات. لا نحتفظ ببيانات البطاقة الأصلية.",
+  "trust_founder": "دعم مباشر من المؤسس وتطوير شفاف.",
+  "footer_privacy": "سياسة الخصوصية",
+  "footer_terms": "شروط الاستخدام"
 }

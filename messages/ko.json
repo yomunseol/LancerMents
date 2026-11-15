@@ -219,5 +219,10 @@
   "limit_starter_tasks": "활성 작업 최대 5개",
   "monthly": "월간",
   "per_month": "/월",
-  "per_year": "/년"
+  "per_year": "/년",
+  "trust_tls": "전송 구간 암호화(TLS/HTTPS)",
+  "trust_stripe": "유료 전환 시 결제는 Stripe가 처리하며, 카드 원본은 저장하지 않습니다.",
+  "trust_founder": "창업자와 직접 소통하고 개발 과정을 투명하게 공개합니다.",
+  "footer_privacy": "개인정보 처리방침",
+  "footer_terms": "이용약관"
 }

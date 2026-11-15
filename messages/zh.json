@@ -219,5 +219,10 @@
   "limit_starter_tasks": "最多 5 个进行中任务",
   "monthly": "按月",
   "per_month": "/月",
-  "per_year": "/年"
+  "per_year": "/年",
+  "trust_tls": "传输加密(TLS/HTTPS)",
+  "trust_stripe": "付费后由 Stripe 处理银行卡支付，我们不保存原始卡号。",
+  "trust_founder": "创始人直接支持，开发过程透明。",
+  "footer_privacy": "隐私政策",
+  "footer_terms": "使用条款"
 }

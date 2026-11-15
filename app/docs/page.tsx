@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { listDocs } from "./lib/loader";
 import { CATEGORY_DESCRIPTIONS, CATEGORY_LABELS, CATEGORY_ORDER } from "./docs-nav";
+import { POLICY_SECTIONS } from "@/lib/site-content";
 
 export const metadata: Metadata = {
   title: "LancerMents Docs",
@@ -51,6 +52,34 @@ export default async function DocsIndexPage() {
             </Link>
           );
         })}
+      </div>
+
+      <div className="mt-14 flex flex-col gap-12">
+        {POLICY_SECTIONS.map((section) => (
+          <section key={section.id} id={section.id} className="scroll-mt-24">
+            <h2 className="text-2xl font-bold tracking-tight text-[#151115] dark:text-[#F8F4F7]">
+              {section.title}
+            </h2>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-widest opacity-50">
+              {section.updated}
+            </p>
+            {section.paragraphs.map((paragraph) => (
+              <p
+                key={paragraph}
+                className="mt-4 text-sm leading-7 text-[#151115]/80 dark:text-[#F8F4F7]/80"
+              >
+                {paragraph}
+              </p>
+            ))}
+            {section.bullets && (
+              <ul className="mt-4 flex list-disc flex-col gap-2 pl-5 text-sm leading-7 text-[#151115]/80 dark:text-[#F8F4F7]/80">
+                {section.bullets.map((bullet) => (
+                  <li key={bullet}>{bullet}</li>
+                ))}
+              </ul>
+            )}
+          </section>
+        ))}
       </div>
     </>
   );
