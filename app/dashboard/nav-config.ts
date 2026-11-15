@@ -14,7 +14,7 @@ export type NavIcon =
   | "security"
   | "settings";
 
-export type NavTier = "pipeline" | "studio";
+export type NavTier = "engine" | "pipeline" | "studio";
 
 export type NavItem = {
   key: NavIcon;
@@ -28,7 +28,7 @@ export const NAV_ITEMS: NavItem[] = [
   { key: "tasks", href: "/dashboard/tasks", icon: "tasks" },
   { key: "notes", href: "/dashboard/notes", icon: "notes" },
   { key: "calendar", href: "/dashboard/calendar", icon: "calendar" },
-  { key: "clients", href: "/dashboard/clients", icon: "clients", tier: "pipeline" },
+  { key: "clients", href: "/dashboard/clients", icon: "clients", tier: "engine" },
   { key: "crm", href: "/dashboard/crm", icon: "crm", tier: "pipeline" },
   { key: "invoices", href: "/dashboard/invoices", icon: "invoices", tier: "pipeline" },
   { key: "analytics", href: "/dashboard/analytics", icon: "analytics", tier: "pipeline" },

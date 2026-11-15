@@ -26,7 +26,7 @@ export function canonicalPlan(
   return LEGACY_PLAN_MAP[key] ?? null;
 }
 
-export type RequiredPlan = "pipeline" | "studio";
+export type RequiredPlan = "engine" | "pipeline" | "studio";
 
 export const PLAN_RANK: Record<CanonicalPlan, number> = {
   engine: 0,
@@ -41,21 +41,6 @@ export function planLocked(
   required: RequiredPlan,
 ): boolean {
   return (plan ? PLAN_RANK[plan] : -1) < PLAN_RANK[required];
-}
-
-const UNLIMITED_TASKS = Number.POSITIVE_INFINITY;
-
-/** Active-task cap per canonical tier. Single source — no legacy cap maps. */
-export const PLAN_TASK_LIMITS: Record<CanonicalPlan, number> = {
-  engine: 5,
-  pipeline: UNLIMITED_TASKS,
-  studio: UNLIMITED_TASKS,
-  business: UNLIMITED_TASKS,
-};
-
-/** Incomplete plans fall back to the lowest tier cap. */
-export function taskLimitFor(plan: CanonicalPlan | null | undefined): number {
-  return plan ? PLAN_TASK_LIMITS[plan] : PLAN_TASK_LIMITS.engine;
 }
 
 export type SaveResult =

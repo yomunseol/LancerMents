@@ -10,8 +10,6 @@ export type PlanDef = {
   positionKey: string;
   /** i18n feature keys, rendered as check bullets. */
   features: string[];
-  /** i18n key for the concrete plan limit. */
-  limitKey?: string;
   popular?: boolean;
   comingSoon?: boolean;
   /** Plain-text locked rows (proper-noun exception). */
@@ -25,8 +23,7 @@ export const PLAN_TIERS: PlanDef[] = [
     monthly: 9,
     annual: 90,
     positionKey: "pos_starter",
-    features: ["feat_task_grid", "feat_calendar"],
-    limitKey: "limit_starter_tasks",
+    features: ["feat_task_grid", "feat_calendar", "feat_clients"],
   },
   {
     slug: "pipeline",

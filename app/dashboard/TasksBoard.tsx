@@ -3,14 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
-import { taskLimitFor } from "@/lib/profile";
 import FeedbackBanner, {
   rawReason,
   type FeedbackState,
 } from "@/app/components/FeedbackBanner";
 import DatePicker from "@/app/components/DatePicker";
 import { useWorkspaceGate } from "./useWorkspaceData";
-import { useProfile } from "./ProfileContext";
 
 export type Task = {
   id: string;
@@ -125,9 +123,6 @@ function TaskRow({
 export default function TasksBoard() {
   const t = useTranslations();
   const ws = useWorkspaceGate();
-  const { planCanonical } = useProfile();
-  const taskLimit = taskLimitFor(planCanonical);
-  const meterVisible = Number.isFinite(taskLimit);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [fb, setFb] = useState<FeedbackState>(null);
@@ -209,7 +204,7 @@ export default function TasksBoard() {
 
   async function handleAdd() {
     const title = newTitle.trim();
-    if (!title || !workspaceId || capReached) return;
+    if (!title || !workspaceId) return;
 
     setFb(null);
     setAdding(true);
@@ -272,7 +267,6 @@ export default function TasksBoard() {
     })
     .sort((a, b) => (dueDay(a.due_date) ?? "").localeCompare(dueDay(b.due_date) ?? ""));
   const completed = tasks.filter((task) => task.is_completed);
-  const capReached = meterVisible && uncompleted.length >= taskLimit;
   const busy = loading || !ws;
 
   const rowFor = (task: Task) => (
@@ -286,25 +280,6 @@ export default function TasksBoard() {
           <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
             {t("daily_tasks")}
           </h2>
-          {meterVisible && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs uppercase tracking-widest opacity-60">
-                {t("daily_grid")}
-              </span>
-              <div className="flex items-center gap-1">
-                {Array.from({ length: taskLimit }).map((_, index) => (
-                  <span
-                    key={index}
-                    className={`h-1.5 w-6 rounded-full transition-colors duration-200 ${
-                      index < uncompleted.length
-                        ? "bg-[#85587D] dark:bg-[#D8A8D3]"
-                        : "bg-[#E2D8E0] dark:bg-[#4A2E46]"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="mt-8">
@@ -325,25 +300,6 @@ export default function TasksBoard() {
         <h2 className="text-lg font-semibold text-[#151115] dark:text-[#F8F4F7]">
           {t("daily_tasks")}
         </h2>
-        {meterVisible && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs uppercase tracking-widest opacity-60">
-              {t("daily_grid")}
-            </span>
-            <div className="flex items-center gap-1">
-              {Array.from({ length: taskLimit }).map((_, index) => (
-                <span
-                  key={index}
-                  className={`h-1.5 w-6 rounded-full transition-colors duration-200 ${
-                    index < uncompleted.length
-                      ? "bg-[#85587D] dark:bg-[#D8A8D3]"
-                      : "bg-[#E2D8E0] dark:bg-[#4A2E46]"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {fb && (
@@ -404,7 +360,7 @@ export default function TasksBoard() {
         <button
           type="button"
           onClick={handleAdd}
-          disabled={capReached || adding}
+          disabled={adding}
           aria-label={t("add_task_aria")}
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#E2D8E0] text-[#151115] transition-all duration-200 hover:border-[#85587D] disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#4A2E46] dark:text-[#F8F4F7] dark:hover:border-[#D8A8D3]"
         >
@@ -416,7 +372,6 @@ export default function TasksBoard() {
           onKeyDown={(event) => {
             if (event.key === "Enter") handleAdd();
           }}
-          disabled={capReached}
           placeholder={t("add_task")}
           className="min-w-0 flex-1 rounded-lg border border-[#E2D8E0] bg-white px-4 py-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D] disabled:opacity-50 dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:ring-[#D8A8D3]"
         />
@@ -425,11 +380,6 @@ export default function TasksBoard() {
         </div>
       </div>
 
-      {capReached && (
-        <p className="mt-3 text-sm text-[#151115]/70 dark:text-[#F8F4F7]/70">
-          {t("limit_reached")}
-        </p>
-      )}
     </section>
   );
 }

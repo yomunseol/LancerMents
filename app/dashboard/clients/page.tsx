@@ -1033,7 +1033,7 @@ function ClientsInner() {
 
 export default function ClientsPage() {
   return (
-    <TierGate requiredTier="pipeline" featureKey="clients">
+    <TierGate requiredTier="engine" featureKey="clients">
       <ClientsInner />
     </TierGate>
   );

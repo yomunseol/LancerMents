@@ -116,14 +116,6 @@ export default function PlanCard({
             <span>{t(key)}</span>
           </li>
         ))}
-        {plan.limitKey && (
-          <li className="flex items-center gap-2 text-[#151115] dark:text-[#F8F4F7]">
-            <CheckIcon />
-            <span className="rounded-full border border-[#E2D8E0] px-2 py-0.5 text-xs font-semibold dark:border-[#4A2E46]">
-              {t(plan.limitKey)}
-            </span>
-          </li>
-        )}
         {plan.lockedFeatures?.map((label) => (
           <li key={label} className="flex items-center gap-2 opacity-60">
             <LockIcon />
