@@ -2,14 +2,13 @@ export const PAYMENT_NOTE =
   "When paid plans begin, card payments will be handled by Stripe. LancerMents never stores raw card numbers.";
 
 export const FOUNDER_NOTE = {
-  eyebrow: "A note from the founder",
-  heading:
-    "I built LancerMents because running solo shouldn’t feel like a second job.",
+  eyebrow: "From the founder",
+  heading: "Why I built LancerMents",
   paragraphs: [
-    "I got tired of duct-taping spreadsheets, timers, and clunky invoicing tools together just to get paid for client work. Most tools are bloated for massive agencies, so I built one calm workspace for freelancers to track tasks, manage clients, and send clean invoices without the busywork.",
-    "It is still early and built by one person. Everything is free while we are in beta—if something feels missing, email me and I will actually read it.",
+    "Most freelance tools are made for big agencies and packed with features you never touch. I just wanted one simple place to track my daily tasks, keep client notes organized, and send invoices without switching between four different tabs.",
+    "I’m building this solo and it’s still early. Everything is free while I test and improve things. If you run into a bug or want a feature added, send me an email and I’ll read it.",
   ],
-  signature: "— Yomunseol, founder",
+  signature: "Yomunseol",
 };
 
 export type PolicySection = {
