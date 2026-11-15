@@ -145,7 +145,7 @@ export default function DatePicker({
       </button>
 
       {open && (
-        <div className="absolute left-0 z-50 mt-2 w-72 origin-top rounded-2xl border border-[#3f3f46] bg-[#121214] p-4 shadow-2xl transition-all duration-200">
+        <div className="absolute start-0 z-50 mt-2 w-72 origin-top rounded-2xl border border-[#3f3f46] bg-[#121214] p-4 shadow-2xl transition-all duration-200">
           <div className="flex items-center justify-between">
             <button
               type="button"

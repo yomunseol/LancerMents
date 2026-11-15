@@ -78,34 +78,62 @@ function ChevronIcon({ open }: { open: boolean }) {
 
 function TaskRow({
   task,
+  pending,
   onToggle,
   onDelete,
 }: {
   task: Task;
+  pending?: "holding" | "leaving";
   onToggle: (task: Task) => void;
   onDelete: (task: Task) => void;
 }) {
   const t = useTranslations();
-  const completed = task.is_completed;
+  const checked = task.is_completed || pending !== undefined;
   const isToday = dueDay(task.due_date) === todayIso();
+  const leaving = pending === "leaving";
 
   return (
-    <li className="group flex items-start gap-3 rounded-xl border border-[#27272a] bg-[#121214] px-4 py-3.5 transition-colors duration-200 hover:border-[#3f3f46]">
-      <input
-        id={`task-${task.id}`}
-        type="checkbox"
-        checked={completed}
-        onChange={() => onToggle(task)}
-        className={`mt-0.5 h-5 w-5 shrink-0 cursor-pointer appearance-none rounded border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500/30 ${
-          completed
-            ? "border-purple-500 bg-purple-500"
-            : "border-zinc-600 bg-transparent hover:border-zinc-500"
-        }`}
-      />
+    <li
+      className={`group flex items-start gap-3 rounded-xl border border-[#27272a] bg-[#121214] px-4 py-3.5 transition-all duration-200 hover:border-[#3f3f46] ${
+        leaving ? "opacity-0" : "opacity-100"
+      }`}
+    >
+      <label className="relative mt-0.5 flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center">
+        <input
+          id={`task-${task.id}`}
+          type="checkbox"
+          checked={checked}
+          onChange={() => onToggle(task)}
+          className="peer sr-only"
+        />
+        <span
+          aria-hidden="true"
+          className={`flex h-5 w-5 items-center justify-center rounded-md border transition-colors duration-200 peer-focus-visible:ring-2 peer-focus-visible:ring-purple-500/30 ${
+            checked
+              ? "border-purple-500 bg-purple-500"
+              : "border-zinc-600 hover:border-purple-500"
+          }`}
+        >
+          {checked && (
+            <svg
+              className="h-3 w-3 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12l4 4L19 6" />
+            </svg>
+          )}
+        </span>
+      </label>
       <label htmlFor={`task-${task.id}`} className="min-w-0 flex-1 cursor-pointer">
         <span
           className={`block text-base leading-relaxed ${
-            completed ? "text-zinc-500 line-through" : "text-zinc-200"
+            checked ? "text-zinc-500 line-through" : "text-zinc-200"
           }`}
         >
           {task.title}
@@ -115,7 +143,7 @@ function TaskRow({
         )}
       </label>
       {task.due_date && (
-        <span className="ml-3 mt-0.5 whitespace-nowrap rounded-full border border-[#3f3f46] px-2.5 py-1 text-xs text-zinc-400">
+        <span className="ms-3 mt-0.5 whitespace-nowrap rounded-full border border-[#3f3f46] px-2.5 py-1 text-xs text-zinc-400">
           {isToday ? t("dashboard.today") : formatDue(task.due_date)}
         </span>
       )}
@@ -123,7 +151,7 @@ function TaskRow({
         type="button"
         onClick={() => onDelete(task)}
         aria-label={`Delete ${task.title}`}
-        className="ml-3 mt-0.5 shrink-0 text-zinc-500 opacity-0 transition-colors duration-200 hover:text-red-400 focus:opacity-100 group-hover:opacity-100"
+        className="ms-3 mt-0.5 shrink-0 text-zinc-500 opacity-0 transition-colors duration-200 hover:text-red-400 focus:opacity-100 group-hover:opacity-100"
       >
         <XIcon />
       </button>
@@ -135,6 +163,8 @@ export default function TasksBoard() {
   const t = useTranslations();
   const ws = useWorkspaceGate();
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const timersRef = useRef<Record<string, number[]>>({});
+  const [pending, setPending] = useState<Record<string, "holding" | "leaving">>({});
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [fb, setFb] = useState<FeedbackState>(null);
@@ -183,26 +213,108 @@ export default function TasksBoard() {
     loadTasks(ws.id).finally(() => setLoading(false));
   }, [ws?.id, loadTasks]);
 
+  useEffect(() => {
+    return () => {
+      Object.values(timersRef.current)
+        .flat()
+        .forEach((timer) => window.clearTimeout(timer));
+    };
+  }, []);
+
+  function clearTaskTimers(id: string) {
+    const timers = timersRef.current[id];
+    if (timers) timers.forEach((timer) => window.clearTimeout(timer));
+    delete timersRef.current[id];
+  }
+
+  function setPendingFor(id: string, value: "holding" | "leaving" | null) {
+    setPending((current) => {
+      const next = { ...current };
+      if (value) next[id] = value;
+      else delete next[id];
+      return next;
+    });
+  }
+
   async function handleToggle(task: Task) {
     setFb(null);
-    const next = !task.is_completed;
-    setTasks((current) =>
-      current.map((item) =>
-        item.id === task.id ? { ...item, is_completed: next } : item,
-      ),
-    );
 
-    try {
-      const { error: updateError } = await supabase
-        .from("tasks")
-        .update({ is_completed: next })
-        .eq("id", task.id);
+    // A second click during the 2s hold cancels the completion.
+    if (pending[task.id]) {
+      clearTaskTimers(task.id);
+      setPendingFor(task.id, null);
+      try {
+        const { error } = await supabase
+          .from("tasks")
+          .update({ is_completed: false })
+          .eq("id", task.id);
+        if (error) throw error;
+      } catch (updateError) {
+        setFb({
+          kind: "error",
+          label: t("err_save"),
+          raw: rawReason(updateError),
+        });
+      }
+      return;
+    }
 
-      if (updateError) throw updateError;
-    } catch (updateError) {
+    if (task.is_completed) {
       setTasks((current) =>
         current.map((item) =>
-          item.id === task.id ? { ...item, is_completed: task.is_completed } : item,
+          item.id === task.id ? { ...item, is_completed: false } : item,
+        ),
+      );
+      try {
+        const { error } = await supabase
+          .from("tasks")
+          .update({ is_completed: false })
+          .eq("id", task.id);
+        if (error) throw error;
+      } catch (updateError) {
+        setTasks((current) =>
+          current.map((item) =>
+            item.id === task.id ? { ...item, is_completed: true } : item,
+          ),
+        );
+        setFb({
+          kind: "error",
+          label: t("err_save"),
+          raw: rawReason(updateError),
+        });
+      }
+      return;
+    }
+
+    setPendingFor(task.id, "holding");
+
+    const holdTimer = window.setTimeout(() => {
+      setPendingFor(task.id, "leaving");
+      const leaveTimer = window.setTimeout(() => {
+        setTasks((current) =>
+          current.map((item) =>
+            item.id === task.id ? { ...item, is_completed: true } : item,
+          ),
+        );
+        setPendingFor(task.id, null);
+        delete timersRef.current[task.id];
+      }, 200);
+      timersRef.current[task.id] = [leaveTimer];
+    }, 2000);
+    timersRef.current[task.id] = [holdTimer];
+
+    try {
+      const { error } = await supabase
+        .from("tasks")
+        .update({ is_completed: true })
+        .eq("id", task.id);
+      if (error) throw error;
+    } catch (updateError) {
+      clearTaskTimers(task.id);
+      setPendingFor(task.id, null);
+      setTasks((current) =>
+        current.map((item) =>
+          item.id === task.id ? { ...item, is_completed: false } : item,
         ),
       );
       setFb({
@@ -304,7 +416,13 @@ export default function TasksBoard() {
   const busy = loading || !ws;
 
   const rowFor = (task: Task) => (
-    <TaskRow key={task.id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
+    <TaskRow
+      key={task.id}
+      task={task}
+      pending={pending[task.id]}
+      onToggle={handleToggle}
+      onDelete={handleDelete}
+    />
   );
 
   if (loadFailed && fb) {
@@ -334,7 +452,7 @@ export default function TasksBoard() {
       </div>
 
       {fb && (
-        <div className="fixed bottom-4 right-4 z-50 w-[min(22rem,calc(100vw-2rem))]">
+        <div className="fixed bottom-4 end-4 z-50 w-[min(22rem,calc(100vw-2rem))]">
           <FeedbackBanner
             kind={fb.kind}
             label={fb.label}
@@ -349,7 +467,7 @@ export default function TasksBoard() {
       ) : (
         <div className="mt-6 space-y-8">
           <section>
-            <h3 className="text-xs uppercase tracking-widest text-zinc-500">
+            <h3 className="text-sm font-medium text-zinc-500 tracking-normal">
               {t("dashboard.today")}
             </h3>
             {todayTasks.length > 0 ? (
@@ -363,7 +481,7 @@ export default function TasksBoard() {
 
           {scheduled.length > 0 && (
             <section>
-              <h3 className="text-xs uppercase tracking-widest text-zinc-500">
+              <h3 className="text-sm font-medium text-zinc-500 tracking-normal">
                 {t("scheduled")}
               </h3>
               <ul className="mt-3 space-y-3">{scheduled.map(rowFor)}</ul>
@@ -376,7 +494,7 @@ export default function TasksBoard() {
                 type="button"
                 onClick={() => setShowCompleted((open) => !open)}
                 aria-expanded={showCompleted}
-                className="flex items-center gap-2 text-xs uppercase tracking-widest text-zinc-500 transition-colors duration-200 hover:text-zinc-300"
+                className="flex items-center gap-2 text-start text-sm font-medium text-zinc-500 tracking-normal transition-colors duration-200 hover:text-zinc-300"
               >
                 {t("dashboard.completed")} ({completed.length})
                 <ChevronIcon open={showCompleted} />
