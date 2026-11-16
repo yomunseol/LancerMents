@@ -250,5 +250,12 @@
     "start": "Tosaigh an t-amadóir",
     "pause": "Cuir an t-amadóir ar sos",
     "reset": "Athshocraigh"
+  },
+  "groups": {
+    "new": "+ Grúpa nua",
+    "noGroup": "Gan grúpa",
+    "move": "Bog go grúpa",
+    "placeholder": "Ainm an ghrúpa",
+    "select": "Roghnaigh grúpa"
   }
 }

@@ -250,5 +250,12 @@
     "start": "Begin timer",
     "pause": "Pouseer timer",
     "reset": "Herstel"
+  },
+  "groups": {
+    "new": "+ Nuwe groep",
+    "noGroup": "Geen groep",
+    "move": "Skuif na groep",
+    "placeholder": "Groepnaam",
+    "select": "Kies groep"
   }
 }

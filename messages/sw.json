@@ -250,5 +250,12 @@
     "start": "Anza kipima muda",
     "pause": "Simamisha kipima muda",
     "reset": "Weka upya"
+  },
+  "groups": {
+    "new": "+ Kundi jipya",
+    "noGroup": "Hakuna kundi",
+    "move": "Hamisha kwenye kundi",
+    "placeholder": "Jina la kundi",
+    "select": "Chagua kundi"
   }
 }

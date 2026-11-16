@@ -9,8 +9,11 @@ import FeedbackBanner, {
   type FeedbackState,
 } from "@/app/components/FeedbackBanner";
 import DatePicker from "@/app/components/DatePicker";
+import FolderIcon from "@/app/components/FolderIcon";
+import TaskGroupMenu from "@/app/components/TaskGroupMenu";
 import { useClients } from "@/app/components/useClients";
 import { useClientTimer } from "@/app/components/useClientTimer";
+import { useTaskGroups, type TaskGroup } from "@/app/components/useTaskGroups";
 import { useWorkspaceGate } from "./useWorkspaceData";
 
 export type Task = {
@@ -21,9 +24,11 @@ export type Task = {
   created_at: string;
   is_completed: boolean;
   client_name?: string | null;
+  group_id?: string | null;
 };
 
 const TASK_COLUMNS = "id,workspace_id,title,due_date,created_at,is_completed";
+const TASK_COLUMNS_GROUP = `${TASK_COLUMNS},group_id`;
 
 const CARD =
   "rounded-2xl border border-[#E2D8E0] bg-white shadow-xl dark:border-[#4A2E46] dark:bg-[#221C21]";
@@ -115,15 +120,19 @@ function ChevronIcon({ open }: { open: boolean }) {
 function TaskRow({
   task,
   clientLabel,
+  groups,
   pending,
   onToggle,
   onDelete,
+  onMove,
 }: {
   task: Task;
   clientLabel?: string;
+  groups: TaskGroup[];
   pending?: "holding" | "leaving";
   onToggle: (task: Task) => void;
   onDelete: (task: Task) => void;
+  onMove: (task: Task, groupId: string | null) => void;
 }) {
   const t = useTranslations();
   const checked = task.is_completed || pending !== undefined;
@@ -193,6 +202,13 @@ function TaskRow({
         )}
       </label>
       <div className="flex items-center justify-self-end gap-2">
+        {groups.length > 0 && (
+          <TaskGroupMenu
+            groups={groups}
+            currentGroupId={task.group_id ?? null}
+            onMove={(groupId) => onMove(task, groupId)}
+          />
+        )}
         {task.due_date && (
           <span className={`whitespace-nowrap ${PILL}`}>
             {isToday ? t("dashboard.today") : formatDue(task.due_date)}
@@ -224,23 +240,41 @@ export default function TasksBoard() {
   const [showCompleted, setShowCompleted] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDue, setNewDue] = useState<string | null>(null);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  const [creatingGroup, setCreatingGroup] = useState(false);
+  const [groupName, setGroupName] = useState("");
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const groupInputRef = useRef<HTMLInputElement>(null);
 
   const workspaceId = ws?.id ?? "";
   const clients = useClients(workspaceId);
   const timer = useClientTimer(workspaceId);
+  const {
+    groups,
+    loaded: groupsLoaded,
+    supported: groupsSupported,
+    createGroup,
+  } = useTaskGroups(workspaceId);
 
   const loadTasks = useCallback(
     async (activeWorkspaceId: string) => {
       setFb(null);
       try {
-        const { data, error: loadError } = await supabase
-          .from("tasks")
-          .select(TASK_COLUMNS)
-          .eq("workspace_id", activeWorkspaceId)
-          .order("created_at", { ascending: true });
+        const query = (columns: string) =>
+          supabase
+            .from("tasks")
+            .select(columns)
+            .eq("workspace_id", activeWorkspaceId)
+            .order("created_at", { ascending: true });
 
+        let result = await query(TASK_COLUMNS_GROUP);
+        if (result.error && (result.error as { code?: string }).code === "42703") {
+          result = await query(TASK_COLUMNS);
+        }
+
+        const { data, error: loadError } = result;
         if (loadError) throw loadError;
-        setTasks((data ?? []) as Task[]);
+        setTasks((data ?? []) as unknown as Task[]);
         setLoadFailed(false);
       } catch (loadError) {
         setLoadFailed(true);
@@ -274,6 +308,16 @@ export default function TasksBoard() {
         .forEach((timer) => window.clearTimeout(timer));
     };
   }, []);
+
+  useEffect(() => {
+    if (creatingGroup) groupInputRef.current?.focus();
+  }, [creatingGroup]);
+
+  useEffect(() => {
+    if (selectedGroupId && !groups.some((group) => group.id === selectedGroupId)) {
+      setSelectedGroupId(null);
+    }
+  }, [groups, selectedGroupId]);
 
   function clearTaskTimers(id: string) {
     const timers = timersRef.current[id];
@@ -379,7 +423,11 @@ export default function TasksBoard() {
     }
   }
 
-  async function createTask(title: string, due: string | null) {
+  async function createTask(
+    title: string,
+    due: string | null,
+    groupId: string | null,
+  ) {
     if (!workspaceId) return;
 
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -390,22 +438,35 @@ export default function TasksBoard() {
       due_date: due,
       created_at: new Date().toISOString(),
       is_completed: false,
+      group_id: groupId,
     };
 
     setFb(null);
     setTasks((current) => [...current, optimistic]);
+    if (groupId) {
+      setExpandedGroups((current) => ({ ...current, [groupId]: true }));
+    }
 
     try {
+      const payload: Record<string, unknown> = {
+        workspace_id: workspaceId,
+        title,
+        due_date: due,
+      };
+      if (groupId) payload.group_id = groupId;
+
       const { data, error: insertError } = await supabase
         .from("tasks")
-        .insert({ workspace_id: workspaceId, title, due_date: due })
-        .select(TASK_COLUMNS)
+        .insert(payload)
+        .select(groupId ? TASK_COLUMNS_GROUP : TASK_COLUMNS)
         .single();
 
       if (insertError) throw insertError;
 
       setTasks((current) =>
-        current.map((item) => (item.id === tempId ? (data as Task) : item)),
+        current.map((item) =>
+          item.id === tempId ? (data as unknown as Task) : item,
+        ),
       );
       setFb({ kind: "success", label: t("saved") });
     } catch (insertError) {
@@ -415,7 +476,7 @@ export default function TasksBoard() {
         label: t("err_save"),
         raw: rawReason(insertError),
         onRetry: () => {
-          void createTask(title, due);
+          void createTask(title, due, groupId);
         },
       });
     }
@@ -429,7 +490,60 @@ export default function TasksBoard() {
     setNewTitle("");
     setNewDue(null);
     titleInputRef.current?.focus();
-    void createTask(title, due);
+    void createTask(title, due, selectedGroupId);
+  }
+
+  async function handleCreateGroup() {
+    const name = groupName.trim();
+    if (!name) return;
+
+    try {
+      const group = await createGroup(name);
+      setSelectedGroupId(group.id);
+      setGroupName("");
+      setCreatingGroup(false);
+    } catch (createError) {
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(createError),
+      });
+    }
+  }
+
+  function toggleGroup(id: string) {
+    setExpandedGroups((current) => ({ ...current, [id]: !current[id] }));
+  }
+
+  async function handleMoveTask(task: Task, groupId: string | null) {
+    const previous = task.group_id ?? null;
+    setTasks((current) =>
+      current.map((item) =>
+        item.id === task.id ? { ...item, group_id: groupId } : item,
+      ),
+    );
+    if (groupId) {
+      setExpandedGroups((current) => ({ ...current, [groupId]: true }));
+    }
+
+    try {
+      const { error } = await supabase
+        .from("tasks")
+        .update({ group_id: groupId })
+        .eq("id", task.id);
+      if (error) throw error;
+    } catch (moveError) {
+      setTasks((current) =>
+        current.map((item) =>
+          item.id === task.id ? { ...item, group_id: previous } : item,
+        ),
+      );
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(moveError),
+      });
+    }
   }
 
   async function handleDelete(task: Task) {
@@ -454,20 +568,18 @@ export default function TasksBoard() {
     }
   }
 
-  const today = todayIso();
   const uncompleted = tasks.filter((task) => !task.is_completed);
-  const todayTasks = uncompleted.filter((task) => {
-    const day = dueDay(task.due_date);
-    return day === null || day <= today;
-  });
-  const scheduled = uncompleted
-    .filter((task) => {
-      const day = dueDay(task.due_date);
-      return day !== null && day > today;
-    })
-    .sort((a, b) => (dueDay(a.due_date) ?? "").localeCompare(dueDay(b.due_date) ?? ""));
   const completed = tasks.filter((task) => task.is_completed);
-  const busy = loading || !ws;
+  const groupIds = new Set(groups.map((group) => group.id));
+  const rootTasks = uncompleted.filter(
+    (task) => !task.group_id || !groupIds.has(task.group_id),
+  );
+  const busy = loading || !ws || !groupsLoaded;
+  const addGrid =
+    groups.length > 0
+      ? "grid grid-cols-[2.75rem_minmax(0,1fr)_auto_auto] items-center gap-5"
+      : ROW_GRID;
+  const showEmptyRoot = groups.length === 0 && rootTasks.length === 0;
 
   const storedMissing =
     timer.clientId !== null && !clients.some((client) => client.id === timer.clientId);
@@ -477,9 +589,11 @@ export default function TasksBoard() {
       key={task.id}
       task={task}
       clientLabel={task.client_name ?? undefined}
+      groups={groups}
       pending={pending[task.id]}
       onToggle={handleToggle}
       onDelete={handleDelete}
+      onMove={handleMoveTask}
     />
   );
 
@@ -535,31 +649,132 @@ export default function TasksBoard() {
         <p className={`px-6 py-6 text-sm ${LABEL}`}>{t("loading")}</p>
       ) : (
         <>
-          {todayTasks.length > 0 ? (
-            <ul className="flex flex-col gap-1 px-6 py-3">
-              {todayTasks.map(rowFor)}
-            </ul>
-          ) : (
-            <div className="mx-6 mb-6">
-              <div className="rounded-2xl border border-[#85587D]/20 p-6 dark:border-[#D8A8D3]/20">
-                <p className={LABEL}>{t("notes")}</p>
-                <p className="mt-1 text-xs leading-relaxed text-[#151115]/80 dark:text-[#F8F4F7]/80">
-                  {t("dashboard.empty_today")}
-                </p>
-              </div>
-            </div>
-          )}
+          <ul className="flex flex-col gap-1 px-6 py-3">
+            {groups.map((group) => {
+              const groupTasks = tasks.filter((task) => task.group_id === group.id);
+              const groupDone = groupTasks.filter((task) => task.is_completed).length;
+              const groupActive = groupTasks.filter((task) => !task.is_completed);
+              const open = !!expandedGroups[group.id];
 
-          {scheduled.length > 0 && (
-            <div>
-              <div className="px-6 pb-1 pt-4">
-                <p className={LABEL}>{t("scheduled")}</p>
-              </div>
-              <ul className="flex flex-col gap-1 px-6 pb-3">
-                {scheduled.map(rowFor)}
-              </ul>
-            </div>
-          )}
+              return (
+                <li key={group.id}>
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    onClick={() => toggleGroup(group.id)}
+                    className={`${ROW_GRID} w-full rounded-xl py-6 text-left transition-colors duration-200 hover:bg-[#85587D]/5 dark:hover:bg-[#D8A8D3]/10`}
+                  >
+                    <span className="flex h-11 w-11 items-center justify-center text-[#151115]/60 dark:text-[#F8F4F7]/60">
+                      <ChevronIcon open={open} />
+                    </span>
+                    <span className="flex min-w-0 items-center gap-2">
+                      <FolderIcon className="h-4 w-4 shrink-0 text-[#85587D] dark:text-[#D8A8D3]" />
+                      <span className="truncate text-sm font-semibold text-[#151115] dark:text-[#F8F4F7]">
+                        {group.name}
+                      </span>
+                    </span>
+                    <span className={`justify-self-end whitespace-nowrap ${LABEL}`}>
+                      {groupDone}/{groupTasks.length} {t("dashboard.done")}
+                    </span>
+                  </button>
+                  {open && groupActive.length > 0 && (
+                    <ul className="pl-16">{groupActive.map(rowFor)}</ul>
+                  )}
+                </li>
+              );
+            })}
+
+            {rootTasks.map(rowFor)}
+
+            {showEmptyRoot && (
+              <li className={`${ROW_GRID} py-6`}>
+                <span />
+                <p className={`truncate ${LABEL}`}>{t("dashboard.empty_today")}</p>
+                <span />
+              </li>
+            )}
+
+            {groupsSupported && (
+              <li className="py-2">
+                {creatingGroup ? (
+                  <input
+                    ref={groupInputRef}
+                    value={groupName}
+                    onChange={(event) => setGroupName(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        void handleCreateGroup();
+                      } else if (event.key === "Escape") {
+                        setCreatingGroup(false);
+                        setGroupName("");
+                      }
+                    }}
+                    placeholder={t("groups.placeholder")}
+                    className={`${LABEL} w-full border-none bg-transparent p-0 placeholder:opacity-40 focus:outline-none`}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGroupName("");
+                      setCreatingGroup(true);
+                    }}
+                    className={`${LABEL} transition-opacity duration-200 hover:opacity-100`}
+                  >
+                    {t("groups.new")}
+                  </button>
+                )}
+              </li>
+            )}
+
+            <li className={`${addGrid} py-6`}>
+              <button
+                type="button"
+                onClick={handleAdd}
+                aria-label={t("add_task_aria")}
+                className={ADD_BUTTON}
+              >
+                <span className={ADD_VISUAL}>
+                  <PlusIcon />
+                </span>
+              </button>
+              <input
+                ref={titleInputRef}
+                value={newTitle}
+                onChange={(event) => setNewTitle(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") handleAdd();
+                }}
+                placeholder={t("dashboard.add_task_placeholder")}
+                className="h-10 w-full min-w-0 rounded-lg border border-[#E2D8E0] bg-white px-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-colors duration-200 focus:border-[#85587D] focus:outline-none focus:ring-2 focus:ring-[#85587D]/30 dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:border-[#D8A8D3] dark:focus:ring-[#D8A8D3]/30"
+              />
+              {groups.length > 0 && (
+                <div className="flex h-10 items-center gap-1 rounded-lg border border-[#E2D8E0] bg-white px-2 dark:border-[#4A2E46] dark:bg-[#221C21]">
+                  <FolderIcon className="h-4 w-4 shrink-0 text-[#85587D] dark:text-[#D8A8D3]" />
+                  <select
+                    value={selectedGroupId ?? ""}
+                    onChange={(event) => setSelectedGroupId(event.target.value || null)}
+                    aria-label={t("groups.select")}
+                    className="h-full max-w-[9rem] cursor-pointer border-none bg-transparent pr-1 text-sm text-[#151115] focus:outline-none dark:text-[#F8F4F7]"
+                  >
+                    <option value="">{t("groups.noGroup")}</option>
+                    {groups.map((group) => (
+                      <option key={group.id} value={group.id}>
+                        {group.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <DatePicker
+                value={newDue}
+                onChange={setNewDue}
+                placeholder={t("dashboard.due_date")}
+                onPick={() => titleInputRef.current?.focus()}
+              />
+            </li>
+          </ul>
 
           {completed.length > 0 && (
             <div>
@@ -583,37 +798,6 @@ export default function TasksBoard() {
           )}
         </>
       )}
-
-      <div
-        className={`${ROW_GRID} border-t border-[#E2D8E0] px-6 py-5 dark:border-[#4A2E46]`}
-      >
-        <button
-          type="button"
-          onClick={handleAdd}
-          aria-label={t("add_task_aria")}
-          className={ADD_BUTTON}
-        >
-          <span className={ADD_VISUAL}>
-            <PlusIcon />
-          </span>
-        </button>
-        <input
-          ref={titleInputRef}
-          value={newTitle}
-          onChange={(event) => setNewTitle(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") handleAdd();
-          }}
-          placeholder={t("dashboard.add_task_placeholder")}
-          className="h-10 w-full min-w-0 rounded-lg border border-[#E2D8E0] bg-white px-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-colors duration-200 focus:border-[#85587D] focus:outline-none focus:ring-2 focus:ring-[#85587D]/30 dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:border-[#D8A8D3] dark:focus:ring-[#D8A8D3]/30"
-        />
-        <DatePicker
-          value={newDue}
-          onChange={setNewDue}
-          placeholder={t("dashboard.due_date")}
-          onPick={() => titleInputRef.current?.focus()}
-        />
-      </div>
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-4 border-t border-[#E2D8E0] px-6 py-5 transition-colors duration-200 hover:bg-[#85587D]/5 dark:border-[#4A2E46] dark:hover:bg-[#D8A8D3]/10">
         <div className="min-w-0">

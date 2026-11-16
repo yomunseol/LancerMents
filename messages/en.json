@@ -250,5 +250,12 @@
     "start": "Start timer",
     "pause": "Pause timer",
     "reset": "Reset"
+  },
+  "groups": {
+    "new": "+ New group",
+    "noGroup": "No group",
+    "move": "Move to group",
+    "placeholder": "Group name",
+    "select": "Select group"
   }
 }

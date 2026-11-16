@@ -250,5 +250,12 @@
     "start": "Iniciar cronômetro",
     "pause": "Pausar cronômetro",
     "reset": "Redefinir"
+  },
+  "groups": {
+    "new": "+ Novo grupo",
+    "noGroup": "Sem grupo",
+    "move": "Mover para grupo",
+    "placeholder": "Nome do grupo",
+    "select": "Selecionar grupo"
   }
 }

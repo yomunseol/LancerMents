@@ -250,5 +250,12 @@
     "start": "开始计时",
     "pause": "暂停计时",
     "reset": "重置"
+  },
+  "groups": {
+    "new": "+ 新建分组",
+    "noGroup": "无分组",
+    "move": "移动到分组",
+    "placeholder": "分组名称",
+    "select": "选择分组"
   }
 }

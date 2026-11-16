@@ -250,5 +250,12 @@
     "start": "타이머 시작",
     "pause": "타이머 일시정지",
     "reset": "초기화"
+  },
+  "groups": {
+    "new": "+ 새 그룹",
+    "noGroup": "그룹 없음",
+    "move": "그룹으로 이동",
+    "placeholder": "그룹 이름",
+    "select": "그룹 선택"
   }
 }

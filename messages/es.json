@@ -250,5 +250,12 @@
     "start": "Iniciar temporizador",
     "pause": "Pausar temporizador",
     "reset": "Reiniciar"
+  },
+  "groups": {
+    "new": "+ Nuevo grupo",
+    "noGroup": "Sin grupo",
+    "move": "Mover a grupo",
+    "placeholder": "Nombre del grupo",
+    "select": "Seleccionar grupo"
   }
 }

@@ -250,5 +250,12 @@
     "start": "Démarrer le minuteur",
     "pause": "Mettre en pause",
     "reset": "Réinitialiser"
+  },
+  "groups": {
+    "new": "+ Nouveau groupe",
+    "noGroup": "Sans groupe",
+    "move": "Déplacer vers un groupe",
+    "placeholder": "Nom du groupe",
+    "select": "Choisir un groupe"
   }
 }

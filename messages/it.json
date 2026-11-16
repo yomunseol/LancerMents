@@ -250,5 +250,12 @@
     "start": "Avvia timer",
     "pause": "Metti in pausa",
     "reset": "Reimposta"
+  },
+  "groups": {
+    "new": "+ Nuovo gruppo",
+    "noGroup": "Nessun gruppo",
+    "move": "Sposta nel gruppo",
+    "placeholder": "Nome del gruppo",
+    "select": "Seleziona gruppo"
   }
 }
