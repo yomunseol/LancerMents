@@ -239,5 +239,16 @@
   "cta_my_workspace": "Zu Mein Workspace →",
   "cta_try_free": "LancerMents kostenlos testen",
   "cta_login_your_account": "In deinem Konto anmelden",
-  "cta_no_card_beta": "Keine Kreditkarte nötig · Kostenlos in der offenen Beta"
+  "cta_no_card_beta": "Keine Kreditkarte nötig · Kostenlos in der offenen Beta",
+  "time": {
+    "title": "Zeit",
+    "client": "Kunden-Timer",
+    "none": "Kein Timer aktiv",
+    "noClients": "Noch keine Kunden",
+    "selectClient": "Kunde auswählen",
+    "view": "Ansehen",
+    "start": "Timer starten",
+    "pause": "Timer pausieren",
+    "reset": "Zurücksetzen"
+  }
 }

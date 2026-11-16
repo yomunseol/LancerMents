@@ -239,5 +239,16 @@
   "cta_my_workspace": "Aller à Mon espace →",
   "cta_try_free": "Essayez LancerMents gratuitement",
   "cta_login_your_account": "Connectez-vous à votre compte",
-  "cta_no_card_beta": "Sans carte bancaire · Gratuit pendant la bêta publique"
+  "cta_no_card_beta": "Sans carte bancaire · Gratuit pendant la bêta publique",
+  "time": {
+    "title": "Temps",
+    "client": "Minuteur client",
+    "none": "Aucun minuteur en cours",
+    "noClients": "Pas encore de clients",
+    "selectClient": "Choisir un client",
+    "view": "Voir",
+    "start": "Démarrer le minuteur",
+    "pause": "Mettre en pause",
+    "reset": "Réinitialiser"
+  }
 }

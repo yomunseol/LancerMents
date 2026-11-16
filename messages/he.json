@@ -239,5 +239,16 @@
   "cta_my_workspace": "עברו לסביבת העבודה שלי →",
   "cta_try_free": "נסו את LancerMents בחינם",
   "cta_login_your_account": "התחברו לחשבון שלכם",
-  "cta_no_card_beta": "ללא כרטיס אשראי · חינם במהלך הבטא הציבורית"
+  "cta_no_card_beta": "ללא כרטיס אשראי · חינם במהלך הבטא הציבורית",
+  "time": {
+    "title": "זמן",
+    "client": "טיימר לקוח",
+    "none": "אין טיימר פעיל",
+    "noClients": "אין לקוחות עדיין",
+    "selectClient": "בחר לקוח",
+    "view": "הצג",
+    "start": "התחל טיימר",
+    "pause": "השהה טיימר",
+    "reset": "איפוס"
+  }
 }

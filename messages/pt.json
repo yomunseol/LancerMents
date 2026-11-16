@@ -239,5 +239,16 @@
   "cta_my_workspace": "Ir para Meu espaço →",
   "cta_try_free": "Experimente o LancerMents grátis",
   "cta_login_your_account": "Entre na sua conta",
-  "cta_no_card_beta": "Sem cartão · Grátis durante o beta público"
+  "cta_no_card_beta": "Sem cartão · Grátis durante o beta público",
+  "time": {
+    "title": "Tempo",
+    "client": "Cronômetro do cliente",
+    "none": "Nenhum cronômetro ativo",
+    "noClients": "Ainda sem clientes",
+    "selectClient": "Selecionar cliente",
+    "view": "Ver",
+    "start": "Iniciar cronômetro",
+    "pause": "Pausar cronômetro",
+    "reset": "Redefinir"
+  }
 }

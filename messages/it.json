@@ -239,5 +239,16 @@
   "cta_my_workspace": "Vai al mio spazio →",
   "cta_try_free": "Prova LancerMents gratis",
   "cta_login_your_account": "Accedi al tuo account",
-  "cta_no_card_beta": "Nessuna carta · Gratis durante la beta pubblica"
+  "cta_no_card_beta": "Nessuna carta · Gratis durante la beta pubblica",
+  "time": {
+    "title": "Tempo",
+    "client": "Timer cliente",
+    "none": "Nessun timer attivo",
+    "noClients": "Ancora nessun cliente",
+    "selectClient": "Seleziona cliente",
+    "view": "Vedi",
+    "start": "Avvia timer",
+    "pause": "Metti in pausa",
+    "reset": "Reimposta"
+  }
 }

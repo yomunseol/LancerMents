@@ -239,5 +239,16 @@
   "cta_my_workspace": "Go to My Workspace →",
   "cta_try_free": "Try LancerMents free",
   "cta_login_your_account": "Log in to your account",
-  "cta_no_card_beta": "No credit card required · Free during public beta"
+  "cta_no_card_beta": "No credit card required · Free during public beta",
+  "time": {
+    "title": "Time",
+    "client": "Client timer",
+    "none": "No timer running",
+    "noClients": "No clients yet",
+    "selectClient": "Select client",
+    "view": "View",
+    "start": "Start timer",
+    "pause": "Pause timer",
+    "reset": "Reset"
+  }
 }

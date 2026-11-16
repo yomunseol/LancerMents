@@ -239,5 +239,16 @@
   "cta_my_workspace": "Gaan na My werkspas →",
   "cta_try_free": "Probeer LancerMents gratis",
   "cta_login_your_account": "Meld by jou rekening aan",
-  "cta_no_card_beta": "Geen kredietkaart nodig nie · Gratis tydens die openbare beta"
+  "cta_no_card_beta": "Geen kredietkaart nodig nie · Gratis tydens die openbare beta",
+  "time": {
+    "title": "Tyd",
+    "client": "Kliënt-timer",
+    "none": "Geen timer aktief nie",
+    "noClients": "Nog geen kliënte nie",
+    "selectClient": "Kies kliënt",
+    "view": "Bekyk",
+    "start": "Begin timer",
+    "pause": "Pouseer timer",
+    "reset": "Herstel"
+  }
 }

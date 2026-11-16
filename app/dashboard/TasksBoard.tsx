@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 import FeedbackBanner, {
@@ -8,6 +9,8 @@ import FeedbackBanner, {
   type FeedbackState,
 } from "@/app/components/FeedbackBanner";
 import DatePicker from "@/app/components/DatePicker";
+import { useClients } from "@/app/components/useClients";
+import { useClientTimer } from "@/app/components/useClientTimer";
 import { useWorkspaceGate } from "./useWorkspaceData";
 
 export type Task = {
@@ -68,6 +71,22 @@ function XIcon() {
   );
 }
 
+function PlayIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  );
+}
+
+function PauseIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
+    </svg>
+  );
+}
+
 function ChevronIcon({ open }: { open: boolean }) {
   return (
     <svg
@@ -89,11 +108,13 @@ function ChevronIcon({ open }: { open: boolean }) {
 
 function TaskRow({
   task,
+  clientLabel,
   pending,
   onToggle,
   onDelete,
 }: {
   task: Task;
+  clientLabel?: string;
   pending?: "holding" | "leaving";
   onToggle: (task: Task) => void;
   onDelete: (task: Task) => void;
@@ -102,10 +123,11 @@ function TaskRow({
   const checked = task.is_completed || pending !== undefined;
   const isToday = dueDay(task.due_date) === todayIso();
   const leaving = pending === "leaving";
+  const subLabel = clientLabel?.trim();
 
   return (
     <li
-      className={`${ROW_GRID} px-5 py-3 transition-all duration-200 ${
+      className={`group ${ROW_GRID} rounded-xl px-5 py-2.5 transition-all duration-200 hover:bg-[#85587D]/5 dark:hover:bg-[#D8A8D3]/10 ${
         leaving ? "opacity-0" : "opacity-100"
       }`}
     >
@@ -114,7 +136,14 @@ function TaskRow({
           id={`task-${task.id}`}
           type="checkbox"
           checked={checked}
+          aria-checked={checked}
           onChange={() => onToggle(task)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              onToggle(task);
+            }
+          }}
           className="peer sr-only"
         />
         <span
@@ -147,10 +176,8 @@ function TaskRow({
         >
           {task.title}
         </span>
-        {task.client_name && (
-          <span className="mt-0.5 block truncate text-xs opacity-60">
-            {task.client_name}
-          </span>
+        {subLabel && (
+          <span className="mt-0.5 block truncate text-xs opacity-60">{subLabel}</span>
         )}
       </label>
       <div className="flex items-center justify-self-end gap-2">
@@ -187,6 +214,9 @@ export default function TasksBoard() {
   const [newDue, setNewDue] = useState<string | null>(null);
 
   const workspaceId = ws?.id ?? "";
+  const workspaceName = ws?.name ?? "";
+  const clients = useClients(workspaceId);
+  const timer = useClientTimer(workspaceId);
 
   const loadTasks = useCallback(
     async (activeWorkspaceId: string) => {
@@ -428,10 +458,14 @@ export default function TasksBoard() {
   const completed = tasks.filter((task) => task.is_completed);
   const busy = loading || !ws;
 
+  const storedMissing =
+    timer.clientId !== null && !clients.some((client) => client.id === timer.clientId);
+
   const rowFor = (task: Task) => (
     <TaskRow
       key={task.id}
       task={task}
+      clientLabel={task.client_name ?? workspaceName}
       pending={pending[task.id]}
       onToggle={handleToggle}
       onDelete={handleDelete}
@@ -491,13 +525,13 @@ export default function TasksBoard() {
       ) : (
         <>
           {todayTasks.length > 0 ? (
-            <ul className="divide-y divide-[#E2D8E0] dark:divide-[#4A2E46]">
+            <ul className="flex flex-col gap-1 py-3">
               {todayTasks.map(rowFor)}
             </ul>
           ) : (
-            <div className="px-5 py-4">
+            <div className="px-3 pb-3">
               <div className="rounded-xl border border-[#E2D8E0] p-3 dark:border-[#4A2E46]">
-                <p className={LABEL}>{t("dashboard.today")}</p>
+                <p className={LABEL}>{t("notes")}</p>
                 <p className="mt-1 text-xs leading-5 text-[#151115]/80 dark:text-[#F8F4F7]/80">
                   {t("dashboard.empty_today")}
                 </p>
@@ -507,10 +541,10 @@ export default function TasksBoard() {
 
           {scheduled.length > 0 && (
             <div>
-              <div className="border-t border-[#E2D8E0] px-5 pb-1 pt-3 dark:border-[#4A2E46]">
+              <div className="px-5 pb-1 pt-4">
                 <p className={LABEL}>{t("scheduled")}</p>
               </div>
-              <ul className="divide-y divide-[#E2D8E0] dark:divide-[#4A2E46]">
+              <ul className="flex flex-col gap-1 pb-3">
                 {scheduled.map(rowFor)}
               </ul>
             </div>
@@ -530,7 +564,7 @@ export default function TasksBoard() {
                 <ChevronIcon open={showCompleted} />
               </button>
               {showCompleted && (
-                <ul className="divide-y divide-[#E2D8E0] dark:divide-[#4A2E46]">
+                <ul className="flex flex-col gap-1 pb-3">
                   {completed.map(rowFor)}
                 </ul>
               )}
@@ -566,6 +600,58 @@ export default function TasksBoard() {
           placeholder={t("dashboard.due_date")}
           onPick={() => titleInputRef.current?.focus()}
         />
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-[#E2D8E0] px-5 py-4 transition-colors duration-200 hover:bg-[#85587D]/5 dark:border-[#4A2E46] dark:hover:bg-[#D8A8D3]/10">
+        <div className="min-w-0">
+          <p className={LABEL}>{t("time.client")}</p>
+          <select
+            value={timer.clientId ?? ""}
+            onChange={(event) => {
+              const next =
+                clients.find((client) => client.id === event.target.value) ?? null;
+              timer.selectClient(next?.id ?? null, next?.name ?? null);
+            }}
+            aria-label={t("time.selectClient")}
+            className="mt-0.5 max-w-[12rem] cursor-pointer truncate border-none bg-transparent p-0 text-sm font-semibold text-[#151115] focus:outline-none dark:text-[#F8F4F7]"
+          >
+            <option value="">
+              {clients.length === 0 ? t("time.noClients") : t("time.none")}
+            </option>
+            {storedMissing && (
+              <option value={timer.clientId ?? ""}>
+                {timer.clientName ?? t("time.none")}
+              </option>
+            )}
+            {clients.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-center gap-3">
+          <span
+            className="font-mono text-lg font-semibold tabular-nums text-[#85587D] dark:text-[#D8A8D3]"
+            aria-live="polite"
+          >
+            {timer.formatted}
+          </span>
+          <button
+            type="button"
+            onClick={timer.toggle}
+            aria-label={timer.running ? t("time.pause") : t("time.start")}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#85587D] text-white transition-colors duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
+          >
+            {timer.running ? <PauseIcon /> : <PlayIcon />}
+          </button>
+          <Link
+            href="/dashboard/time"
+            className={`${LABEL} transition-opacity duration-200 hover:opacity-100`}
+          >
+            {t("time.view")}
+          </Link>
+        </div>
       </div>
     </section>
   );

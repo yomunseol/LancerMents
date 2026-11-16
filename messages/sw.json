@@ -239,5 +239,16 @@
   "cta_my_workspace": "Nenda kwenye nafasi yangu →",
   "cta_try_free": "Jaribu LancerMents bure",
   "cta_login_your_account": "Ingia kwenye akaunti yako",
-  "cta_no_card_beta": "Hakuna kadi · Bure wakati wa beta ya umma"
+  "cta_no_card_beta": "Hakuna kadi · Bure wakati wa beta ya umma",
+  "time": {
+    "title": "Muda",
+    "client": "Kipima muda cha mteja",
+    "none": "Hakuna kipima muda kinachoendelea",
+    "noClients": "Bado hakuna wateja",
+    "selectClient": "Chagua mteja",
+    "view": "Tazama",
+    "start": "Anza kipima muda",
+    "pause": "Simamisha kipima muda",
+    "reset": "Weka upya"
+  }
 }

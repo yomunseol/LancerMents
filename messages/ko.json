@@ -239,5 +239,16 @@
   "cta_my_workspace": "내 워크스페이스로 이동 →",
   "cta_try_free": "LancerMents 무료로 체험하기",
   "cta_login_your_account": "계정으로 로그인",
-  "cta_no_card_beta": "카드 등록 없이 · 공개 베타 동안 무료"
+  "cta_no_card_beta": "카드 등록 없이 · 공개 베타 동안 무료",
+  "time": {
+    "title": "시간",
+    "client": "클라이언트 타이머",
+    "none": "실행 중인 타이머 없음",
+    "noClients": "아직 클라이언트가 없습니다",
+    "selectClient": "클라이언트 선택",
+    "view": "보기",
+    "start": "타이머 시작",
+    "pause": "타이머 일시정지",
+    "reset": "초기화"
+  }
 }
