@@ -30,11 +30,17 @@ const CARD =
 const LABEL = "text-[11px] tracking-widest opacity-60";
 const PILL =
   "rounded-full border border-[#85587D]/40 px-2.5 py-1 text-[11px] font-semibold tracking-widest text-[#85587D] dark:border-[#D8A8D3]/40 dark:text-[#D8A8D3]";
+const HIT_LABEL =
+  "relative flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center";
 const ICON_BUTTON =
-  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#E2D8E0] text-[#151115] transition-colors duration-200 hover:border-[#85587D] dark:border-[#4A2E46] dark:text-[#F8F4F7] dark:hover:border-[#D8A8D3]";
+  "flex h-7 w-7 items-center justify-center rounded-lg border border-[#85587D]/40 transition-colors duration-200 hover:border-[#85587D] dark:border-[#D8A8D3]/40 dark:hover:border-[#D8A8D3]";
 const ICON_BUTTON_ACTIVE =
   "border-[#85587D] bg-[#85587D] text-white hover:bg-[#85587D] dark:border-[#D8A8D3] dark:bg-[#D8A8D3] dark:text-[#151115]";
-const ROW_GRID = "grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3";
+const ADD_BUTTON =
+  "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:focus:ring-[#D8A8D3]";
+const ADD_VISUAL =
+  "flex h-7 w-7 items-center justify-center rounded-lg bg-[#85587D] text-white transition-colors duration-200 hover:brightness-95 dark:bg-[#D8A8D3] dark:text-[#151115]";
+const ROW_GRID = "grid grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center gap-5";
 
 function todayIso(): string {
   const now = new Date();
@@ -73,7 +79,7 @@ function XIcon() {
 
 function PlayIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M8 5v14l11-7z" />
     </svg>
   );
@@ -81,7 +87,7 @@ function PlayIcon() {
 
 function PauseIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M7 5h4v14H7zM13 5h4v14h-4z" />
     </svg>
   );
@@ -127,11 +133,11 @@ function TaskRow({
 
   return (
     <li
-      className={`group ${ROW_GRID} rounded-xl px-5 py-2.5 transition-all duration-200 hover:bg-[#85587D]/5 dark:hover:bg-[#D8A8D3]/10 ${
+      className={`group ${ROW_GRID} rounded-xl py-6 transition-all duration-200 hover:bg-[#85587D]/5 dark:hover:bg-[#D8A8D3]/10 ${
         leaving ? "opacity-0" : "opacity-100"
       }`}
     >
-      <label className="relative flex h-10 w-10 cursor-pointer items-center justify-center">
+      <label className={HIT_LABEL}>
         <input
           id={`task-${task.id}`}
           type="checkbox"
@@ -154,7 +160,7 @@ function TaskRow({
         >
           {checked && (
             <svg
-              className="h-3 w-3 text-white"
+              className="h-3.5 w-3.5 text-white dark:text-[#151115]"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -170,14 +176,20 @@ function TaskRow({
       </label>
       <label htmlFor={`task-${task.id}`} className="min-w-0 cursor-pointer">
         <span
-          className={`block truncate text-sm text-[#151115] dark:text-[#F8F4F7] ${
+          className={`block truncate text-sm font-semibold text-[#151115] dark:text-[#F8F4F7] ${
             checked ? "line-through opacity-60" : ""
           }`}
         >
           {task.title}
         </span>
         {subLabel && (
-          <span className="mt-0.5 block truncate text-xs opacity-60">{subLabel}</span>
+          <span
+            className={`mt-0.5 block truncate text-xs opacity-60 ${
+              checked ? "line-through" : ""
+            }`}
+          >
+            {subLabel}
+          </span>
         )}
       </label>
       <div className="flex items-center justify-self-end gap-2">
@@ -214,7 +226,6 @@ export default function TasksBoard() {
   const [newDue, setNewDue] = useState<string | null>(null);
 
   const workspaceId = ws?.id ?? "";
-  const workspaceName = ws?.name ?? "";
   const clients = useClients(workspaceId);
   const timer = useClientTimer(workspaceId);
 
@@ -465,7 +476,7 @@ export default function TasksBoard() {
     <TaskRow
       key={task.id}
       task={task}
-      clientLabel={task.client_name ?? workspaceName}
+      clientLabel={task.client_name ?? undefined}
       pending={pending[task.id]}
       onToggle={handleToggle}
       onDelete={handleDelete}
@@ -475,7 +486,7 @@ export default function TasksBoard() {
   if (loadFailed && fb) {
     return (
       <section className={`mt-8 overflow-hidden ${CARD}`}>
-        <div className="border-b border-[#E2D8E0] px-5 py-4 dark:border-[#4A2E46]">
+        <div className="border-b border-[#E2D8E0] px-6 py-5 dark:border-[#4A2E46]">
           <h2 className="text-sm font-semibold text-[#151115] dark:text-[#F8F4F7]">
             {t("dashboard.daily_tasks")}
           </h2>
@@ -494,7 +505,7 @@ export default function TasksBoard() {
 
   return (
     <section className={`mt-8 ${CARD}`}>
-      <div className="flex items-center justify-between border-b border-[#E2D8E0] px-5 py-4 dark:border-[#4A2E46]">
+      <div className="flex items-center justify-between border-b border-[#E2D8E0] px-6 py-5 dark:border-[#4A2E46]">
         <div className="flex min-w-0 items-center gap-2">
           <span className="h-2 w-2 shrink-0 rounded-full bg-[#85587D] dark:bg-[#D8A8D3]" />
           <h2 className="truncate text-sm font-semibold text-[#151115] dark:text-[#F8F4F7]">
@@ -521,18 +532,18 @@ export default function TasksBoard() {
       )}
 
       {busy ? (
-        <p className={`px-5 py-6 text-sm ${LABEL}`}>{t("loading")}</p>
+        <p className={`px-6 py-6 text-sm ${LABEL}`}>{t("loading")}</p>
       ) : (
         <>
           {todayTasks.length > 0 ? (
-            <ul className="flex flex-col gap-1 py-3">
+            <ul className="flex flex-col gap-1 px-6 py-3">
               {todayTasks.map(rowFor)}
             </ul>
           ) : (
-            <div className="px-3 pb-3">
-              <div className="rounded-xl border border-[#E2D8E0] p-3 dark:border-[#4A2E46]">
+            <div className="mx-6 mb-6">
+              <div className="rounded-2xl border border-[#85587D]/20 p-6 dark:border-[#D8A8D3]/20">
                 <p className={LABEL}>{t("notes")}</p>
-                <p className="mt-1 text-xs leading-5 text-[#151115]/80 dark:text-[#F8F4F7]/80">
+                <p className="mt-1 text-xs leading-relaxed text-[#151115]/80 dark:text-[#F8F4F7]/80">
                   {t("dashboard.empty_today")}
                 </p>
               </div>
@@ -541,10 +552,10 @@ export default function TasksBoard() {
 
           {scheduled.length > 0 && (
             <div>
-              <div className="px-5 pb-1 pt-4">
+              <div className="px-6 pb-1 pt-4">
                 <p className={LABEL}>{t("scheduled")}</p>
               </div>
-              <ul className="flex flex-col gap-1 pb-3">
+              <ul className="flex flex-col gap-1 px-6 pb-3">
                 {scheduled.map(rowFor)}
               </ul>
             </div>
@@ -556,7 +567,7 @@ export default function TasksBoard() {
                 type="button"
                 onClick={() => setShowCompleted((open) => !open)}
                 aria-expanded={showCompleted}
-                className="flex w-full items-center justify-between border-t border-[#E2D8E0] px-5 py-3 text-[11px] tracking-widest opacity-60 transition-opacity duration-200 hover:opacity-100 dark:border-[#4A2E46]"
+                className="flex w-full items-center justify-between border-t border-[#E2D8E0] px-6 py-3 text-[11px] tracking-widest opacity-60 transition-opacity duration-200 hover:opacity-100 dark:border-[#4A2E46]"
               >
                 <span>
                   {t("dashboard.completed")} ({completed.length})
@@ -564,7 +575,7 @@ export default function TasksBoard() {
                 <ChevronIcon open={showCompleted} />
               </button>
               {showCompleted && (
-                <ul className="flex flex-col gap-1 pb-3">
+                <ul className="flex flex-col gap-1 px-6 pb-3">
                   {completed.map(rowFor)}
                 </ul>
               )}
@@ -574,15 +585,17 @@ export default function TasksBoard() {
       )}
 
       <div
-        className={`${ROW_GRID} border-t border-[#E2D8E0] px-5 py-4 dark:border-[#4A2E46]`}
+        className={`${ROW_GRID} border-t border-[#E2D8E0] px-6 py-5 dark:border-[#4A2E46]`}
       >
         <button
           type="button"
           onClick={handleAdd}
           aria-label={t("add_task_aria")}
-          className={`${ICON_BUTTON} ${ICON_BUTTON_ACTIVE}`}
+          className={ADD_BUTTON}
         >
-          <PlusIcon />
+          <span className={ADD_VISUAL}>
+            <PlusIcon />
+          </span>
         </button>
         <input
           ref={titleInputRef}
@@ -602,7 +615,7 @@ export default function TasksBoard() {
         />
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-[#E2D8E0] px-5 py-4 transition-colors duration-200 hover:bg-[#85587D]/5 dark:border-[#4A2E46] dark:hover:bg-[#D8A8D3]/10">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-4 border-t border-[#E2D8E0] px-6 py-5 transition-colors duration-200 hover:bg-[#85587D]/5 dark:border-[#4A2E46] dark:hover:bg-[#D8A8D3]/10">
         <div className="min-w-0">
           <p className={LABEL}>{t("time.client")}</p>
           <select
@@ -630,7 +643,7 @@ export default function TasksBoard() {
             ))}
           </select>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <span
             className="font-mono text-lg font-semibold tabular-nums text-[#85587D] dark:text-[#D8A8D3]"
             aria-live="polite"
@@ -641,7 +654,7 @@ export default function TasksBoard() {
             type="button"
             onClick={timer.toggle}
             aria-label={timer.running ? t("time.pause") : t("time.start")}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#85587D] text-white transition-colors duration-200 hover:opacity-90 dark:bg-[#D8A8D3] dark:text-[#151115]"
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#85587D] text-white transition-colors duration-200 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:bg-[#D8A8D3] dark:text-[#151115] dark:focus:ring-[#D8A8D3]"
           >
             {timer.running ? <PauseIcon /> : <PlayIcon />}
           </button>
