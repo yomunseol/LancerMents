@@ -32,7 +32,13 @@
     "empty_today": "Niks vir vandag nie. Die rooster is oop.",
     "done": "voltooi"
   },
-  "tasks": "Take",
+  "tasks": {
+    "empty": "Niks vir vandag nie. Die rooster is oop.",
+    "edit": "Wysig taak",
+    "delete": "Verwyder taak",
+    "deleted": "Taak verwyder",
+    "undo": "Ontdoen"
+  },
   "calendar": "Kalender",
   "tier": {
     "headline": "This lives in {tier}",

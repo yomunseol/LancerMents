@@ -32,7 +32,13 @@
     "empty_today": "本日の締切なし。グリッドは空です。",
     "done": "完了"
   },
-  "tasks": "タスク",
+  "tasks": {
+    "empty": "本日の締切なし。グリッドは空です。",
+    "edit": "タスクを編集",
+    "delete": "タスクを削除",
+    "deleted": "タスクを削除しました",
+    "undo": "元に戻す"
+  },
   "calendar": "カレンダー",
   "tier": {
     "headline": "This lives in {tier}",

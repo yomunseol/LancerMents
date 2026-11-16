@@ -80,11 +80,13 @@ export default function DatePicker({
   onChange,
   placeholder,
   onPick,
+  variant = "field",
 }: {
   value: string | null;
   onChange: (value: string | null) => void;
   placeholder?: string;
   onPick?: () => void;
+  variant?: "field" | "pill";
 }) {
   const t = useTranslations();
   const placeholderText = placeholder ?? t("select_date");
@@ -130,22 +132,35 @@ export default function DatePicker({
 
   const today = todayIso();
 
+  const triggerClass =
+    variant === "pill"
+      ? `inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold tracking-widest transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#85587D]/30 dark:focus:ring-[#D8A8D3]/30 ${
+          selected
+            ? "border-[#85587D]/40 text-[#85587D] hover:border-[#85587D] dark:border-[#D8A8D3]/40 dark:text-[#D8A8D3] dark:hover:border-[#D8A8D3]"
+            : "border-[#E2D8E0] text-[#151115]/50 hover:border-[#85587D] dark:border-[#4A2E46] dark:text-[#F8F4F7]/50 dark:hover:border-[#D8A8D3]"
+        }`
+      : "flex h-10 w-full items-center gap-2 rounded-lg border border-[#E2D8E0] bg-white px-3 text-left text-sm text-[#151115] transition-colors duration-200 hover:border-[#85587D] focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:hover:border-[#D8A8D3] dark:focus:ring-[#D8A8D3]";
+
   return (
     <div ref={wrapper} className="relative">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
-        className="flex h-10 w-full items-center gap-2 rounded-lg border border-[#E2D8E0] bg-white px-3 text-left text-sm text-[#151115] transition-colors duration-200 hover:border-[#85587D] focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:hover:border-[#D8A8D3] dark:focus:ring-[#D8A8D3]"
+        className={triggerClass}
       >
-        <CalendarIcon />
+        {variant === "field" && <CalendarIcon />}
         <span className={selected ? "" : "opacity-60"}>
           {selected ? formatLabel(selected) : placeholderText}
         </span>
       </button>
 
       {open && (
-        <div className="absolute start-0 z-50 mt-2 w-72 origin-top rounded-2xl border border-[#E2D8E0] bg-white p-4 shadow-2xl transition-all duration-200 dark:border-[#4A2E46] dark:bg-[#221C21]">
+        <div
+          className={`absolute z-50 mt-2 w-72 origin-top rounded-2xl border border-[#E2D8E0] bg-white p-4 shadow-2xl transition-all duration-200 dark:border-[#4A2E46] dark:bg-[#221C21] ${
+            variant === "pill" ? "end-0" : "start-0"
+          }`}
+        >
           <div className="flex items-center justify-between">
             <button
               type="button"

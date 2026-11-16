@@ -32,7 +32,13 @@
     "empty_today": "Nada para hoje. A grade está livre.",
     "done": "concluídas"
   },
-  "tasks": "Tarefas",
+  "tasks": {
+    "empty": "Nada para hoje. A grade está livre.",
+    "edit": "Editar tarefa",
+    "delete": "Excluir tarefa",
+    "deleted": "Tarefa excluída",
+    "undo": "Desfazer"
+  },
   "calendar": "Calendário",
   "tier": {
     "headline": "This lives in {tier}",

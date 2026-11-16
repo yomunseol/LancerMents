@@ -32,7 +32,13 @@
     "empty_today": "Nichts für heute. Das Raster ist frei.",
     "done": "erledigt"
   },
-  "tasks": "Aufgaben",
+  "tasks": {
+    "empty": "Nichts für heute. Das Raster ist frei.",
+    "edit": "Aufgabe bearbeiten",
+    "delete": "Aufgabe löschen",
+    "deleted": "Aufgabe gelöscht",
+    "undo": "Rückgängig"
+  },
   "calendar": "Kalender",
   "tier": {
     "headline": "This lives in {tier}",

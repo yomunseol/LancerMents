@@ -32,7 +32,13 @@
     "empty_today": "Nothing due today. The grid is clear.",
     "done": "done"
   },
-  "tasks": "Tasks",
+  "tasks": {
+    "empty": "Nothing due today. The grid is clear.",
+    "edit": "Edit task",
+    "delete": "Delete task",
+    "deleted": "Task deleted",
+    "undo": "Undo"
+  },
   "calendar": "Calendar",
   "tier": {
     "headline": "This lives in {tier}",

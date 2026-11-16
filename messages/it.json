@@ -32,7 +32,13 @@
     "empty_today": "Niente per oggi. Il grid è libero.",
     "done": "fatte"
   },
-  "tasks": "Attività",
+  "tasks": {
+    "empty": "Niente per oggi. Il grid è libero.",
+    "edit": "Modifica attività",
+    "delete": "Elimina attività",
+    "deleted": "Attività eliminata",
+    "undo": "Annulla"
+  },
   "calendar": "Calendario",
   "tier": {
     "headline": "This lives in {tier}",

@@ -32,7 +32,13 @@
     "empty_today": "שום דבר להיום. הרשת פנויה.",
     "done": "הושלמו"
   },
-  "tasks": "משימות",
+  "tasks": {
+    "empty": "שום דבר להיום. הרשת פנויה.",
+    "edit": "ערוך משימה",
+    "delete": "מחק משימה",
+    "deleted": "המשימה נמחקה",
+    "undo": "בטל"
+  },
   "calendar": "לוח שנה",
   "tier": {
     "headline": "This lives in {tier}",

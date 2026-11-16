@@ -32,7 +32,13 @@
     "empty_today": "Rien pour aujourd'hui. Le grid est libre.",
     "done": "faites"
   },
-  "tasks": "Tâches",
+  "tasks": {
+    "empty": "Rien pour aujourd'hui. Le grid est libre.",
+    "edit": "Modifier la tâche",
+    "delete": "Supprimer la tâche",
+    "deleted": "Tâche supprimée",
+    "undo": "Annuler"
+  },
   "calendar": "Calendrier",
   "tier": {
     "headline": "This lives in {tier}",

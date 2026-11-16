@@ -32,7 +32,13 @@
     "empty_today": "Hakuna kazi leo. Gridi iko wazi.",
     "done": "zilizokamilika"
   },
-  "tasks": "Kazi",
+  "tasks": {
+    "empty": "Hakuna kazi leo. Gridi iko wazi.",
+    "edit": "Hariri kazi",
+    "delete": "Futa kazi",
+    "deleted": "Kazi imefutwa",
+    "undo": "Tendua"
+  },
   "calendar": "Kalenda",
   "tier": {
     "headline": "This lives in {tier}",

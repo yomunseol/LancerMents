@@ -32,7 +32,13 @@
     "empty_today": "今天没有截止任务。网格是清的。",
     "done": "已完成"
   },
-  "tasks": "任务",
+  "tasks": {
+    "empty": "今天没有截止任务。网格是清的。",
+    "edit": "编辑任务",
+    "delete": "删除任务",
+    "deleted": "任务已删除",
+    "undo": "撤销"
+  },
   "calendar": "日历",
   "tier": {
     "headline": "This lives in {tier}",

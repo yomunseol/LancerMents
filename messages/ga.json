@@ -32,7 +32,13 @@
     "empty_today": "Faic inniu. Tá an ghreille glan.",
     "done": "déanta"
   },
-  "tasks": "Tascanna",
+  "tasks": {
+    "empty": "Faic inniu. Tá an ghreille glan.",
+    "edit": "Cuir tasc in eagar",
+    "delete": "Scrios tasc",
+    "deleted": "Scriosadh an tasc",
+    "undo": "Cealaigh"
+  },
   "calendar": "Féilire",
   "tier": {
     "headline": "This lives in {tier}",

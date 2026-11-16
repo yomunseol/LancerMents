@@ -33,8 +33,6 @@ const TASK_COLUMNS_GROUP = `${TASK_COLUMNS},group_id`;
 const CARD =
   "rounded-2xl border border-[#E2D8E0] bg-white shadow-xl dark:border-[#4A2E46] dark:bg-[#221C21]";
 const LABEL = "text-[11px] tracking-widest opacity-60";
-const PILL =
-  "rounded-full border border-[#85587D]/40 px-2.5 py-1 text-[11px] font-semibold tracking-widest text-[#85587D] dark:border-[#D8A8D3]/40 dark:text-[#D8A8D3]";
 const HIT_LABEL =
   "relative flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center";
 const ICON_BUTTON =
@@ -47,25 +45,6 @@ const ADD_VISUAL =
   "flex h-7 w-7 items-center justify-center rounded-lg bg-[#85587D] text-white transition-colors duration-200 hover:brightness-95 dark:bg-[#D8A8D3] dark:text-[#151115]";
 const ROW_GRID = "grid grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center gap-5";
 
-function todayIso(): string {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${now.getFullYear()}-${month}-${day}`;
-}
-
-function dueDay(due: string | null): string | null {
-  return due ? String(due).slice(0, 10) : null;
-}
-
-function formatDue(due: string | null): string {
-  const day = dueDay(due);
-  if (!day) return "";
-  const parsed = new Date(`${day}T00:00:00`);
-  if (Number.isNaN(parsed.getTime())) return day;
-  return parsed.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
 function PlusIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
@@ -74,10 +53,18 @@ function PlusIcon() {
   );
 }
 
-function XIcon() {
+function PencilIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-      <path d="M6 6l12 12M18 6L6 18" />
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 20h4l10-10-4-4L4 16zM14 6l4 4" />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
     </svg>
   );
 }
@@ -121,30 +108,70 @@ function TaskRow({
   task,
   clientLabel,
   groups,
-  pending,
   onToggle,
   onDelete,
   onMove,
+  onEdit,
+  onDueDate,
 }: {
   task: Task;
   clientLabel?: string;
   groups: TaskGroup[];
-  pending?: "holding" | "leaving";
   onToggle: (task: Task) => void;
   onDelete: (task: Task) => void;
   onMove: (task: Task, groupId: string | null) => void;
+  onEdit: (task: Task, title: string) => void;
+  onDueDate: (task: Task, due: string | null) => void;
 }) {
   const t = useTranslations();
-  const checked = task.is_completed || pending !== undefined;
-  const isToday = dueDay(task.due_date) === todayIso();
-  const leaving = pending === "leaving";
+  const checked = task.is_completed;
   const subLabel = clientLabel?.trim();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(task.title);
+  const editInputRef = useRef<HTMLInputElement>(null);
+  const committedRef = useRef(false);
+
+  useEffect(() => {
+    if (!editing) return;
+    committedRef.current = false;
+    setDraft(task.title);
+    const frame = requestAnimationFrame(() => {
+      editInputRef.current?.focus();
+      editInputRef.current?.select();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [editing, task.title]);
+
+  function beginEdit() {
+    if (editing) {
+      editInputRef.current?.focus();
+      return;
+    }
+    setDraft(task.title);
+    setEditing(true);
+  }
+
+  function commitEdit() {
+    if (committedRef.current) return;
+    committedRef.current = true;
+    const next = draft.trim();
+    setEditing(false);
+    if (next && next !== task.title) onEdit(task, next);
+    else setDraft(task.title);
+  }
+
+  function cancelEdit() {
+    committedRef.current = true;
+    setEditing(false);
+    setDraft(task.title);
+  }
+
+  const actionButtonClass =
+    "flex h-7 w-7 items-center justify-center rounded-md text-[#151115]/40 transition-colors duration-200 hover:bg-[#85587D]/10 hover:text-[#85587D] focus:outline-none focus:ring-2 focus:ring-[#85587D]/30 dark:text-[#F8F4F7]/40 dark:hover:bg-[#D8A8D3]/10 dark:hover:text-[#D8A8D3] dark:focus:ring-[#D8A8D3]/30";
 
   return (
     <li
-      className={`group ${ROW_GRID} rounded-xl py-6 transition-all duration-200 hover:bg-[#85587D]/5 dark:hover:bg-[#D8A8D3]/10 ${
-        leaving ? "opacity-0" : "opacity-100"
-      }`}
+      className={`group ${ROW_GRID} rounded-xl py-6 transition-colors duration-200 hover:bg-[#85587D]/5 dark:hover:bg-[#D8A8D3]/10`}
     >
       <label className={HIT_LABEL}>
         <input
@@ -183,45 +210,83 @@ function TaskRow({
           )}
         </span>
       </label>
-      <label htmlFor={`task-${task.id}`} className="min-w-0 cursor-pointer">
-        <span
-          className={`block truncate text-sm font-semibold text-[#151115] dark:text-[#F8F4F7] ${
-            checked ? "line-through opacity-60" : ""
-          }`}
-        >
-          {task.title}
-        </span>
-        {subLabel && (
+
+      {editing ? (
+        <div className="min-w-0">
+          <input
+            ref={editInputRef}
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                commitEdit();
+              } else if (event.key === "Escape") {
+                event.preventDefault();
+                cancelEdit();
+              }
+            }}
+            onBlur={commitEdit}
+            aria-label={t("tasks.edit")}
+            className="block w-full bg-transparent text-sm font-semibold text-[#151115] focus:outline-none dark:text-[#F8F4F7]"
+          />
+          {subLabel && (
+            <span className="mt-0.5 block truncate text-xs opacity-60">
+              {subLabel}
+            </span>
+          )}
+        </div>
+      ) : (
+        <label htmlFor={`task-${task.id}`} className="min-w-0 cursor-pointer">
           <span
-            className={`mt-0.5 block truncate text-xs opacity-60 ${
-              checked ? "line-through" : ""
+            className={`block truncate text-sm font-semibold text-[#151115] dark:text-[#F8F4F7] ${
+              checked ? "line-through opacity-60" : ""
             }`}
           >
-            {subLabel}
+            {task.title}
           </span>
-        )}
-      </label>
+          {subLabel && (
+            <span
+              className={`mt-0.5 block truncate text-xs opacity-60 ${
+                checked ? "line-through" : ""
+              }`}
+            >
+              {subLabel}
+            </span>
+          )}
+        </label>
+      )}
+
       <div className="flex items-center justify-self-end gap-2">
-        {groups.length > 0 && (
+        <div className="flex items-center gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100 [@media(pointer:coarse)]:opacity-100">
           <TaskGroupMenu
             groups={groups}
             currentGroupId={task.group_id ?? null}
             onMove={(groupId) => onMove(task, groupId)}
           />
-        )}
-        {task.due_date && (
-          <span className={`whitespace-nowrap ${PILL}`}>
-            {isToday ? t("dashboard.today") : formatDue(task.due_date)}
-          </span>
-        )}
-        <button
-          type="button"
-          onClick={() => onDelete(task)}
-          aria-label={`Delete ${task.title}`}
-          className="shrink-0 text-[#151115]/50 opacity-0 transition-colors duration-200 hover:text-red-400 focus:opacity-100 group-hover:opacity-100 dark:text-[#F8F4F7]/50"
-        >
-          <XIcon />
-        </button>
+          <button
+            type="button"
+            onClick={beginEdit}
+            aria-label={t("tasks.edit")}
+            className={actionButtonClass}
+          >
+            <PencilIcon />
+          </button>
+          <button
+            type="button"
+            onClick={() => onDelete(task)}
+            aria-label={t("tasks.delete")}
+            className={actionButtonClass}
+          >
+            <TrashIcon />
+          </button>
+        </div>
+        <DatePicker
+          variant="pill"
+          value={task.due_date}
+          onChange={(value) => onDueDate(task, value)}
+          placeholder={t("dashboard.due_date")}
+        />
       </div>
     </li>
   );
@@ -231,30 +296,25 @@ export default function TasksBoard() {
   const t = useTranslations();
   const ws = useWorkspaceGate();
   const titleInputRef = useRef<HTMLInputElement>(null);
-  const timersRef = useRef<Record<string, number[]>>({});
-  const [pending, setPending] = useState<Record<string, "holding" | "leaving">>({});
+  const undoTimerRef = useRef<number | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [fb, setFb] = useState<FeedbackState>(null);
   const [loadFailed, setLoadFailed] = useState(false);
-  const [showCompleted, setShowCompleted] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDue, setNewDue] = useState<string | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const [creatingGroup, setCreatingGroup] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [undoTask, setUndoTask] = useState<{ task: Task; index: number } | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const groupInputRef = useRef<HTMLInputElement>(null);
 
   const workspaceId = ws?.id ?? "";
   const clients = useClients(workspaceId);
   const timer = useClientTimer(workspaceId);
-  const {
-    groups,
-    loaded: groupsLoaded,
-    supported: groupsSupported,
-    createGroup,
-  } = useTaskGroups(workspaceId);
+  const { groups, loaded: groupsLoaded, createGroup } = useTaskGroups(workspaceId);
 
   const loadTasks = useCallback(
     async (activeWorkspaceId: string) => {
@@ -303,9 +363,9 @@ export default function TasksBoard() {
 
   useEffect(() => {
     return () => {
-      Object.values(timersRef.current)
-        .flat()
-        .forEach((timer) => window.clearTimeout(timer));
+      if (undoTimerRef.current !== null) {
+        window.clearTimeout(undoTimerRef.current);
+      }
     };
   }, []);
 
@@ -314,105 +374,93 @@ export default function TasksBoard() {
   }, [creatingGroup]);
 
   useEffect(() => {
-    if (selectedGroupId && !groups.some((group) => group.id === selectedGroupId)) {
+    if (
+      selectedGroupId &&
+      !groups.some(
+        (group) => group.id === selectedGroupId && (group.name ?? "").trim(),
+      )
+    ) {
       setSelectedGroupId(null);
     }
   }, [groups, selectedGroupId]);
 
-  function clearTaskTimers(id: string) {
-    const timers = timersRef.current[id];
-    if (timers) timers.forEach((timer) => window.clearTimeout(timer));
-    delete timersRef.current[id];
-  }
-
-  function setPendingFor(id: string, value: "holding" | "leaving" | null) {
-    setPending((current) => {
-      const next = { ...current };
-      if (value) next[id] = value;
-      else delete next[id];
-      return next;
-    });
-  }
-
   async function handleToggle(task: Task) {
     setFb(null);
-
-    // A second click during the 2s hold cancels the completion.
-    if (pending[task.id]) {
-      clearTaskTimers(task.id);
-      setPendingFor(task.id, null);
-      try {
-        const { error } = await supabase
-          .from("tasks")
-          .update({ is_completed: false })
-          .eq("id", task.id);
-        if (error) throw error;
-      } catch (updateError) {
-        setFb({
-          kind: "error",
-          label: t("err_save"),
-          raw: rawReason(updateError),
-        });
-      }
-      return;
-    }
-
-    if (task.is_completed) {
-      setTasks((current) =>
-        current.map((item) =>
-          item.id === task.id ? { ...item, is_completed: false } : item,
-        ),
-      );
-      try {
-        const { error } = await supabase
-          .from("tasks")
-          .update({ is_completed: false })
-          .eq("id", task.id);
-        if (error) throw error;
-      } catch (updateError) {
-        setTasks((current) =>
-          current.map((item) =>
-            item.id === task.id ? { ...item, is_completed: true } : item,
-          ),
-        );
-        setFb({
-          kind: "error",
-          label: t("err_save"),
-          raw: rawReason(updateError),
-        });
-      }
-      return;
-    }
-
-    setPendingFor(task.id, "holding");
-
-    const holdTimer = window.setTimeout(() => {
-      setPendingFor(task.id, "leaving");
-      const leaveTimer = window.setTimeout(() => {
-        setTasks((current) =>
-          current.map((item) =>
-            item.id === task.id ? { ...item, is_completed: true } : item,
-          ),
-        );
-        setPendingFor(task.id, null);
-        delete timersRef.current[task.id];
-      }, 200);
-      timersRef.current[task.id] = [leaveTimer];
-    }, 2000);
-    timersRef.current[task.id] = [holdTimer];
+    const next = !task.is_completed;
+    setTasks((current) =>
+      current.map((item) =>
+        item.id === task.id ? { ...item, is_completed: next } : item,
+      ),
+    );
 
     try {
       const { error } = await supabase
         .from("tasks")
-        .update({ is_completed: true })
+        .update({ is_completed: next })
         .eq("id", task.id);
       if (error) throw error;
     } catch (updateError) {
-      clearTaskTimers(task.id);
-      setPendingFor(task.id, null);
       setTasks((current) =>
         current.map((item) =>
-          item.id === task.id ? { ...item, is_completed: false } : item,
+          item.id === task.id ? { ...item, is_completed: task.is_completed } : item,
+        ),
+      );
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(updateError),
+      });
+    }
+  }
+
+  async function handleEditTitle(task: Task, title: string) {
+    const next = title.trim();
+    if (!next || next === task.title) return;
+    const previous = task.title;
+    setTasks((current) =>
+      current.map((item) =>
+        item.id === task.id ? { ...item, title: next } : item,
+      ),
+    );
+
+    try {
+      const { error } = await supabase
+        .from("tasks")
+        .update({ title: next })
+        .eq("id", task.id);
+      if (error) throw error;
+    } catch (updateError) {
+      setTasks((current) =>
+        current.map((item) =>
+          item.id === task.id ? { ...item, title: previous } : item,
+        ),
+      );
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(updateError),
+      });
+    }
+  }
+
+  async function handleDueDate(task: Task, due: string | null) {
+    const previous = task.due_date;
+    setTasks((current) =>
+      current.map((item) =>
+        item.id === task.id ? { ...item, due_date: due } : item,
+      ),
+    );
+
+    try {
+      const { error } = await supabase
+        .from("tasks")
+        .update({ due_date: due })
+        .eq("id", task.id);
+      if (error) throw error;
+    } catch (updateError) {
+      setTasks((current) =>
+        current.map((item) =>
+          item.id === task.id ? { ...item, due_date: previous } : item,
         ),
       );
       setFb({
@@ -548,38 +596,103 @@ export default function TasksBoard() {
 
   async function handleDelete(task: Task) {
     setFb(null);
-    const previous = tasks;
+    const index = tasks.findIndex((item) => item.id === task.id);
+    const snapshot = { ...task };
     setTasks((current) => current.filter((item) => item.id !== task.id));
 
-    try {
-      const { error: deleteError } = await supabase
-        .from("tasks")
-        .delete()
-        .eq("id", task.id);
+    if (undoTimerRef.current !== null) {
+      window.clearTimeout(undoTimerRef.current);
+    }
+    setUndoTask({ task: snapshot, index: index >= 0 ? index : tasks.length });
+    undoTimerRef.current = window.setTimeout(() => {
+      setUndoTask(null);
+      undoTimerRef.current = null;
+    }, 5000);
 
-      if (deleteError) throw deleteError;
+    setDeleting(true);
+    try {
+      const { error } = await supabase.from("tasks").delete().eq("id", task.id);
+      if (error) throw error;
     } catch (deleteError) {
-      setTasks(previous);
+      setTasks((current) => {
+        if (current.some((item) => item.id === snapshot.id)) return current;
+        const next = [...current];
+        next.splice(
+          Math.min(index >= 0 ? index : next.length, next.length),
+          0,
+          snapshot,
+        );
+        return next;
+      });
+      setUndoTask(null);
+      if (undoTimerRef.current !== null) {
+        window.clearTimeout(undoTimerRef.current);
+        undoTimerRef.current = null;
+      }
       setFb({
         kind: "error",
         label: t("err_save"),
         raw: rawReason(deleteError),
       });
+    } finally {
+      setDeleting(false);
     }
   }
 
-  const uncompleted = tasks.filter((task) => !task.is_completed);
-  const completed = tasks.filter((task) => task.is_completed);
-  const groupIds = new Set(groups.map((group) => group.id));
-  const rootTasks = uncompleted.filter(
+  async function handleUndo() {
+    const target = undoTask;
+    if (!target || deleting) return;
+
+    if (undoTimerRef.current !== null) {
+      window.clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = null;
+    }
+    setUndoTask(null);
+
+    const { task, index } = target;
+    setTasks((current) => {
+      if (current.some((item) => item.id === task.id)) return current;
+      const next = [...current];
+      next.splice(Math.min(index, next.length), 0, task);
+      return next;
+    });
+    if (task.group_id) {
+      setExpandedGroups((current) => ({ ...current, [task.group_id as string]: true }));
+    }
+
+    try {
+      const payload: Record<string, unknown> = {
+        id: task.id,
+        workspace_id: task.workspace_id,
+        title: task.title,
+        due_date: task.due_date,
+        created_at: task.created_at,
+        is_completed: task.is_completed,
+      };
+      if (task.group_id) payload.group_id = task.group_id;
+      const { error } = await supabase.from("tasks").insert(payload);
+      if (error) throw error;
+    } catch (undoError) {
+      setTasks((current) => current.filter((item) => item.id !== task.id));
+      setFb({
+        kind: "error",
+        label: t("err_save"),
+        raw: rawReason(undoError),
+      });
+    }
+  }
+
+  const visibleTasks = tasks.filter((task) => (task.title ?? "").trim().length > 0);
+  const validGroups = groups.filter((group) => (group.name ?? "").trim().length > 0);
+  const groupIds = new Set(validGroups.map((group) => group.id));
+  const rootTasks = visibleTasks.filter(
     (task) => !task.group_id || !groupIds.has(task.group_id),
   );
+  const completedVisible = visibleTasks.filter((task) => task.is_completed).length;
   const busy = loading || !ws || !groupsLoaded;
-  const addGrid =
-    groups.length > 0
-      ? "grid grid-cols-[2.75rem_minmax(0,1fr)_auto_auto] items-center gap-5"
-      : ROW_GRID;
-  const showEmptyRoot = groups.length === 0 && rootTasks.length === 0;
+  const ADD_GRID =
+    "grid grid-cols-[2.75rem_minmax(0,1fr)_auto_auto] items-center gap-5";
+  const showEmptyRoot = validGroups.length === 0 && rootTasks.length === 0;
 
   const storedMissing =
     timer.clientId !== null && !clients.some((client) => client.id === timer.clientId);
@@ -589,11 +702,12 @@ export default function TasksBoard() {
       key={task.id}
       task={task}
       clientLabel={task.client_name ?? undefined}
-      groups={groups}
-      pending={pending[task.id]}
+      groups={validGroups}
       onToggle={handleToggle}
       onDelete={handleDelete}
       onMove={handleMoveTask}
+      onEdit={handleEditTitle}
+      onDueDate={handleDueDate}
     />
   );
 
@@ -630,7 +744,7 @@ export default function TasksBoard() {
           </span>
         </div>
         <span className="shrink-0 text-xs opacity-60">
-          {completed.length}/{tasks.length} {t("dashboard.done")}
+          {completedVisible}/{visibleTasks.length} {t("dashboard.done")}
         </span>
       </div>
 
@@ -650,10 +764,11 @@ export default function TasksBoard() {
       ) : (
         <>
           <ul className="flex flex-col gap-1 px-6 py-3">
-            {groups.map((group) => {
-              const groupTasks = tasks.filter((task) => task.group_id === group.id);
+            {validGroups.map((group) => {
+              const groupTasks = visibleTasks.filter(
+                (task) => task.group_id === group.id,
+              );
               const groupDone = groupTasks.filter((task) => task.is_completed).length;
-              const groupActive = groupTasks.filter((task) => !task.is_completed);
               const open = !!expandedGroups[group.id];
 
               return (
@@ -677,8 +792,8 @@ export default function TasksBoard() {
                       {groupDone}/{groupTasks.length} {t("dashboard.done")}
                     </span>
                   </button>
-                  {open && groupActive.length > 0 && (
-                    <ul className="pl-16">{groupActive.map(rowFor)}</ul>
+                  {open && groupTasks.length > 0 && (
+                    <ul className="pl-16">{groupTasks.map(rowFor)}</ul>
                   )}
                 </li>
               );
@@ -689,46 +804,44 @@ export default function TasksBoard() {
             {showEmptyRoot && (
               <li className={`${ROW_GRID} py-6`}>
                 <span />
-                <p className={`truncate ${LABEL}`}>{t("dashboard.empty_today")}</p>
+                <p className={`truncate ${LABEL}`}>{t("tasks.empty")}</p>
                 <span />
               </li>
             )}
 
-            {groupsSupported && (
-              <li className="py-2">
-                {creatingGroup ? (
-                  <input
-                    ref={groupInputRef}
-                    value={groupName}
-                    onChange={(event) => setGroupName(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        event.preventDefault();
-                        void handleCreateGroup();
-                      } else if (event.key === "Escape") {
-                        setCreatingGroup(false);
-                        setGroupName("");
-                      }
-                    }}
-                    placeholder={t("groups.placeholder")}
-                    className={`${LABEL} w-full border-none bg-transparent p-0 placeholder:opacity-40 focus:outline-none`}
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
+            <li className="py-2">
+              {creatingGroup ? (
+                <input
+                  ref={groupInputRef}
+                  value={groupName}
+                  onChange={(event) => setGroupName(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      void handleCreateGroup();
+                    } else if (event.key === "Escape") {
+                      setCreatingGroup(false);
                       setGroupName("");
-                      setCreatingGroup(true);
-                    }}
-                    className={`${LABEL} transition-opacity duration-200 hover:opacity-100`}
-                  >
-                    {t("groups.new")}
-                  </button>
-                )}
-              </li>
-            )}
+                    }
+                  }}
+                  placeholder={t("groups.placeholder")}
+                  className={`${LABEL} w-full border-none bg-transparent p-0 placeholder:opacity-40 focus:outline-none`}
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGroupName("");
+                    setCreatingGroup(true);
+                  }}
+                  className={`${LABEL} transition-opacity duration-200 hover:opacity-100`}
+                >
+                  {t("groups.new")}
+                </button>
+              )}
+            </li>
 
-            <li className={`${addGrid} py-6`}>
+            <li className={`${ADD_GRID} py-6`}>
               <button
                 type="button"
                 onClick={handleAdd}
@@ -749,24 +862,22 @@ export default function TasksBoard() {
                 placeholder={t("dashboard.add_task_placeholder")}
                 className="h-10 w-full min-w-0 rounded-lg border border-[#E2D8E0] bg-white px-3 text-sm text-[#151115] placeholder:text-[#151115]/60 transition-colors duration-200 focus:border-[#85587D] focus:outline-none focus:ring-2 focus:ring-[#85587D]/30 dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:placeholder:text-[#F8F4F7]/60 dark:focus:border-[#D8A8D3] dark:focus:ring-[#D8A8D3]/30"
               />
-              {groups.length > 0 && (
-                <div className="flex h-10 items-center gap-1 rounded-lg border border-[#E2D8E0] bg-white px-2 dark:border-[#4A2E46] dark:bg-[#221C21]">
-                  <FolderIcon className="h-4 w-4 shrink-0 text-[#85587D] dark:text-[#D8A8D3]" />
-                  <select
-                    value={selectedGroupId ?? ""}
-                    onChange={(event) => setSelectedGroupId(event.target.value || null)}
-                    aria-label={t("groups.select")}
-                    className="h-full max-w-[9rem] cursor-pointer border-none bg-transparent pr-1 text-sm text-[#151115] focus:outline-none dark:text-[#F8F4F7]"
-                  >
-                    <option value="">{t("groups.noGroup")}</option>
-                    {groups.map((group) => (
-                      <option key={group.id} value={group.id}>
-                        {group.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+              <div className="flex h-10 items-center gap-1 rounded-lg border border-[#E2D8E0] bg-white px-2 dark:border-[#4A2E46] dark:bg-[#221C21]">
+                <FolderIcon className="h-4 w-4 shrink-0 text-[#85587D] dark:text-[#D8A8D3]" />
+                <select
+                  value={selectedGroupId ?? ""}
+                  onChange={(event) => setSelectedGroupId(event.target.value || null)}
+                  aria-label={t("groups.select")}
+                  className="h-full max-w-[9rem] cursor-pointer border-none bg-transparent pr-1 text-sm text-[#151115] focus:outline-none dark:text-[#F8F4F7]"
+                >
+                  <option value="">{t("groups.noGroup")}</option>
+                  {validGroups.map((group) => (
+                    <option key={group.id} value={group.id}>
+                      {group.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <DatePicker
                 value={newDue}
                 onChange={setNewDue}
@@ -776,26 +887,6 @@ export default function TasksBoard() {
             </li>
           </ul>
 
-          {completed.length > 0 && (
-            <div>
-              <button
-                type="button"
-                onClick={() => setShowCompleted((open) => !open)}
-                aria-expanded={showCompleted}
-                className="flex w-full items-center justify-between border-t border-[#E2D8E0] px-6 py-3 text-[11px] tracking-widest opacity-60 transition-opacity duration-200 hover:opacity-100 dark:border-[#4A2E46]"
-              >
-                <span>
-                  {t("dashboard.completed")} ({completed.length})
-                </span>
-                <ChevronIcon open={showCompleted} />
-              </button>
-              {showCompleted && (
-                <ul className="flex flex-col gap-1 px-6 pb-3">
-                  {completed.map(rowFor)}
-                </ul>
-              )}
-            </div>
-          )}
         </>
       )}
 
@@ -850,6 +941,24 @@ export default function TasksBoard() {
           </Link>
         </div>
       </div>
+
+      {undoTask && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-lg border border-[#E2D8E0] bg-white px-4 py-2 shadow-xl dark:border-[#4A2E46] dark:bg-[#221C21]"
+        >
+          <span className={LABEL}>{t("tasks.deleted")}</span>
+          <button
+            type="button"
+            onClick={() => void handleUndo()}
+            disabled={deleting}
+            className="text-[11px] font-semibold tracking-widest text-[#85587D] hover:underline disabled:cursor-not-allowed disabled:opacity-50 dark:text-[#D8A8D3]"
+          >
+            {t("tasks.undo")}
+          </button>
+        </div>
+      )}
     </section>
   );
 }

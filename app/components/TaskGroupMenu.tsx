@@ -37,8 +37,8 @@ export default function TaskGroupMenu({
   }, [open]);
 
   function choose(groupId: string | null) {
-    onMove(groupId);
     setOpen(false);
+    if (groupId !== currentGroupId) onMove(groupId);
   }
 
   const itemClass =
@@ -52,9 +52,7 @@ export default function TaskGroupMenu({
         aria-label={t("groups.move")}
         aria-haspopup="menu"
         aria-expanded={open}
-        className={`flex h-7 w-7 items-center justify-center rounded-md text-[#151115]/40 transition-opacity duration-200 hover:text-[#85587D] focus:opacity-100 group-hover:opacity-100 dark:text-[#F8F4F7]/40 dark:hover:text-[#D8A8D3] ${
-          open ? "opacity-100" : "opacity-0"
-        }`}
+        className="flex h-7 w-7 items-center justify-center rounded-md text-[#151115]/40 transition-colors duration-200 hover:bg-[#85587D]/10 hover:text-[#85587D] focus:outline-none focus:ring-2 focus:ring-[#85587D]/30 dark:text-[#F8F4F7]/40 dark:hover:bg-[#D8A8D3]/10 dark:hover:text-[#D8A8D3] dark:focus:ring-[#D8A8D3]/30"
       >
         <FolderIcon />
       </button>
