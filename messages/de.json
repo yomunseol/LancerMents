@@ -29,7 +29,8 @@
     "completed": "Erledigt",
     "add_task_placeholder": "Aufgabe hinzufügen…",
     "due_date": "Fällig am",
-    "empty_today": "Nichts für heute. Das Raster ist frei."
+    "empty_today": "Nichts für heute. Das Raster ist frei.",
+    "done": "erledigt"
   },
   "tasks": "Aufgaben",
   "calendar": "Kalender",

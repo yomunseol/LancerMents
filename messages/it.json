@@ -29,7 +29,8 @@
     "completed": "Completate",
     "add_task_placeholder": "Aggiungi un'attività…",
     "due_date": "Scadenza",
-    "empty_today": "Niente per oggi. Il grid è libero."
+    "empty_today": "Niente per oggi. Il grid è libero.",
+    "done": "fatte"
   },
   "tasks": "Attività",
   "calendar": "Calendario",

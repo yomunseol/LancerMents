@@ -29,7 +29,8 @@
     "completed": "완료",
     "add_task_placeholder": "작업 추가…",
     "due_date": "마감일",
-    "empty_today": "오늘 마감 없음. 그리드가 비어 있습니다."
+    "empty_today": "오늘 마감 없음. 그리드가 비어 있습니다.",
+    "done": "완료"
   },
   "tasks": "작업",
   "calendar": "캘린더",

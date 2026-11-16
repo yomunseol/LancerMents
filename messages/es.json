@@ -29,7 +29,8 @@
     "completed": "Completadas",
     "add_task_placeholder": "Añadir tarea…",
     "due_date": "Fecha límite",
-    "empty_today": "Nada para hoy. El grid está libre."
+    "empty_today": "Nada para hoy. El grid está libre.",
+    "done": "hechas"
   },
   "tasks": "Tareas",
   "calendar": "Calendario",

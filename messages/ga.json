@@ -29,7 +29,8 @@
     "completed": "Críochnaithe",
     "add_task_placeholder": "Cuir tasc leis…",
     "due_date": "Spriocdháta",
-    "empty_today": "Faic inniu. Tá an ghreille glan."
+    "empty_today": "Faic inniu. Tá an ghreille glan.",
+    "done": "déanta"
   },
   "tasks": "Tascanna",
   "calendar": "Féilire",

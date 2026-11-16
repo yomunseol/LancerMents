@@ -29,7 +29,8 @@
     "completed": "Concluídas",
     "add_task_placeholder": "Adicionar tarefa…",
     "due_date": "Data de vencimento",
-    "empty_today": "Nada para hoje. A grade está livre."
+    "empty_today": "Nada para hoje. A grade está livre.",
+    "done": "concluídas"
   },
   "tasks": "Tarefas",
   "calendar": "Calendário",

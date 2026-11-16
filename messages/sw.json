@@ -29,7 +29,8 @@
     "completed": "Imekamilika",
     "add_task_placeholder": "Ongeza kazi…",
     "due_date": "Tarehe ya mwisho",
-    "empty_today": "Hakuna kazi leo. Gridi iko wazi."
+    "empty_today": "Hakuna kazi leo. Gridi iko wazi.",
+    "done": "zilizokamilika"
   },
   "tasks": "Kazi",
   "calendar": "Kalenda",

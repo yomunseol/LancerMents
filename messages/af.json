@@ -29,7 +29,8 @@
     "completed": "Voltooi",
     "add_task_placeholder": "Voeg 'n taak by…",
     "due_date": "Verskyningsdatum",
-    "empty_today": "Niks vir vandag nie. Die rooster is oop."
+    "empty_today": "Niks vir vandag nie. Die rooster is oop.",
+    "done": "voltooi"
   },
   "tasks": "Take",
   "calendar": "Kalender",

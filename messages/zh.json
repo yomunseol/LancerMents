@@ -29,7 +29,8 @@
     "completed": "已完成",
     "add_task_placeholder": "添加任务…",
     "due_date": "截止日期",
-    "empty_today": "今天没有截止任务。网格是清的。"
+    "empty_today": "今天没有截止任务。网格是清的。",
+    "done": "已完成"
   },
   "tasks": "任务",
   "calendar": "日历",

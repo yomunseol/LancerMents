@@ -29,7 +29,8 @@
     "completed": "Terminées",
     "add_task_placeholder": "Ajouter une tâche…",
     "due_date": "Échéance",
-    "empty_today": "Rien pour aujourd'hui. Le grid est libre."
+    "empty_today": "Rien pour aujourd'hui. Le grid est libre.",
+    "done": "faites"
   },
   "tasks": "Tâches",
   "calendar": "Calendrier",

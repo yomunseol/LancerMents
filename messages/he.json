@@ -29,7 +29,8 @@
     "completed": "הושלם",
     "add_task_placeholder": "הוסף משימה…",
     "due_date": "תאריך יעד",
-    "empty_today": "שום דבר להיום. הרשת פנויה."
+    "empty_today": "שום דבר להיום. הרשת פנויה.",
+    "done": "הושלמו"
   },
   "tasks": "משימות",
   "calendar": "לוח שנה",

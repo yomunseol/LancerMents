@@ -136,16 +136,16 @@ export default function DatePicker({
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
-        className="flex w-full items-center gap-2 rounded-lg border border-[#27272a] bg-[#18181b] px-4 py-3 text-left text-sm text-zinc-100 transition-colors duration-200 hover:border-[#3f3f46] focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/20"
+        className="flex h-10 w-full items-center gap-2 rounded-lg border border-[#E2D8E0] bg-white px-3 text-left text-sm text-[#151115] transition-colors duration-200 hover:border-[#85587D] focus:outline-none focus:ring-2 focus:ring-[#85587D] dark:border-[#4A2E46] dark:bg-[#221C21] dark:text-[#F8F4F7] dark:hover:border-[#D8A8D3] dark:focus:ring-[#D8A8D3]"
       >
         <CalendarIcon />
-        <span className={selected ? "" : "text-zinc-500"}>
+        <span className={selected ? "" : "opacity-60"}>
           {selected ? formatLabel(selected) : placeholderText}
         </span>
       </button>
 
       {open && (
-        <div className="absolute start-0 z-50 mt-2 w-72 origin-top rounded-2xl border border-[#3f3f46] bg-[#121214] p-4 shadow-2xl transition-all duration-200">
+        <div className="absolute start-0 z-50 mt-2 w-72 origin-top rounded-2xl border border-[#E2D8E0] bg-white p-4 shadow-2xl transition-all duration-200 dark:border-[#4A2E46] dark:bg-[#221C21]">
           <div className="flex items-center justify-between">
             <button
               type="button"
@@ -157,11 +157,11 @@ export default function DatePicker({
                 )
               }
               aria-label={t("prev_month")}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-colors duration-200 hover:bg-purple-500/10 hover:text-zinc-200"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#151115] transition-colors duration-200 hover:bg-[#85587D]/10 dark:text-[#F8F4F7] dark:hover:bg-[#D8A8D3]/10"
             >
               <Chevron dir="left" />
             </button>
-            <span className="text-sm font-semibold text-zinc-100">
+            <span className="text-sm font-semibold text-[#151115] dark:text-[#F8F4F7]">
               {MONTHS[cursor.month]} {cursor.year}
             </span>
             <button
@@ -174,7 +174,7 @@ export default function DatePicker({
                 )
               }
               aria-label={t("next_month")}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-colors duration-200 hover:bg-purple-500/10 hover:text-zinc-200"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#151115] transition-colors duration-200 hover:bg-[#85587D]/10 dark:text-[#F8F4F7] dark:hover:bg-[#D8A8D3]/10"
             >
               <Chevron dir="right" />
             </button>
@@ -184,7 +184,7 @@ export default function DatePicker({
             {WEEKDAYS.map((day, index) => (
               <span
                 key={`${day}-${index}`}
-                className="flex h-8 items-center justify-center text-xs text-zinc-500"
+                className="flex h-8 items-center justify-center text-xs opacity-60"
               >
                 {day}
               </span>
@@ -204,9 +204,9 @@ export default function DatePicker({
                   }}
                   className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm transition-colors duration-200 ${
                     isSelected
-                      ? "bg-purple-500 font-semibold text-white"
-                      : "text-zinc-300 hover:bg-purple-500/10"
-                  } ${isToday && !isSelected ? "ring-1 ring-purple-500/50" : ""}`}
+                      ? "bg-[#85587D] font-semibold text-white dark:bg-[#D8A8D3] dark:text-[#151115]"
+                      : "text-[#151115] hover:bg-[#85587D]/10 dark:text-[#F8F4F7] dark:hover:bg-[#D8A8D3]/10"
+                  } ${isToday && !isSelected ? "ring-1 ring-[#85587D] dark:ring-[#D8A8D3]" : ""}`}
                 >
                   {Number(cell.slice(8, 10))}
                 </button>
@@ -222,7 +222,7 @@ export default function DatePicker({
                 setOpen(false);
                 onPick?.();
               }}
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-400 transition-colors duration-200 hover:bg-purple-500/10 hover:text-zinc-200"
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-[#151115]/70 transition-colors duration-200 hover:bg-[#85587D]/10 dark:text-[#F8F4F7]/70 dark:hover:bg-[#D8A8D3]/10"
             >
               {t("clear")}
             </button>
@@ -233,7 +233,7 @@ export default function DatePicker({
                 setOpen(false);
                 onPick?.();
               }}
-              className="rounded-lg px-3 py-1.5 text-sm font-semibold text-purple-400 transition-colors duration-200 hover:bg-purple-500/10"
+              className="rounded-lg px-3 py-1.5 text-sm font-semibold text-[#85587D] transition-colors duration-200 hover:bg-[#85587D]/10 dark:text-[#D8A8D3] dark:hover:bg-[#D8A8D3]/10"
             >
               {t("today")}
             </button>

@@ -29,7 +29,8 @@
     "completed": "Completed",
     "add_task_placeholder": "Add a task…",
     "due_date": "Due date",
-    "empty_today": "Nothing due today. The grid is clear."
+    "empty_today": "Nothing due today. The grid is clear.",
+    "done": "done"
   },
   "tasks": "Tasks",
   "calendar": "Calendar",

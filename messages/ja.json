@@ -29,7 +29,8 @@
     "completed": "完了",
     "add_task_placeholder": "タスクを追加…",
     "due_date": "締切日",
-    "empty_today": "本日の締切なし。グリッドは空です。"
+    "empty_today": "本日の締切なし。グリッドは空です。",
+    "done": "完了"
   },
   "tasks": "タスク",
   "calendar": "カレンダー",
